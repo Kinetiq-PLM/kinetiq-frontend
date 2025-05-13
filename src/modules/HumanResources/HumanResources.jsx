@@ -341,16 +341,16 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         const resignations = resignationsRes.data;
         
         // 7. Fetch recruitment data
-        const recruitmentRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/applicants/");
-        const recruitment = recruitmentRes.data;
+        // const recruitmentRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/applicants/");
+        // const recruitment = recruitmentRes.data;
         
         // 8. Fetch payroll data
-        const payrollRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payroll_history/");
+        const payrollRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/");
         const payroll = payrollRes.data;
         
         // 9. Fetch training data
-        const trainingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/training/employee_trainings/");
-        const training = trainingRes.data;
+        // const trainingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/training/employee_trainings/");
+        // const training = trainingRes.data;
         
         // 10. Fetch overtime data
         const overtimeResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/overtime_requests/");
@@ -361,19 +361,19 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setPositions(positionsRes.data);
         
         // 12. Fetch candidates data
-        const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/candidates/");
+        const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
         setCandidates(candidatesRes.data);
 
         // 13. Fetch interviews data
-        const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/interviews/");
+        const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/");
         setInterviews(interviewsRes.data);
 
         // 14. Fetch job postings data
-        const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/job_postings/");
+        const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
         setJobPostings(jobPostingsRes.data);
 
         // 15. Fetch onboarding tasks data
-        const onboardingTasksRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/tasks/");
+        const onboardingTasksRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
         setOnboardingTasks(onboardingTasksRes.data);
 
         // Process leave requests for table and chart

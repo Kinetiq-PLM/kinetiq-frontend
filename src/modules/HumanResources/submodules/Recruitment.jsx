@@ -82,6 +82,9 @@ const Recruitment = () => {
   // Add these state variables after the other state declarations
   const [selectedArchivedCandidates, setSelectedArchivedCandidates] = useState([]);
   const [selectedArchivedJobPostings, setSelectedArchivedJobPostings] = useState([]);
+  const [selectedArchivedInterviews, setSelectedArchivedInterviews] = useState([]);
+  const [selectedArchivedOnboardingTasks, setSelectedArchivedOnboardingTasks] = useState([]);
+
 
   // Add these after other state variables
   const [interviews, setInterviews] = useState([]);
@@ -113,83 +116,128 @@ const Recruitment = () => {
     assigned_to: "",
     priority: "Medium" // Default value
   });
+  
+// Add this near the beginning of your component after the useState declarations
+useEffect(() => {
+  // Debug log whenever data changes
+  console.log("Data state:", {
+    candidates: candidates.length,
+    archivedCandidates: archivedCandidates.length,
+    jobPostings: jobPostings.length,
+    archivedJobPostings: archivedJobPostings.length,
+    interviews: interviews.length,
+    archivedInterviews: archivedInterviews.length,
+    onboardingTasks: onboardingTasks.length,
+    archivedOnboardingTasks: archivedOnboardingTasks.length
+  });
+}, [candidates, archivedCandidates, jobPostings, archivedJobPostings, 
+    interviews, archivedInterviews, onboardingTasks, archivedOnboardingTasks]);
 
   // Fetch data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch candidates
       try {
-        // Existing fetch calls
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
         ]);
+        setCandidates(ensureArray(candidatesRes.data));
+        setArchivedCandidates(ensureArray(archivedCandidatesRes.data));
+        console.log("Candidates data loaded:", ensureArray(candidatesRes.data).length);
+      } catch (err) {
+        console.error("Error fetching candidates:", err);
+        setCandidates([]);
+        setArchivedCandidates([]);
+      }
 
-        console.log('Candidates data:', candidatesRes.data);
-        if (candidatesRes.data && candidatesRes.data.length > 0) {
-          console.log('Sample candidate:', candidatesRes.data[0]);
-        }
-
-        // Add this debugging code
-        console.log('CANDIDATE DATA STRUCTURE:');
-        if (candidatesRes.data && candidatesRes.data.length > 0) {
-          const sampleCandidate = candidatesRes.data[0];
-          console.log('Sample candidate object keys:', Object.keys(sampleCandidate));
-          console.log('Full sample candidate:', sampleCandidate);
-        }
-
+      // Fetch job postings
+      try {
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
         ]);
+        setJobPostings(ensureArray(jobPostingsRes.data));
+        setArchivedJobPostings(ensureArray(archivedJobPostingsRes.data));
+        console.log("Job postings data loaded:", ensureArray(jobPostingsRes.data).length);
+      } catch (err) {
+        console.error("Error fetching job postings:", err);
+        setJobPostings([]);
+        setArchivedJobPostings([]);
+      }
 
-        // New fetch calls for departments, positions, and employees - THIS WAS MISSING
+      // Fetch interviews
+      try {
+        const [interviewsRes, archivedInterviewsRes] = await Promise.all([
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/archived/")
+        ]);
+        setInterviews(ensureArray(interviewsRes.data));
+        setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
+        console.log("Interviews data loaded:", ensureArray(interviewsRes.data).length);
+      } catch (err) {
+        console.error("Error fetching interviews:", err);
+        setInterviews([]);
+        setArchivedInterviews([]);
+      }
+      try {
+        const [onboardingRes, archivedOnboardingRes] = await Promise.all([
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/archived/")
+        ]);
+        setOnboardingTasks(ensureArray(onboardingRes.data));
+        setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+        console.log("Onboarding data loaded:", ensureArray(onboardingRes.data).length);
+      } catch (err) {
+        console.error("Error fetching onboarding tasks:", err);
+        setOnboardingTasks([]);
+        setArchivedOnboardingTasks([]);
+      }
+
+      // Fetch reference data
+      try {
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/")
         ]);
-
-        // Add this debugging to see what's coming back
-        console.log('Departments data:', deptsRes.data);
-        console.log('Positions data:', positionsRes.data);
-        console.log('Employees data:', employeesRes.data);
-
-        // Ensure we're working with arrays
-        const departmentsData = ensureArray(deptsRes.data);
-        const positionsData = ensureArray(positionsRes.data);
-        const employeesData = ensureArray(employeesRes.data);
-        
-        // Set all the state values with the fetched data
-        setCandidates(candidatesRes.data);
-        setArchivedCandidates(archivedCandidatesRes.data);
-        setJobPostings(jobPostingsRes.data);
-        setArchivedJobPostings(archivedJobPostingsRes.data);
-        setDepartments(departmentsData);
-        setPositions(positionsData);
-        setEmployees(employeesData); // Add this line to save employees
+        setDepartments(ensureArray(deptsRes.data));
+        setPositions(ensureArray(positionsRes.data));
+        setEmployees(ensureArray(employeesRes.data));
+        console.log("Reference data loaded");
       } catch (err) {
-        console.error("Error fetching data:", err);
-        showToast("Failed to fetch data", false);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching reference data:", err);
+        setDepartments([]);
+        setPositions([]);
+        setEmployees([]);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
   
   // Add this helper function near the top of your component
   const ensureArray = (data) => {
-    if (Array.isArray(data)) {
-      return data;
-    } else if (data && typeof data === 'object') {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
       // If it's an object, it might be a response with results property
       if (data.results && Array.isArray(data.results)) {
         return data.results;
       }
       // Or it might be an object where values are what we want
-      return data.values;
+      if (data.values && Array.isArray(data.values)) {
+        return data.values;
+      }
+      // Last resort: if it has no results but is an object, check if it might be an array-like object
+      if (Object.keys(data).length > 0 && typeof Object.keys(data)[0] === 'number') {
+        return Object.values(data);
+      }
     }
     // Default to empty array
     return [];
@@ -558,170 +606,304 @@ const Recruitment = () => {
       setLoading(false);
     }
   };
+  // Add these functions for interview management
+const handleArchiveInterview = async (interview) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/${interview.interview_id}/archive/`);
+    showToast("Interview archived successfully", true);
+    
+    // Refresh interview lists
+    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/archived/")
+    ]);
+    
+    setInterviews(interviewsRes.data);
+    setArchivedInterviews(archivedInterviewsRes.data);
+  } catch (err) {
+    console.error("Error archiving interview:", err);
+    showToast("Failed to archive interview", false);
+  }
+};
+
+const handleRestoreInterview = async (interview) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/${interview.interview_id}/restore/`);
+    showToast("Interview restored successfully", true);
+    
+    // Refresh interview lists
+    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/archived/")
+    ]);
+    
+    setInterviews(interviewsRes.data);
+    setArchivedInterviews(archivedInterviewsRes.data);
+  } catch (err) {
+    console.error("Error restoring interview:", err);
+    showToast("Failed to restore interview", false);
+  }
+};
+
+const handleEditInterview = (interview) => {
+  setEditingInterview({
+    ...interview,
+    // Ensure all required fields exist
+    candidate_id: interview.candidate_id || "",
+    interview_date: interview.interview_date ? interview.interview_date.split('T')[0] : "",
+    interview_time: interview.interview_time || "",
+    interview_type: interview.interview_type || "Technical",
+    interviewer_id: interview.interviewer_id || "",
+    status: interview.status || "Scheduled",
+    notes: interview.notes || ""
+  });
+  setShowEditInterviewModal(true);
+  setDotsMenuOpen(null);
+};
+
+const handleEditInterviewSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    
+    // Submit to API
+    await axios.patch(
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/${editingInterview.interview_id}/`,
+      editingInterview
+    );
+    
+    showToast("Interview updated successfully", true);
+    setShowEditInterviewModal(false);
+    
+    // Refresh interviews list
+    const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/");
+    setInterviews(interviewsRes.data);
+    
+  } catch (err) {
+    console.error("Error updating interview:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to update interview";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Add this function to handle bulk unarchiving of interviews
+const bulkUnarchiveInterviews = async () => {
+  try {
+    setLoading(true);
+    
+    // Create an array of promises for each selected interview
+    const promises = selectedArchivedInterviews.map(id => 
+      axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/${id}/restore/`)
+    );
+    
+    // Execute all promises
+    await Promise.all(promises);
+    
+    // Show success message
+    showToast("Selected interviews restored successfully", true);
+    
+    // Reset selection
+    setSelectedArchivedInterviews([]);
+    
+    // Refresh interview lists
+    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/archived/")
+    ]);
+    
+    setInterviews(interviewsRes.data);
+    setArchivedInterviews(archivedInterviewsRes.data);
+  } catch (err) {
+    console.error("Error restoring interviews:", err);
+    showToast("Failed to restore interviews", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+// Also add the selected archived interviews state if you haven't already
 
   // Utility functions
   const filterAndPaginate = (data) => {
+    // Safety check for empty/null data
+    if (!data || !Array.isArray(data)) {
+      return { paginated: [], totalPages: 0 };
+    }
+
     // Filter based on search term
     let filtered = data;
     if (searchTerm) {
       filtered = data.filter(item => {
-        // These properties are appropriate for both candidates and job postings
-        return (
-          // For job postings
-          (item.job_id?.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.position_title?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.dept_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.posting_status?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.employment_type?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          // For candidates
-          (item.candidate_id?.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.first_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.last_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.application_status?.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
+        if (!item) return false;
+        // Check all properties that might be strings for a match
+        return Object.entries(item).some(([key, value]) => {
+          if (typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())) {
+            return true;
+          }
+          if (typeof value === 'number' && value.toString().includes(searchTerm)) {
+            return true;
+          }
+          return false;
+        });
       });
     }
-  
+
     // Sort if needed
     if (sortField !== 'all') {
       filtered = [...filtered].sort((a, b) => {
+        if (!a || !b) return 0;
+        
         if (sortField === 'id') {
-          // Use job_id or candidate_id depending on what's available
-          return (a.job_id || a.candidate_id || '')?.toString().localeCompare((b.job_id || b.candidate_id || '')?.toString());
+          const aId = a.job_id || a.candidate_id || a.interview_id || a.task_id || '';
+          const bId = b.job_id || b.candidate_id || b.interview_id || b.task_id || '';
+          return aId.toString().localeCompare(bId.toString());
         } else if (sortField === 'status') {
-          // Use posting_status or application_status depending on what's available
-          return (a.posting_status || a.application_status || '')?.localeCompare((b.posting_status || b.application_status || ''));
+          const aStatus = a.posting_status || a.application_status || a.status || '';
+          const bStatus = b.posting_status || b.application_status || b.status || '';
+          return aStatus.toString().localeCompare(bStatus.toString());
         }
         return 0;
       });
     }
-  
+
     // Paginate
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-  
+
     return { paginated, totalPages };
   };
-
   // Render functions for each table
-  const renderJobPostingsTable = (data, isArchived = false) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    
-    if (loading) return <div className="recruitment-no-results">Loading job postings...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No job postings found.</div>;
+const renderJobPostingsTable = (data, isArchived = false) => {
+  if (loading) return <div className="recruitment-no-results">Loading job postings...</div>;
+  
+  // Safety check for data
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div className="recruitment-no-results">
+      {isArchived ? "No archived job postings found." : "No job postings found."}
+    </div>;
+  }
+  
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (!paginated || paginated.length === 0) {
+    return <div className="recruitment-no-results">No matching job postings found with the current filters.</div>;
+  }
 
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  {isArchived && <th>Select</th>}
-                  <th>Job ID</th>
-                  <th>Department ID</th>
-                  <th>Position ID</th>
-                  <th>Position Title</th>
-                  <th>Description</th>
-                  <th>Requirements</th>
-                  <th>Employment Type</th>
-                  <th>Base Salary</th>
-                  <th>Daily Rate</th>
-                  <th>Duration (Days)</th>
-                  <th>Finance Approval Status</th>
-                  <th>Posting Status</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((posting, index) => (
-                  <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                    {isArchived && (
-                      <td>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedArchivedJobPostings.includes(posting.job_id)}
-                          onChange={() => toggleSelectArchivedJobPosting(posting.job_id)}
-                        />
-                      </td>
-                    )}
-                    <td>{posting.job_id}</td>
-                    <td>{posting.dept_id}</td>
-                    <td>{posting.position_id}</td>
-                    <td>{posting.position_title}</td>
-                    <td>{posting.description}</td>
-                    <td>{posting.requirements}</td>
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Job ID</th>
+                <th>Department ID</th>
+                <th>Position ID</th>
+                <th>Position Title</th>
+                <th>Description</th>
+                <th>Requirements</th>
+                <th>Employment Type</th>
+                <th>Base Salary</th>
+                <th>Daily Rate</th>
+                <th>Duration (Days)</th>
+                <th>Finance Approval Status</th>
+                <th>Posting Status</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((posting, index) => (
+                <tr key={posting.job_id || index} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
                     <td>
-                      <span className={`recruitment-tag ${posting.employment_type?.toLowerCase() || 'unknown'}`}>
-                        {posting.employment_type || 'Unknown'}
-                      </span>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedJobPostings.includes(posting.job_id)}
+                        onChange={() => toggleSelectArchivedJobPosting(posting.job_id)}
+                      />
                     </td>
-                    <td>{posting.base_salary}</td>
-                    <td>{posting.daily_rate}</td>
-                    <td>{posting.duration_days}</td>
-                    <td>
-                      <span className={`recruitment-tag ${posting.finance_approval_status ? 
-                        `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
-                        {posting.finance_approval_status || 'Pending'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`recruitment-tag ${posting.posting_status ? 
-                        posting.posting_status.toLowerCase() : 'unknown'}`}>
-                        {posting.posting_status || 'Unknown'}
-                      </span>
-                    </td>
-                    <td>{formatDate(posting.created_at)}</td>
-                    <td>{formatDate(posting.updated_at)}</td>
-                    <td className="recruitment-actions">
-                      <div
-                        className="recruitment-dots"
-                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                      >
-                        ⋮
-
-                        {dotsMenuOpen === index && (
-                          <div className="recruitment-dropdown">
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => handleEditJobPosting(posting)}
-                            >
-                              Edit
-                            </div>
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
-                            >
-                              {isArchived ? "Restore" : "Archive"}
-                            </div>
+                  )}
+                  <td>{posting.job_id || '-'}</td>
+                  <td>{posting.dept_id || '-'}</td>
+                  <td>{posting.position_id || '-'}</td>
+                  <td>{posting.position_title || '-'}</td>
+                  <td>{posting.description || '-'}</td>
+                  <td>{posting.requirements || '-'}</td>
+                  <td>
+                    <span className={`recruitment-tag ${(posting.employment_type?.toLowerCase() || 'unknown')}`}>
+                      {posting.employment_type || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{posting.base_salary || '-'}</td>
+                  <td>{posting.daily_rate || '-'}</td>
+                  <td>{posting.duration_days || '-'}</td>
+                  <td>
+                    <span className={`recruitment-tag ${posting.finance_approval_status ? 
+                      `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
+                      {posting.finance_approval_status || 'Pending'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`recruitment-tag ${posting.posting_status ? 
+                      posting.posting_status.toLowerCase() : 'unknown'}`}>
+                      {posting.posting_status || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{formatDate(posting.created_at)}</td>
+                  <td>{formatDate(posting.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div
+                      className="recruitment-dots"
+                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                    >
+                      ⋮
+                      {dotsMenuOpen === index && (
+                        <div className="recruitment-dropdown">
+                          <div 
+                            className="recruitment-dropdown-item"
+                            onClick={() => handleEditJobPosting(posting)}
+                          >
+                            Edit
                           </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          <div 
+                            className="recruitment-dropdown-item"
+                            onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
+                          >
+                            {isArchived ? "Restore" : "Archive"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {isArchived && selectedArchivedJobPostings.length > 0 && (
-          <div className="recruitment-bulk-actions">
-            <button 
-              className="recruitment-bulk-action-btn" 
-              onClick={bulkUnarchiveJobPostings}
-            >
-              Restore Selected Job Postings
-            </button>
-          </div>
-        )}
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
+      </div>
+      {isArchived && selectedArchivedJobPostings.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveJobPostings}
+          >
+            Restore Selected Job Postings
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
 
   const renderCandidatesTable = (data, isArchived = false) => {
     const { paginated, totalPages } = filterAndPaginate(data);
@@ -881,222 +1063,250 @@ const Recruitment = () => {
   };
 
   // Function to render interviews table
-  const renderInterviewsTable = (data, isArchived = false) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    
-    if (loading) return <div className="recruitment-no-results">Loading interviews...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No interviews found.</div>;
-    
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  {isArchived && <th>Select</th>}
-                  <th>Interview ID</th>
-                  <th>Candidate</th>
-                  <th>Position</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Type</th>
-                  <th>Interviewer</th>
-                  <th>Status</th>
-                  <th>Notes</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((interview, index) => (
-                  <tr key={interview.interview_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                    {isArchived && (
-                      <td>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedArchivedInterviews.includes(interview.interview_id)}
-                          onChange={() => toggleSelectArchivedInterview(interview.interview_id)}
-                        />
-                      </td>
-                    )}
-                    <td>{interview.interview_id}</td>
-                    <td>{interview.candidate_name || `${interview.first_name} ${interview.last_name}`}</td>
-                    <td>{interview.position_title}</td>
-                    <td>{formatDate(interview.interview_date)}</td>
-                    <td>{interview.interview_time}</td>
+// renderInterviewsTable function - update or replace as needed
+const renderInterviewsTable = (data, isArchived = false) => {
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (loading) return <div className="recruitment-no-results">Loading interviews...</div>;
+  if (!paginated.length) return <div className="recruitment-no-results">No interviews found.</div>;
+  
+  // Log the data to help debug
+  console.log("Interview data in rendering function:", paginated);
+  
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Interview ID</th>
+                <th>Candidate</th>
+                <th>Position</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Interviewer</th>
+                <th>Feedback</th>
+                <th>Rating</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((interview, index) => {
+                // Extract date and time from interview_date if it exists
+                const interviewDate = interview.interview_date ? 
+                  new Date(interview.interview_date) : null;
+                const formattedDate = interviewDate ? 
+                  interviewDate.toLocaleDateString() : '-';
+                const formattedTime = interviewDate ? 
+                  interviewDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-';
+                
+                return (
+                <tr key={interview.interview_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
                     <td>
-                      <span className={`recruitment-tag ${interview.interview_type.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {interview.interview_type}
-                      </span>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedInterviews.includes(interview.interview_id)}
+                        onChange={() => toggleSelectArchivedInterview(interview.interview_id)}
+                      />
                     </td>
-                    <td>{interview.interviewer_name}</td>
-                    <td>
-                      <span className={`recruitment-tag ${interview.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {interview.status}
-                      </span>
-                    </td>
-                    <td>{interview.notes}</td>
-                    <td>{formatDate(interview.created_at)}</td>
-                    <td>{formatDate(interview.updated_at)}</td>
-                    <td className="recruitment-actions">
-                      <div className="recruitment-action-buttons">
-                        <div
-                          className="recruitment-dots"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDotsMenuOpen(dotsMenuOpen === index ? null : index);
-                          }}
-                        >
-                          ⋮
-                          {dotsMenuOpen === index && (
-                            <div className="recruitment-dropdown">
+                  )}
+                  <td>{interview.interview_id}</td>
+                  <td>{interview.candidate_name || interview.candidate_id}</td>
+                  <td>{interview.position_title || interview.job_id}</td>
+                  <td>{formattedDate} {formattedTime}</td>
+                  <td>
+                    <span className={`recruitment-tag ${(interview.status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                      {interview.status || 'Not Set'}
+                    </span>
+                  </td>
+                  <td>{interview.interviewer_name || interview.interviewer_id}</td>
+                  <td>{interview.feedback || '-'}</td>
+                  <td>{interview.rating ? `${interview.rating}/5` : '-'}</td>
+                  <td>{formatDate(interview.created_at)}</td>
+                  <td>{formatDate(interview.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div className="recruitment-action-buttons">
+                      <div
+                        className="recruitment-dots"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                        }}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => handleEditInterview(interview)}
+                            >
+                              Edit
+                            </div>
+                            {!isArchived && (
                               <div 
                                 className="recruitment-dropdown-item"
-                                onClick={() => handleEditInterview(interview)}
+                                onClick={() => handleArchiveInterview(interview)}
                               >
-                                Edit
+                                Archive
                               </div>
-                              {!isArchived && (
-                                <div 
-                                  className="recruitment-dropdown-item"
-                                  onClick={() => handleArchiveInterview(interview)}
-                                >
-                                  Archive
-                                </div>
-                              )}
-                              {isArchived && (
-                                <div 
-                                  className="recruitment-dropdown-item"
-                                  onClick={() => handleRestoreInterview(interview)}
-                                >
-                                  Restore
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                            )}
+                            {isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleRestoreInterview(interview)}
+                              >
+                                Restore
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                </tr>
+              )})}
+            </tbody>
+          </table>
         </div>
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
+      </div>
+      {isArchived && selectedArchivedInterviews.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveInterviews}
+          >
+            Restore Selected Interviews
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
 
   // Function to render onboarding tasks table
-  const renderOnboardingTable = (data, isArchived = false) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    
-    if (loading) return <div className="recruitment-no-results">Loading onboarding tasks...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No onboarding tasks found.</div>;
-    
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  {isArchived && <th>Select</th>}
-                  <th>Task ID</th>
-                  <th>Employee</th>
-                  <th>Task Name</th>
-                  <th>Description</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
-                  <th>Assigned To</th>
-                  <th>Priority</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((task, index) => (
-                  <tr key={task.task_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                    {isArchived && (
-                      <td>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedArchivedOnboardingTasks.includes(task.task_id)}
-                          onChange={() => toggleSelectArchivedOnboardingTask(task.task_id)}
-                        />
-                      </td>
-                    )}
-                    <td>{task.task_id}</td>
-                    <td>{task.employee_name}</td>
-                    <td>{task.task_name}</td>
-                    <td>{task.description}</td>
-                    <td>{formatDate(task.due_date)}</td>
+const renderOnboardingTable = (data, isArchived = false) => {
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (loading) return <div className="recruitment-no-results">Loading onboarding tasks...</div>;
+  if (!paginated.length) return <div className="recruitment-no-results">No onboarding tasks found.</div>;
+  
+  // Log the data to help debug
+  console.log("Onboarding data in rendering function:", paginated);
+  
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Onboarding ID</th>
+                <th>Candidate</th>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Offer Details</th>
+                <th>Contract Details</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((task, index) => (
+                <tr key={task.onboarding_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
                     <td>
-                      <span className={`recruitment-tag ${task.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {task.status}
-                      </span>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedOnboardingTasks.includes(task.onboarding_id)}
+                        onChange={() => toggleSelectArchivedOnboardingTask(task.onboarding_id)}
+                      />
                     </td>
-                    <td>{task.assigned_to_name}</td>
-                    <td>
-                      <span className={`recruitment-tag ${task.priority.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {task.priority}
-                      </span>
-                    </td>
-                    <td>{formatDate(task.created_at)}</td>
-                    <td>{formatDate(task.updated_at)}</td>
-                    <td className="recruitment-actions">
-                      <div className="recruitment-action-buttons">
-                        <div
-                          className="recruitment-dots"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDotsMenuOpen(dotsMenuOpen === index ? null : index);
-                          }}
-                        >
-                          ⋮
-                          {dotsMenuOpen === index && (
-                            <div className="recruitment-dropdown">
+                  )}
+                  <td>{task.onboarding_id}</td>
+                  <td>{task.candidate}</td>
+                  <td>{task.job}</td>
+                  <td>
+                    <span className={`recruitment-tag ${task.status ? task.status.toLowerCase().replace(/\s+/g, '-') : 'unknown'}`}>
+                      {task.status || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{task.offer_details ? 
+                      <button onClick={() => handleViewOfferDetails(task.offer_details)} className="recruitment-view-btn">View Details</button> : 
+                      '-'}
+                  </td>
+                  <td>{task.contract_details ? 
+                      <button onClick={() => handleViewContractDetails(task.contract_details)} className="recruitment-view-btn">View Details</button> : 
+                      '-'}
+                  </td>
+                  <td>{formatDate(task.created_at)}</td>
+                  <td>{formatDate(task.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div className="recruitment-action-buttons">
+                      <div
+                        className="recruitment-dots"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                        }}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => handleEditOnboardingTask(task)}
+                            >
+                              Edit
+                            </div>
+                            {!isArchived && (
                               <div 
                                 className="recruitment-dropdown-item"
-                                onClick={() => handleEditOnboardingTask(task)}
+                                onClick={() => handleArchiveOnboardingTask(task)}
                               >
-                                Edit
+                                Archive
                               </div>
-                              {!isArchived && (
-                                <div 
-                                  className="recruitment-dropdown-item"
-                                  onClick={() => handleArchiveOnboardingTask(task)}
-                                >
-                                  Archive
-                                </div>
-                              )}
-                              {isArchived && (
-                                <div 
-                                  className="recruitment-dropdown-item"
-                                  onClick={() => handleRestoreOnboardingTask(task)}
-                                >
-                                  Restore
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                            )}
+                            {isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleRestoreOnboardingTask(task)}
+                              >
+                                Restore
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
+      </div>
+      {isArchived && selectedArchivedOnboardingTasks.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveOnboardingTasks}
+          >
+            Restore Selected Tasks
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
 
   const renderPagination = (totalPages) => {
     return (
@@ -1863,23 +2073,38 @@ const handleInterviewSubmit = async (e) => {
   e.preventDefault();
   try {
     setLoading(true);
-    // API call would go here
-    // const response = await axios.post("your-api-endpoint", newInterview);
     
-    // For now, simulate adding the interview
-    const mockResponse = {
-      ...newInterview,
-      interview_id: Date.now(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+    // Create a formatted interview object
+    const interviewData = {
+      candidate_id: newInterview.candidate_id,
+      job_id: candidates.find(c => c.candidate_id === newInterview.candidate_id)?.job_id,
+      interview_date: `${newInterview.interview_date}T${newInterview.interview_time}:00`,
+      interview_type: newInterview.interview_type,
+      interviewer_id: newInterview.interviewer_id,
+      status: newInterview.status,
+      feedback: newInterview.notes || "",
+      rating: 0 // Default to 0 for new interviews
     };
     
-    setInterviews(prev => [...prev, mockResponse]);
-    setShowAddInterviewModal(false);
+    // Submit to API
+    await axios.post(
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/",
+      interviewData
+    );
+    
     showToast("Interview scheduled successfully", true);
-  } catch (error) {
-    console.error("Error scheduling interview:", error);
-    showToast("Failed to schedule interview", false);
+    setShowAddInterviewModal(false);
+    
+    // Refresh interviews list
+    const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/");
+    setInterviews(interviewsRes.data);
+    
+  } catch (err) {
+    console.error("Error scheduling interview:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to schedule interview";
+    showToast(errorMessage, false);
   } finally {
     setLoading(false);
   }
@@ -3028,7 +3253,140 @@ const handleOnboardingTaskSubmit = async (e) => {
           </div>
         </div>
       )}
-
+{/* Edit Interview Modal */}
+{showEditInterviewModal && editingInterview && (
+  <div className="recruitment-modal-overlay">
+    <div className="recruitment-modal">
+      <h3>Edit Interview</h3>
+      <form onSubmit={handleEditInterviewSubmit} className="recruitment-form">
+        <div className="recruitment-form-two-columns">
+          <div className="form-column">
+            <div className="form-group">
+              <label>Candidate *</label>
+              <select 
+                name="candidate_id" 
+                value={editingInterview.candidate_id} 
+                onChange={(e) => setEditingInterview({...editingInterview, candidate_id: e.target.value})}
+                required
+              >
+                <option value="">-- Select Candidate --</option>
+                {candidates.map(candidate => (
+                  <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                    {candidate.first_name} {candidate.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Interview Date *</label>
+              <input 
+                type="date" 
+                name="interview_date" 
+                value={editingInterview.interview_date} 
+                onChange={(e) => setEditingInterview({...editingInterview, interview_date: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Interview Time *</label>
+              <input 
+                type="time" 
+                name="interview_time" 
+                value={editingInterview.interview_time} 
+                onChange={(e) => setEditingInterview({...editingInterview, interview_time: e.target.value})}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="form-column">
+            <div className="form-group">
+              <label>Interview Type *</label>
+              <select
+                name="interview_type"
+                value={editingInterview.interview_type}
+                onChange={(e) => setEditingInterview({...editingInterview, interview_type: e.target.value})}
+                required
+              >
+                <option value="Technical">Technical</option>
+                <option value="HR">HR</option>
+                <option value="Cultural Fit">Cultural Fit</option>
+                <option value="Final">Final</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Interviewer *</label>
+              <select
+                name="interviewer_id"
+                value={editingInterview.interviewer_id}
+                onChange={(e) => setEditingInterview({...editingInterview, interviewer_id: e.target.value})}
+                required
+              >
+                <option value="">-- Select Interviewer --</option>
+                {employees.map(emp => (
+                  <option key={emp.employee_id} value={emp.employee_id}>
+                    {emp.first_name} {emp.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Status</label>
+              <select
+                name="status"
+                value={editingInterview.status}
+                onChange={(e) => setEditingInterview({...editingInterview, status: e.target.value})}
+              >
+                <option value="Scheduled">Scheduled</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Rescheduled">Rescheduled</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="form-group full-width">
+            <label>Feedback</label>
+            <textarea
+              name="feedback"
+              value={editingInterview.feedback || ""}
+              onChange={(e) => setEditingInterview({...editingInterview, feedback: e.target.value})}
+              placeholder="Detailed feedback on the interview..."
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Rating (1-5)</label>
+            <input 
+              type="number" 
+              name="rating" 
+              value={editingInterview.rating || ""} 
+              onChange={(e) => setEditingInterview({...editingInterview, rating: e.target.value})}
+              min="1"
+              max="5"
+            />
+          </div>
+        </div>
+        
+        <div className="recruitment-modal-buttons">
+          <button type="submit" className="submit-btn">Save Changes</button>
+          <button 
+            type="button" 
+            className="cancel-btn" 
+            onClick={() => setShowEditInterviewModal(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
       {/* Onboarding Add Modal */}
       {showAddOnboardingModal && (
         <div className="recruitment-modal-overlay">
