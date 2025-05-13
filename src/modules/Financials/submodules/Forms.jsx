@@ -167,8 +167,7 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                     <label>Usage Period (end date): <span className="required">*</span></label>
                     <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
                     {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
-                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
-                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
+                    
                   </div>
                   <div className="form-group">
                     <label>Reason for Request: <span className="required">*</span></label>
