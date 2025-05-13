@@ -58,8 +58,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [pnpOrder, setPnpOrder] = useState([]);
     const [prinOrder, setPrincipalOrder] = useState([]);
-    const baseurl = "http://127.0.0.1:8000";
-    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    //const baseurl = "http://127.0.0.1:8000";
+    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
     useEffect(() => {
         const fetchMrpData = async () => {
@@ -178,14 +178,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             const data = await response.json();
             console.log('Success:', data);
 
-            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'recipe.json';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            // const url = URL.createObjectURL(blob);
+            // const link = document.createElement('a');
+            // link.href = url;
+            // link.download = 'recipe.json';
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
             
         } catch (error) {
             console.error('Error sending Product Recipe:', error);
