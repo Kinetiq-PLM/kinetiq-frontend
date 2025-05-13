@@ -80,35 +80,104 @@ const BodyContent = ({ onClose }) => {
   }, []);
 
   useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const response = await fetch("http://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/departments/");
-        const data = await response.json();
-  
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          const userDept = data.find((dept) => dept.dept_id === user.department);
-  
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/departments/");
+      const data = await response.json();
+
+      console.log("Fetched Departments:", data); // Log the entire response to verify the structure
+
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const userDept = data.find((dept) => dept.dept_id === user.department);
+
+        if (userDept) {
+          console.log("Matched Department:", {
+            dept_id: userDept.dept_id,
+            dept_name: userDept.dept_name,
+          }); // Log the matched dept_id and dept_name
+
+          const isDropdownEnabled = ["Sales", "Support & Services"].includes(userDept.dept_name);
+          setFormData((prev) => ({
+            ...prev,
+            requestType: isDropdownEnabled ? prev.requestType : "Assets", // Default to Assets if disabled
+          }));
+          setIsDropdownEnabled(isDropdownEnabled); // Enable or disable dropdown
+        } else {
+          console.log("No matching department found for the user's dept_id.");
+        }
+      } else {
+        setError("Failed to load user data. Please log in again.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch departments:", error);
+      setError("Failed to fetch departments.");
+    }
+  };
+
+  fetchDepartments();
+}, []);
+
+useEffect(() => {
+  const fetchEmployeeDeptId = async () => {
+    try {
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+      const employeesData = await response.json();
+
+      console.log("Fetched Employees:", employeesData); // Log the employees data to verify the structure
+
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+
+        // Match the employee based on first_name and last_name
+        const matchedEmployee = employeesData.find(
+          (employee) =>
+            employee.first_name === user.first_name && employee.last_name === user.last_name
+        );
+
+        if (matchedEmployee) {
+          console.log("Matched Employee:", matchedEmployee); // Log the matched employee
+          console.log("Matched Employee's Department ID (dept_id):", matchedEmployee.dept_id); // Log the dept_id
+
+          // Fetch departments to map dept_id to dept_name
+          const deptResponse = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/departments/");
+          const departmentsData = await deptResponse.json();
+
+          console.log("Fetched Departments:", departmentsData); // Log the departments data
+
+          const userDept = departmentsData.find((dept) => dept.dept_id === matchedEmployee.dept_id);
+
           if (userDept) {
+            console.log("Matched Department:", {
+              dept_id: userDept.dept_id,
+              dept_name: userDept.dept_name,
+            }); // Log the matched dept_id and dept_name
+
             const isDropdownEnabled = ["Sales", "Support & Services"].includes(userDept.dept_name);
             setFormData((prev) => ({
               ...prev,
               requestType: isDropdownEnabled ? prev.requestType : "Assets", // Default to Assets if disabled
             }));
             setIsDropdownEnabled(isDropdownEnabled); // Enable or disable dropdown
+          } else {
+            console.log("No matching department found for the employee's dept_id.");
           }
         } else {
-          setError("Failed to load user data. Please log in again.");
+          console.log("No matching employee found for the stored user's first_name and last_name.");
         }
-      } catch (error) {
-        console.error("Failed to fetch departments:", error);
-        setError("Failed to fetch departments.");
+      } else {
+        setError("Failed to load user data. Please log in again.");
       }
-    };
-  
-    fetchDepartments();
-  }, []);
+    } catch (error) {
+      console.error("Failed to fetch employees or departments:", error);
+      setError("Failed to fetch employees or departments.");
+    }
+  };
+
+  fetchEmployeeDeptId();
+}, []);
 
   const handleInputChange = (e, index = null) => {
     const { name, value } = e.target;
