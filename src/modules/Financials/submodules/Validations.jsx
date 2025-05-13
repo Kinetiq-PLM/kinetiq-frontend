@@ -53,6 +53,7 @@ const BodyContent = () => {
   const [isReviewConfirmationVisible, setIsReviewConfirmationVisible] = useState(false);
   const [returnRemarks, setReturnRemarks] = useState({});
   const [returnComments, setReturnComments] = useState({});
+  const [isRequestWarningVisible, setIsRequestWarningVisible] = useState(false);
 
   const closeWarningPopup = () => {
     setIsWarningPopupVisible(false);
@@ -376,6 +377,7 @@ const BodyContent = () => {
         validationDate: sub.validation_date || "",
         validatedBy: sub.validated_by || "",
       }));
+      console.log("Fetched returns:", mappedData);
       setOriginalReturnsData(mappedData);
     } catch (error) {
       console.error("Error fetching returns:", error);
@@ -664,6 +666,19 @@ const BodyContent = () => {
         )}
         {activeTab === "Budget Request List" && (
           <div className="content-container">
+            {isRequestWarningVisible ? (
+  <div className="warning-popup">
+    <div className="warning-popup-content">
+      <h3>Oops...</h3>
+      <p>Sorry, we're not yet accepting any budget request at the moment.</p>
+      <p>No records to show yet.</p>
+      <button className="close-popup-button" onClick={() => setIsRequestWarningVisible(false)}>
+        OK
+      </button>
+    </div>
+  </div>
+) : (
+  <>
             <InfoCard className="summary-infocard">
               <div className="summary-container">
                 <div className="summary-date-range">January 2025-January 2026</div>
@@ -783,9 +798,13 @@ const BodyContent = () => {
                   </tbody>
                 </table>
                 <button className="edit-button" onClick={handleEditClick}>Edit</button>
+              
               </InfoCard>
             </InfoCard>
+            </>
+          )}
           </div>
+          
         )}
         {activeTab === "Returns List" && (
           <div className="content-container">

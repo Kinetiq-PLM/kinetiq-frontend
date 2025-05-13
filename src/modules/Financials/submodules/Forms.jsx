@@ -411,7 +411,7 @@ const BodyContent = () => {
         expected_end_usage_period: formData.endUsagePeriod,
         reason_for_request: formData.requestReason,
         urgency_level_request: formData.urgencyLevel,
-        //expense_breakdown: formData.expenseBreakdown
+        //expense_breakdown_period: formData.expenseBreakdown
       };
       handleSubmitRequest(subData);
     } else if (tabName === "Budget Return Form") {
@@ -424,7 +424,7 @@ const BodyContent = () => {
         total_amount_requested: formData.totalRequestAmount,
         returned_amount: formData.returnedAmount,
         reason_returned: formData.returnReason,
-        //expense_history_breakdown: formData.expenseHistoryBreakdown
+        //expense_history_breakdown: formData.expenseBreakdown
       };
       handleSubmitReturn(subData);
     } else {
