@@ -210,7 +210,7 @@ const BodyContent = ({employee_id}) => {
     };
 
     const fetchMessages = async (conversationId) => {
-        setActiveConversationId(conversationId); // ID is set here
+        setActiveConversationId(conversationId);
         console.log(`fetchMessages: Set activeConversationId to ${conversationId}`);
         
         if (!conversationId) return;
@@ -218,49 +218,64 @@ const BodyContent = ({employee_id}) => {
         try {
             const response = await fetch(`${API_BASE_URL}chatbot/load_messages/${conversationId}/`);
             if (!response.ok) {
-                // Attempt to get error details from response body
                 const errorData = await response.json().catch(() => ({ error: `HTTP error! Status: ${response.status}` }));
                 throw new Error(errorData.error || `Failed to fetch messages: ${response.statusText}`);
             }
             const data = await response.json();
 
-            // --- Explicitly check if data.messages is an array ---
             const fetchedMessages = Array.isArray(data.messages) ? data.messages : [];
             const messageCount = data.message_count || 0;
 
-            // Now fetchedMessages is guaranteed to be an array
             const formattedMessages = fetchedMessages.map(msg => {
-                let messageType = "text";
-                let tablesData = null;
-                let originalSqlQuery = msg.sql_query; // Keep original SQL by default
+                let messageType = "text"; 
+                let tablesData = null;    
+                let uiDisplaySqlQuery = msg.sql_query; 
 
                 const TABLE_DATA_MARKER = "[TABLE_DATA]:";
-                if (msg.sql_query && msg.sql_query.startsWith(TABLE_DATA_MARKER)) {
-                    try {
-                        const tableJsonString = msg.sql_query.substring(TABLE_DATA_MARKER.length);
-                        const parsedData = JSON.parse(tableJsonString);
+                const NO_RENDER_TABLE_MARKER = "[no_rendertable]:";
 
-                        // --- Adjust logic to handle potential array wrapper ---
-                        let tableObject = null;
-                        if (Array.isArray(parsedData) && parsedData.length > 0) {
-                            tableObject = parsedData[0];
-                        } else if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
-                            tableObject = parsedData;
-                        }
+                if (msg.sql_query) {
+                    const originalFullSqlQuery = msg.sql_query;
 
-                        // --- Check the extracted tableObject ---
-                        if (tableObject && typeof tableObject === 'object' && Array.isArray(tableObject.headers) && Array.isArray(tableObject.rows)) {
-                            tablesData = [{ // Still wrap in array as expected by ChatMessage component
-                                headers: tableObject.headers,
-                                rows: tableObject.rows
-                            }];
-                            messageType = "table";
-                            originalSqlQuery = null;
-                        } else {
-                            console.warn("Extracted table object missing headers/rows or invalid format:", tableObject, "Original parsed data:", parsedData);
+                    if (originalFullSqlQuery.includes(NO_RENDER_TABLE_MARKER)) {
+                        // If [no_rendertable]: is present, it's definitely text.
+                        // We don't need to parse for table data, even if [TABLE_DATA]: is also there.
+                        messageType = "text";
+                        // uiDisplaySqlQuery remains originalFullSqlQuery (or you could clean the marker if needed)
+                        // tablesData remains null
+                    } else {
+                        // [no_rendertable]: is NOT present, so check for [TABLE_DATA]:
+                        const tableDataStartIndex = originalFullSqlQuery.indexOf(TABLE_DATA_MARKER);
+                        if (tableDataStartIndex !== -1) {
+                            // [TABLE_DATA]: marker is present, attempt to parse
+                            try {
+                                const tableJsonString = originalFullSqlQuery.substring(tableDataStartIndex + TABLE_DATA_MARKER.length);
+                                const parsedData = JSON.parse(tableJsonString);
+
+                                let tableObject = null;
+                                if (Array.isArray(parsedData) && parsedData.length > 0) {
+                                    tableObject = parsedData[0];
+                                } else if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+                                    tableObject = parsedData;
+                                }
+
+                                if (tableObject && typeof tableObject === 'object' && Array.isArray(tableObject.headers) && Array.isArray(tableObject.rows)) {
+                                    tablesData = [{ 
+                                        headers: tableObject.headers,
+                                        rows: tableObject.rows
+                                    }];
+                                    messageType = "table"; // Render as table
+                                    uiDisplaySqlQuery = null; // Clear raw SQL for UI if table is processed
+                                } else {
+                                    console.warn("Extracted table object missing headers/rows or invalid format:", tableObject, "Original parsed data:", parsedData);
+                                    // Keep messageType as "text", tablesData as null, uiDisplaySqlQuery as original
+                                }
+                            } catch (parseError) {
+                                console.error("Failed to parse table data from sql_query:", parseError, "Raw data:", originalFullSqlQuery);
+                                // Keep messageType as "text", tablesData as null, uiDisplaySqlQuery as original
+                            }
                         }
-                    } catch (parseError) {
-                        console.error("Failed to parse table data from sql_query:", parseError, "Raw data:", msg.sql_query);
+                        // If neither [no_rendertable]: nor [TABLE_DATA]: (or parsing failed), it remains text.
                     }
                 }
 
@@ -270,19 +285,16 @@ const BodyContent = ({employee_id}) => {
                     text: msg.message,
                     type: messageType,
                     tables: tablesData,
-                    sql_query: originalSqlQuery,
+                    sql_query: uiDisplaySqlQuery, 
                     created_at: msg.created_at,
                 };
             });
 
             setMessages(formattedMessages);
 
-            // --- Logic to potentially trigger title generation ---
             const currentConversation = conversations.find(c => c.convo_id === conversationId);
-
-            // --- Check if the title matches the default pattern ---
             const isDefaultTitle = currentConversation && currentConversation.title &&
-                                   (currentConversation.title.startsWith("Convo ") || !currentConversation.title); // Check if it's the default or empty/null
+                                   (currentConversation.title.startsWith("Convo ") || !currentConversation.title);
 
             if (isDefaultTitle && messageCount >= 2 && !isGeneratingTitle) {
                 console.log(`Conversation ${conversationId} has ${messageCount} messages and a default/missing title. Triggering generation.`);
@@ -291,7 +303,6 @@ const BodyContent = ({employee_id}) => {
 
         } catch (error) {
             console.error("Error loading messages:", error);
-            // Handle error display if needed
         } finally {
             setIsLoadingMessages(false);
         }
