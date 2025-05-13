@@ -166,6 +166,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             console.log('Payload:', payload);
 
+            const response = await fetch(`${baseurl}/insert_productmats/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+    
+            if (!response.ok) throw new Error('Failed to submit Product Recipe Data');
+            const data = await response.json();
+            console.log('Success:', data);
+
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -176,7 +188,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             document.body.removeChild(link);
             
         } catch (error) {
-            console.error('Error sending Principal Item:', error);
+            console.error('Error sending Product Recipe:', error);
         }
     };
 
