@@ -11,6 +11,7 @@ const Employees = () => {
   const [archivedEmployees, setArchivedEmployees] = useState([]);
   const [selectedArchivedEmployees, setSelectedArchivedEmployees] = useState([]);
   const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
+  const [deptSuperiorNames, setDeptSuperiorNames] = useState({});
 
   // Add/Edit modals for Employees
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
@@ -82,8 +83,9 @@ const Employees = () => {
     employee_id: "",
     notice_period_days: "",
     hr_approver_id: "",
-    approval_status: "Pending", // Default value
-    clearance_status: "Not Started" // Default value
+    approval_status: "Pending",
+    clearance_status: "Not Started",
+    reason: "" // Add reason field
   });
 
   /*************************************
@@ -512,8 +514,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/archived/")
       ]);
       console.log("Fetched employee data:", activeRes.data);
       setEmployees(activeRes.data);
@@ -521,11 +523,30 @@ const Employees = () => {
     } catch (err) {
       console.error("Full error response:", err.response);
       const errorDetail = err.response?.data?.detail || 
-                         JSON.stringify(err.response?.data || {});
+                        JSON.stringify(err.response?.data || {});
       showToast(`Error: ${errorDetail}`, false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDeptSuperiorName = (employee) => {
+    if (!employee) return "—";
+    
+    // First check if dept_superior_name is directly available in the employee object
+    if (employee.dept_superior_name) {
+      return employee.dept_superior_name;
+    }
+    
+    // Fall back to existing lookup logic if the direct property isn't available
+    if (!employee.dept_id) return "—";
+    
+    const superior = departmentSuperiors.find(sup => 
+      sup.dept_id === employee.dept_id && 
+      (employee.dept_superior_id ? sup.dept_superior_id === employee.dept_superior_id : true)
+    );
+    
+    return superior ? superior.superior_name || "—" : "—";
   };
 
   const fetchDepartmentSuperiors = async () => {
@@ -594,19 +615,38 @@ const Employees = () => {
     fetchDepartmentSuperiors(); 
   }, []);
 
-  useEffect(() => {
-    const fetchResignations = async () => {
-      try {
-        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-        setResignations(resignationsRes.data);
-      } catch (err) {
-        console.error("Error fetching resignations:", err);
-        showToast("Failed to fetch resignations", false);
-      }
-    };
+useEffect(() => {
+  const fetchResignations = async () => {
+    try {
+      setLoading(true); // Set loading state when starting to fetch
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      
+      // Ensure employee names are present in the data
+      const enrichedResignations = resignationsRes.data.map(resignation => {
+        if (!resignation.employee_name && resignation.employee_id) {
+          // Find employee by ID to get their name
+          const employee = employees.find(emp => emp.employee_id === resignation.employee_id);
+          if (employee) {
+            return {
+              ...resignation,
+              employee_name: `${employee.first_name} ${employee.last_name}`
+            };
+          }
+        }
+        return resignation;
+      });
+      
+      setResignations(enrichedResignations);
+    } catch (err) {
+      console.error("Error fetching resignations:", err);
+      showToast("Failed to fetch resignations", false);
+    } finally {
+      setLoading(false); // Always ensure loading state is set to false
+    }
+  };
 
-    fetchResignations();
-  }, []);
+  fetchResignations();
+}, [employees]); // Add employees as dependency to ensure names can be populated
 
   /***************************************************************************
    * Searching + Debounce
@@ -881,7 +921,7 @@ const Employees = () => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/", employeeData);
+      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -963,7 +1003,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${editingEmployee.employee_id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -980,7 +1020,7 @@ const Employees = () => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       
       // Immediately update state to reflect changes
@@ -1005,7 +1045,7 @@ const Employees = () => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       
@@ -1035,7 +1075,7 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -1676,37 +1716,46 @@ const handleResignationUploadSubmit = async (e) => {
     }));
   };
 
-  // Handle resignation submission
-  const handleResignationSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      // Validate required fields
-      if (!newResignation.employee_id || !newResignation.notice_period_days) {
-        showToast("Please fill all required fields", false);
-        return;
-      }
-      
-      // Send resignation data to the API
-      await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
-        newResignation
-      );
-      
-      showToast("Resignation created successfully", true);
-      setShowAddResignationModal(false);
-      
-      // Refresh resignations
-      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-      setResignations(resignationsRes.data);
-    } catch (err) {
-      console.error("Error creating resignation:", err.response?.data || err);
-      const errorMessage = err.response?.data?.detail || 
-                         Object.values(err.response?.data || {}).flat().join(", ") || 
-                         "Failed to create resignation";
-      showToast(errorMessage, false);
+// In the handleResignationSubmit function (around line 1690)
+const handleResignationSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    // Validate required fields
+    if (!newResignation.employee_id || !newResignation.notice_period_days) {
+      showToast("Please fill all required fields", false);
+      return;
     }
-  };
+    
+    // Find the employee to get their name
+    const selectedEmployee = employees.find(emp => emp.employee_id === newResignation.employee_id);
+    const employeeName = selectedEmployee ? 
+      `${selectedEmployee.first_name} ${selectedEmployee.last_name}` : '';
+    
+    // Send resignation data to the API with employee_name
+    await axios.post(
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
+      {
+        ...newResignation,
+        employee_name: employeeName,
+        reason: newResignation.reason || '' // Ensure reason field exists
+      }
+    );
+    
+    showToast("Resignation created successfully", true);
+    setShowAddResignationModal(false);
+    
+    // Refresh resignations
+    const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+    setResignations(resignationsRes.data);
+  } catch (err) {
+    console.error("Error creating resignation:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to create resignation";
+    showToast(errorMessage, false);
+  }
+};
 
   // Handle edit resignation modal
   const handleEditResignation = (resignation) => {
@@ -1910,6 +1959,7 @@ const handleResignationUploadSubmit = async (e) => {
                 {isArchived && <th>Select</th>}
                 <th>Employee ID</th>
                 <th>Department ID</th>
+                <th>Department Superior Name</th>
                 <th>Department Name</th>
                 <th>Position ID</th>
                 <th>Position Title</th>
@@ -1917,9 +1967,8 @@ const handleResignationUploadSubmit = async (e) => {
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Phone</th>
-                <th>Employment Type</th> {/* Added column */}
-                <th>Reports To</th> {/* Added column */}
-                <th>Department Superior</th>  {/* New column header */}
+                <th>Employment Type</th>
+                <th>Reports To</th>
                 <th>Status</th>
                 <th>Is Supervisor</th>
                 <th>Documents</th>
@@ -1942,6 +1991,7 @@ const handleResignationUploadSubmit = async (e) => {
                   )}
                   <td>{emp.employee_id}</td>
                   <td>{emp.dept_id}</td>
+                  <td>{getDeptSuperiorName(emp)}</td>
                   <td>{emp.dept_name || "—"}</td>
                   <td>{emp.position_id || "—"}</td>
                   <td>{emp.position_title || "—"}</td>
@@ -1955,9 +2005,7 @@ const handleResignationUploadSubmit = async (e) => {
                     </span>
                   </td>
                   <td>{emp.reports_to || "—"}</td>
-                  <td>
-                  {emp.dept_superior_id ? emp.dept_superior_id : "—"}
-                  </td>
+                 
                   <td>
                     <span className={`hr-tag ${emp.status.toLowerCase()}`}>
                       {emp.status}
@@ -2419,7 +2467,7 @@ const handleResignationUploadSubmit = async (e) => {
       setCurrentEmployee(employee);
       
       // Fetch the employee to get the latest document data
-      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employee.employee_id}/`);
+      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${employee.employee_id}/`);
       const employeeData = response.data;
       
       console.log("Employee documents data:", employeeData.documents);
@@ -2499,7 +2547,7 @@ const handleResignationUploadSubmit = async (e) => {
       });
       
       // Step 4: Fetch current documents for the employee
-      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`);
+      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`);
       
       // Step 5: Parse existing documents or create a new structure
       let documents = { required: {}, optional: {} };
@@ -2530,7 +2578,7 @@ const handleResignationUploadSubmit = async (e) => {
       
       // Step 7: Update the employee's documents in your backend
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`, 
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`, 
         { documents: JSON.stringify(documents) }
       );
       
@@ -3559,6 +3607,16 @@ const handleResignationUploadSubmit = async (e) => {
                     <option value="Completed">Completed</option>
                   </select>
                 </div>
+                <div className="form-group">
+                <label>Reason for Resignation</label>
+                <textarea
+                  name="reason"
+                  value={newResignation.reason || ''}
+                  onChange={handleResignationChange}
+                  placeholder="Enter reason for resignation"
+                  rows="3"
+                ></textarea>
+              </div>
               </div>
               
               <div className="hr-employee-modal-buttons">
