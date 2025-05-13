@@ -39,7 +39,7 @@ useEffect(() => {
       
       for (const employeeId of employeeIds) {
         try {
-          const empRes = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employee/${employeeId}/`);
+          const empRes = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${employeeId}/`);
           typesObj[employeeId] = empRes.data.employment_type;
         } catch (err) {
           console.error(`Failed to fetch employment type for ${employeeId}:`, err);

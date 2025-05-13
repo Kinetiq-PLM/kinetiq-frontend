@@ -213,7 +213,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setLoading(true);
         
         // 1. Fetch all employees first to ensure we have the total count
-        const employeesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+        const employeesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/");
         const employees = employeesRes.data;
         const totalEmployees = employees.length;
         
