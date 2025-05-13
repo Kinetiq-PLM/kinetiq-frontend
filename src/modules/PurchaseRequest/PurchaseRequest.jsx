@@ -31,6 +31,7 @@ const BodyContent = ({ onClose }) => {
   const [latestRequestId, setLatestRequestId] = useState(null);
   const [successMessage, setSuccessMessage] = useState(""); // Success message state
   const [isSaveClicked, setIsSaveClicked] = useState(false); // Track if Save button is clicked
+  const [isDropdownEnabled, setIsDropdownEnabled] = useState(false); // State to enable/disable dropdown
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -76,6 +77,37 @@ const BodyContent = ({ onClose }) => {
     } else {
       setError("Failed to load user data. Please log in again.");
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch("http://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/departments/");
+        const data = await response.json();
+  
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          const userDept = data.find((dept) => dept.dept_id === user.department);
+  
+          if (userDept) {
+            const isDropdownEnabled = ["Sales", "Support & Services"].includes(userDept.dept_name);
+            setFormData((prev) => ({
+              ...prev,
+              requestType: isDropdownEnabled ? prev.requestType : "Assets", // Default to Assets if disabled
+            }));
+            setIsDropdownEnabled(isDropdownEnabled); // Enable or disable dropdown
+          }
+        } else {
+          setError("Failed to load user data. Please log in again.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch departments:", error);
+        setError("Failed to fetch departments.");
+      }
+    };
+  
+    fetchDepartments();
   }, []);
 
   const handleInputChange = (e, index = null) => {
@@ -296,29 +328,30 @@ const BodyContent = ({ onClose }) => {
               </div>
 
               <div className="form-group">
-                  <label>Request Type</label>
-                  <select
-                    name="requestType"
-                    value={formData.requestType}
-                    onChange={(e) => {
-                      const newRequestType = e.target.value;
-                      console.log("Selected Request Type:", newRequestType);
+  <label>Request Type</label>
+  <select
+    name="requestType"
+    value={formData.requestType}
+    onChange={(e) => {
+      const newRequestType = e.target.value;
+      console.log("Selected Request Type:", newRequestType);
 
-                      // Update the request type and item_type for all items
-                      setFormData((prev) => ({
-                        ...prev,
-                        requestType: newRequestType,
-                        items: prev.items.map((item) => ({
-                          ...item,
-                          item_type: newRequestType, // Update item_type for all items
-                        })),
-                      }));
-                    }}
-                  >
-                  <option value="Assets">Assets</option>
-                  <option value="Material">Material</option>
-                </select>
-              </div>
+      // Update the request type and item_type for all items
+      setFormData((prev) => ({
+        ...prev,
+        requestType: newRequestType,
+        items: prev.items.map((item) => ({
+          ...item,
+          item_type: newRequestType, // Update item_type for all items
+        })),
+      }));
+    }}
+    disabled={!isDropdownEnabled} // Disable dropdown if not enabled
+  >
+    <option value="Assets">Assets</option>
+    <option value="Material">Material</option>
+  </select>
+</div>
             </div>
 
             <div className="form-section">
