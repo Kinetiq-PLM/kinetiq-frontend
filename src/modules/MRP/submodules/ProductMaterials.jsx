@@ -223,15 +223,15 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         const term = (searchTerm || "").toLowerCase();
       
         const filterItem = (item) => {
-          const number = (item.number || item.serviceOrderItemId || "").toLowerCase();
-          const date = (item.date || "").toLowerCase();
-          const details = (item.details || item.description || "").toLowerCase();
-      
-          return (
-            number.includes(term) ||
-            date.includes(term) ||
-            details.includes(term)
-          );
+            const productId = (item.number || "").toLowerCase();
+            const productName = (item.type || "").toLowerCase();
+            const productDescription = (item.details || "").toLowerCase();
+
+            return (
+                productId.includes(term) ||
+                productName.includes(term) ||
+                productDescription.includes(term)
+            );
         };
       
         const mrpFiltered = (mrpData || []).filter(item => {
@@ -369,7 +369,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </div>
     
                     <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
-                        <input placeholder="Search Product ID..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
+                        <input placeholder="Search by Product ID, Product, or Description..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
                     </div>
                 </div>
 
@@ -379,7 +379,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
-                    {mrpData.map((item, index) => (
+                    {filteredData.map((item, index) => (
                         <div key={index} className="table-row" onClick={() => {setSelectedRowData(item);setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
                             <div className="table-cell" style={rowCellStyle} data-label="Product ID">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Product">{item.type}</div>
@@ -419,9 +419,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <span style={{paddingLeft: 10,paddingRight: 10 }}>Add Raw Material</span>
                             </button> */}
 
-                            <button onClick={() => { setEditRawMaterial(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            {/* <button onClick={() => { setEditRawMaterial(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                 <span style={{paddingLeft: 10,paddingRight: 10 }}>Edit Raw Material</span>
-                            </button>
+                            </button> */}
                         </div>
 
                         <button onClick={() => { setRawMaterial(false); setSelectedProductId(null); }} style={{height: 40, padding: '8px 24px', background: 'white', borderRadius: 8, outline: '1.5px #A4A4A4 solid', display: 'flex', alignItems: 'center', gap: 10}}>
@@ -460,11 +460,24 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
                         <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Product ID:</label>
                         <select
-                            className="select-truncate"
-                            value={productId}
-                            onChange={(e) => setProductId(e.target.value)}
-                            style={{ ...inputStyle, width: '100%', appearance: 'none', cursor: 'pointer' }}
+                        className="select-truncate"
+                        value={productId}
+                        onChange={(e) => {
+                            const selectedId = e.target.value;
+                            setProductId(selectedId);
+
+                            const selectedProduct = prodData.find(item => item.prod_id === selectedId);
+                            if (selectedProduct) {
+                            setProductName(selectedProduct.prod_name || "");
+                            setProductDescription(selectedProduct.prod_description || "");
+                            } else {
+                            setProductName("");
+                            setProductDescription("");
+                            }
+                        }}
+                        style={{ ...inputStyle, width: '100%', appearance: 'none', cursor: 'pointer' }}
                         >
+
                             <option value="">Select Product ID</option>
                             {prodData
                             .sort((a, b) => a.prod_name.localeCompare(b.prod_name))

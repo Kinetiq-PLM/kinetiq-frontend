@@ -630,7 +630,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
                     <div className="table-header" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8'}}>
-                        {['Order No.', 'Type', 'Details', 'Date'].map((label) => (
+                        {['Order No.', 'Type', 'Details'].map((label) => (
                             <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
@@ -639,7 +639,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details || '—'}</div>
-                            <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
+                            {/* <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div> */}
                         </div>
                     ))}
                 </div>
@@ -658,7 +658,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         { label: 'Order No.', value: selectedRowData.number },
                         { label: 'Type', value: selectedRowData.type },
                         { label: 'Details', value: selectedRowData.details },
-                        { label: 'Date', value: selectedRowData.date },
+                        // { label: 'Date', value: selectedRowData.date },
                     ].map((item) => (
                         <div key={item.label} style={{ flex: '1 1 45%', minWidth: 200}}>
                         <div style={{fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: '500', color: '#585757', marginBottom: 5,}}>
@@ -860,7 +860,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={rowCellStyle}>{item.prin_uom}</div>
                                     <div style={rowCellStyle}>{item.prin_item_name}</div>
                                     <div style={rowCellStyle}>{item.prin_quantity}</div>
-                                    <div style={rowCellStyle}>₱{item.prin_itemcost} </div>
+                                    <div style={rowCellStyle}>₱{item.prin_itemcost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </div>
                                     <div style={rowCellStyle}>₱{item.prin_totalitemcost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </div>
                                     </div>
                                 ))}
@@ -919,8 +919,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div className="table-cell" style={rowCellStyle} data-label="Material ID">{item.materialId}</div>
                                 <div className="table-cell" style={rowCellStyle} data-label="Quantity">{item.rmquantity}</div>
                                 <div className="table-cell" style={rowCellStyle} data-label="Units">{item.rmunits}</div>
-                                <div className="table-cell" style={rowCellStyle} data-label="Unit Cost">₱{parseFloat(item.rmunitCost).toFixed(2)}</div>
-                                <div className="table-cell" style={rowCellStyle} data-label="Total Cost">₱{parseFloat(item.rmtotalCost).toFixed(2)}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Unit Cost">₱{parseFloat(item.rmunitCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Total Cost">₱{parseFloat(item.rmtotalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                             </div>
                             ))}
                         </div>
@@ -931,7 +931,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost Of Raw Material:</b></span>
-                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalCostofRawMaterial}</span>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalCostofRawMaterial.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
 
                                     </div>
                                 </div>
