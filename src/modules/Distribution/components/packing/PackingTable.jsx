@@ -8,7 +8,7 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
   
   // Add pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
+  const [itemsPerPage] = useState(10);
   
   // Handle sort change
   const handleSort = (field) => {
@@ -177,6 +177,17 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
     );
   }
 
+  // Add this function to calculate total quantity
+  const getTotalQuantity = (list) => {
+    if (!list.items_details || !list.items_details.length) {
+      return list.total_items_packed || 0;
+    }
+    
+    return list.items_details.reduce((sum, item) => {
+      return sum + (parseInt(item.quantity) || 0);
+    }, 0);
+  };
+
   return (
     <div className="packing-table-container">
       <div className="table-metadata">
@@ -256,7 +267,15 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
                   {list.packing_status || '-'}
                 </td>
                 <td>{getEmployeeName(list.packed_by)}</td>
-                <td className="centered-cell">{list.total_items_packed || '0'}</td>
+                
+                {/* Update this line to show total quantity */}
+                <td className="centered-cell">
+                  {getTotalQuantity(list)}
+                  {list.items_details?.length > 0 && (
+                    <span className="item-count-badge">({list.items_details.length} items)</span>
+                  )}
+                </td>
+                
                 <td>{list.packing_type || '-'}</td>
                 <td>{formatDate(list.packing_date)}</td>
               </tr>

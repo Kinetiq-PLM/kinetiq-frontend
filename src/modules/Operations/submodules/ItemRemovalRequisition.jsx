@@ -38,10 +38,10 @@ const ItemRemoval = () => {
         return;
       }
       const updatePayload = {
-          external_id: selectedData.external_id
+        external_id: selectedData.report_id,
+        status: "pending"
       }
-
-
+      console.log(updatePayload)
       try {
           const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/send-to-management/`, {
               method: "POST",
@@ -55,7 +55,7 @@ const ItemRemoval = () => {
           fetchData();
           toast.success("Record sent to management."); 
       } catch (error) {
-          toast.error("Error updating approval status.", error);
+          toast.error("Error: Unable to send to management.", error);
       }
     };
 
@@ -142,15 +142,15 @@ const ItemRemoval = () => {
                   </tr>
                 ) : filteredData.length > 0 ? (
                     filteredData.map((row, index) => (
-                    <tr key={row.external_id}>
+                    <tr key={row.report_id}>
                         <td>
                       
                         <input
-  type="checkbox"
-  className="checkbox"
-  checked={selectedRow === index}
-  onChange={() => handleCheckboxChange(index, row)}
-/>
+                          type="checkbox"
+                          className="checkbox"
+                          checked={selectedRow === index}
+                          onChange={() => handleCheckboxChange(index, row)}
+                        />
                         </td>
                         <td>{row.report_id}</td>
                         <td>{row.item_id}</td>

@@ -19,13 +19,14 @@
     justify-content: flex-start;
     min-width: auto; 
     min-height: unset;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
 .InternalTransfer .table-container,
 .InternalTransfer.rework .table-container {
   width: 100%;
-  height: 492px;
+  height: 450px;
   position: relative;
   background: white;
   border-radius: 8px;
@@ -64,14 +65,13 @@
 
 .InternalTransfer .table-container thead tr {
     width: 100%;
-    display: table;
+    
     table-layout: fixed;
 }
 
 
 .InternalTransfer .table-container tbody tr {
     width: 100%;
-    display: table;
     table-layout: fixed;
 }
 
@@ -99,7 +99,10 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: auto; 
+    overflow-y: visible;
+    overflow-x: auto;
+    height: auto;
+    min-height: fit-content;
   }
   
 
@@ -137,31 +140,7 @@
 }
 
 /* FIXED TABLE CELL STYLING */
-.InternalTransfer table th:first-child {
-    width: 50px;
-    padding: 0;
-    position: relative;
-    height: 100%;
-}
-.InternalTransfer table td:first-child {
-    width: 50px;
-    position: relative;
-    height: 100%;
-     
-}
-.InternalTransfer table th:nth-child(2) {
-    width: 15em;
-    padding: 0.75rem;
-    position: relative;
-    height: 100%;
-}
 
-.InternalTransfer table td:nth-child(2) {
-    width: 15em;
-    padding: 0.75rem;
-    position: relative;
-    height: 100%;
-}
 
 .InternalTransfer table td {
     padding: 0.75rem;
@@ -180,7 +159,41 @@
 
 }
 
-.InternalTransfer .input-group {
+
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(1),
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(2),
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(33% - 0.5rem); 
+    min-width: 150px; 
+}
+.InternalTransfer .input-row:nth-child(2){
+    justify-content: flex-start;
+}
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(1),
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(2),
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(33% - 0.5rem); 
+    min-width: 150px; 
+}
+
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(1),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(2),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 0.5rem); 
+    min-width: 150px; 
+}
+.InternalTransfer .input-row:nth-child(2){
+    justify-content: flex-start;
+}
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(1),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(2),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(3){
     display: flex;
     flex-direction: column;
     width: calc(50% - 0.5rem); 
@@ -448,36 +461,72 @@
     }
   }
 
-  .InternalTransfer table th:nth-child(1),
-.InternalTransfer table td:nth-child(1) {
+.InternalTransfer table th.deliveryTH:nth-child(1),
+.InternalTransfer table td.deliveryTD:nth-child(1) {
     width: 2rem;
 }
 
-.InternalTransfer table th:nth-child(2),
-.InternalTransfer table td:nth-child(2) {
+.InternalTransfer table th.deliveryTH:nth-child(2),
+.InternalTransfer table td.deliveryTD:nth-child(2) {
     width: 15rem;
 }
 
-.InternalTransfer table th:nth-child(3),
-.InternalTransfer table td:nth-child(3) {
+
+.InternalTransfer table th.deliveryTH:nth-child(3),
+.InternalTransfer table td.deliveryTD:nth-child(3) {
     width: 15rem;
 }
 
-.InternalTransfer table th:nth-child(4),
-.InternalTransfer table td:nth-child(4) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(4),
+.InternalTransfer table td.deliveryTD:nth-child(4) {
+    width: 8rem;
 }
 
-.InternalTransfer table th:nth-child(5),
-.InternalTransfer table td:nth-child(5) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(5),
+.InternalTransfer table td.deliveryTD:nth-child(5) {
+    width: 8rem;
 }
 
-.InternalTransfer table th:nth-child(6),
-.InternalTransfer table td:nth-child(6) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(6),
+.InternalTransfer table td.deliveryTD:nth-child(6) {
+    width: 8rem;
 }
-.InternalTransfer table th:nth-child(7),
-.InternalTransfer table td:nth-child(7) {
-    width: 10rem;
+
+.InternalTransfer table th.deliveryTH:nth-child(7),
+.InternalTransfer table td.deliveryTD:nth-child(7) {
+    width: 15rem;
+}
+.InternalTransfer table th.deliveryTH:nth-child(8),
+.InternalTransfer table td.deliveryTD:nth-child(8) {
+    width: 8rem;
+}
+
+
+/*Rework*/
+.InternalTransfer table th.reworkTH:nth-child(1),
+.InternalTransfer table td.reworkTD:nth-child(1) {
+    width: 2rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(2),
+.InternalTransfer table td.reworkTD:nth-child(2) {
+    width: 15rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(3),
+.InternalTransfer table td.reworkTD:nth-child(3) {
+    width: 15rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(4),
+.InternalTransfer table td.reworkTD:nth-child(4) {
+    width: 15rem;
+}
+
+.InternalTransfer table th.reworkTH:nth-child(5),
+.InternalTransfer table td.reworkTD:nth-child(5) {
+    width: 8rem;
+    
+}
+
+.InternalTransfer table th.reworkTH:nth-child(6),
+.InternalTransfer table td.reworkTD:nth-child(6) {
+    width: 8rem;
 }

@@ -15,6 +15,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  overflow: auto;
 }
 
 .finance .budget-balance-card,
@@ -26,6 +27,10 @@
   border-radius: 15px; 
   width: 100%;
   box-sizing: border-box;
+}
+.bg-white.shadow-sm {
+  grid-column: 1 / -1;
+  grid-row: 1 / 3;
 }
 
 .finance .budget-balance-card {
@@ -127,7 +132,7 @@
 .finance .total-bonus-amount {
   font-size: 1.2em; 
   margin-left: 15px; 
-  color: #008080;
+  color: #00A8A8;
 }
 
 .finance .infocard-cash-flow {
@@ -169,12 +174,12 @@
 }
 
 .finance .income-statement-table thead tr {
-  background-color: #469fc2;
+  background-color: #00A8A8;
   color: white;
 }
 
 .finance .income-statement-table tbody th {
-  background-color: #6CB3D0;
+  background-color: #47b3b3e1;
   color: white;
 }
 

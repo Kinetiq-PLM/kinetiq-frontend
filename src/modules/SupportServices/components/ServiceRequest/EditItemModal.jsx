@@ -15,6 +15,9 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   const [markupPrice, setMarkupPrice] = useState("")
   const [itemName, setItemName] = useState("")
   const [totalPrice, setTotalPrice] = useState("")
+  const [warehouseId, setWarehouseId] = useState("")
+  const [warehouseName, setWarehouseName] = useState("")
+  const [warehouseLocation, setWarehouseLocation] = useState("")
 
   const [items, setItems] = useState([]);
   const [isItemsDropdown, setItemsDropdown] = useState(false)
@@ -32,6 +35,9 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
       setMarkupPrice(item.principal_item?.mark_up_price || "")
       setItemName(item.item_name || "")
       setTotalPrice(item.total_price || "")
+      setWarehouseId(item.warehouse?.warehouse_id || "")
+      setWarehouseName(item.warehouse?.warehouse_name || "")
+      setWarehouseLocation(item.warehouse?.warehouse_location || "")
     }
   }, [item]);
 
@@ -54,43 +60,26 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
 
   const handleSelectItem = (item) => {
     setItemId(item.inventory_item_id);
-    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setItemName(item?.item?.item_name || "");
+    setWarehouseId(item?.warehouse?.warehouse_id ||  "");
+    setWarehouseName(item?.warehouse?.warehouse_name ||  "");
+    setWarehouseLocation(item?.warehouse?.warehouse_location ||  "");
     setPrincipalItemId("")
+    setMarkupPrice("0.00")
+    setTotalPrice("0.00")
     setItemsDropdown(false);
   };
 
   const handleSelectItemInventory = (item) => {
     setItemId(item.inventory_item_id);
-    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setItemName(item?.item?.item_name || "");
+    setWarehouseId(item?.warehouse?.warehouse_id ||  "");
+    setWarehouseName(item?.warehouse?.warehouse_name ||  "");
+    setWarehouseLocation(item?.warehouse?.warehouse_location ||  "");
     setPrincipalItemId("")
+    setMarkupPrice("0.00")
+    setTotalPrice("0.00")
     setShowViewInventoryModal(false)
-  };
-
-  const [principals, setPrincipals] = useState([]);
-  const [isPrincipalDropdown, setPrincipalDropdown] = useState(false)
-
-  const fetchPrincipals = async (orderId) => {
-    console.log(orderId)
-    try {
-      const data = await GET(`order/principal-items/${orderId}/`);
-      setPrincipals(data);
-    } catch (error) {
-      console.error("Error fetching principal items:", error);
-    }
-  };
-
-  const handleTogglePrincipals = () => {
-    if (!isPrincipalDropdown) {
-      fetchPrincipals(orderId); 
-    }
-    setPrincipalDropdown(!isPrincipalDropdown);
-  };
-
-  const handleSelectPrincipal = (principal) => {
-    setPrincipalItemId(principal.principal_item_id);
-    setMarkupPrice(principal.mark_up_price || "");
-
-    setPrincipalDropdown(false);
   };
 
   const handleViewInventory = () => {
@@ -112,6 +101,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
       total_price: totalPrice,
       service_order_item_id: orderId,
       item_name: itemName,
+      warehouse_id: warehouseId
     })
   }
 
@@ -193,6 +183,71 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                 </div>
               </div>
               <div className="form-group">
+                <label htmlFor="warehouseId">Warehouse ID</label>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="warehouseId"
+                    readOnly
+                    value={warehouseId}
+                    onChange={(e) => setWarehouseId(e.target.value)}
+                    placeholder="Enter warehouse ID"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                  <label htmlFor="itemName">Item Name</label>
+                  <input
+                    type="text"
+                    id="itemName"
+                    readOnly
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    placeholder="Enter item name"
+                  />
+                </div>
+                <div className="form-group">
+                <label htmlFor="warehouseName">Warehouse Name</label>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="warehouseName"
+                    readOnly
+                    value={warehouseName}
+                    onChange={(e) => setWarehouseName(e.target.value)}
+                    placeholder="Enter warehouse name"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="form-row">
+            <div className="form-group">
+                  <label htmlFor="quantity">Quantity</label>
+                  <input
+                    type="text"
+                    id="quantity"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="Enter quantity"
+                  />
+                </div>
+              <div className="form-group">
+                <label htmlFor="warehouseLocation">Warehouse Location</label>
+                <input
+                  type="text"
+                  id="warehouseLocation"
+                  readOnly
+                  value={warehouseLocation}
+                  onChange={(e) => setWarehouseLocation(e.target.value)}
+                  placeholder="Enter warehouse location"
+                />
+              </div>
+            </div>      
+            <div className="form-row">
+            <div className="form-group">
                 <label htmlFor="principalItemId">Principal Item ID</label>
                 <div className="select-wrapper" ref={principalRef}>
                   <input
@@ -203,34 +258,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                     onChange={(e) => setPrincipalItemId(e.target.value)}
                     placeholder="Enter principal item ID"
                   />
-                  {/* <span className="select-arrow" onClick={handleTogglePrincipals} >▼</span> */}
-                  {/* {isPrincipalDropdown && (
-                    <ul className="dropdown-list">
-                      {principals.length > 0 ? (
-                        principals.map((principal) => (
-                              <li key={principal.principal_item_id} onClick={() => handleSelectPrincipal(principal)}>
-                                {principal.principal_item_id}
-                              </li>
-                            ))
-                          ) : (
-                            <li>No principal ID found</li>
-                          )}
-                        </ul>
-                  )}  */}
                 </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="quantity">Quantity</label>
-                <input
-                  type="text"
-                  id="quantity"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="Enter quantity"
-                />
               </div>
               <div className="form-group">
                 <label htmlFor="markupPrice">Markup Price</label>
@@ -243,21 +271,18 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                   placeholder="Enter markup price"
                 />
               </div>
+              
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="itemName">Item Name</label>
-                <input
-                  type="text"
-                  id="itemName"
-                  readOnly
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  placeholder="Enter item name"
-                />
-              </div>
-              <div className="edit-cancel-button">
+            
+          </div>
+        </div>
+
+        <div className="inventory-request-section">  
+          <button className="update-modal-button" onClick={handleViewInventory}>
+              View Inventory
+            </button>
+          <div className="add-cancel-button">
               <button className="cancel-button" onClick={onClose}>
                 Cancel
               </button>
@@ -265,47 +290,6 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                 Edit
               </button>
               </div>
-              {/* <div className="form-group">
-                <label htmlFor="totalPrice">Total Price</label>
-                <input
-                  type="text"
-                  id="totalPrice"
-                  readOnly
-                  value={totalPrice}
-                  onChange={(e) => setTotalPrice(e.target.value)}
-                  placeholder="Enter total price"
-                />
-              </div> */}
-            </div>
-
-            {/* <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="unitPrice">Unit Price</label>
-                <input
-                  type="text"
-                  id="unitPrice"
-                  value={unitPrice}
-                  onChange={(e) => setUnitPrice(e.target.value)}
-                  placeholder="Enter unit price"
-                />
-              </div>
-            </div> */}
-          </div>
-        </div>
-
-        <div className="inventory-request-section">  
-          <div className="request-group">
-            <p>&nbsp;</p>
-            <button className="view-inventory-button" onClick={handleViewInventory}>
-              View Inventory
-            </button>
-          </div>
-          <div className="request-group">
-            <p>Item not in stock? Request here:</p>
-            <button className="purchase-request-button">
-              Purchase Request
-            </button>
-          </div>
         </div>
 
         {showViewInventoryModal && (

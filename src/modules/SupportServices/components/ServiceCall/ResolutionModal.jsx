@@ -25,10 +25,10 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowReque
       setResolutionDetails(callData.resolution || "")
       setCallId(callData.service_call_id || "")
       setCustomerId(callData.customer?.customer_id || "")
-      setStatus(callData.call_status || "")
+      setStatus(callData.call_status || "") 
       setPriority(callData.priority_level || "")
       setTicketId(callData.service_ticket?.ticket_id || "")
-      setProductId(callData.product?.product_id || "");
+      setProductId(callData.product?.item_id || "");
       setContractNo(callData.contract?.contract_id || "")
       setCallType(callData.call_type || "")
     }

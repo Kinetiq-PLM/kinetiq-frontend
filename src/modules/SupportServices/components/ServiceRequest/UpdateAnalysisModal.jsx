@@ -17,10 +17,10 @@ const UpdateAnalysisModal = ({ isOpen, onClose, onUpdate, analysis }) => {
     if (analysis) {
       console.log("asdasd", analysis)
       // Reset all fields to empty to show placeholders
-      setAnalysisStatus(analysis.analysis_status || "");
-      setAnalysisDate(analysis.analysis_date || "");
-      setLaborCost(analysis.labor_cost || "");
-      setAnalysisDescription(analysis.analysis_description || "");
+      setAnalysisStatus(analysis.analysisStatus || "");
+      setAnalysisDate(analysis.analysisDate || "");
+      setLaborCost(analysis.laborCost || "");
+      setAnalysisDescription(analysis.analysisDescription || "");
     }
   }, [analysis])
 
@@ -34,22 +34,19 @@ const UpdateAnalysisModal = ({ isOpen, onClose, onUpdate, analysis }) => {
     setOpenStatusDD(false); 
   };
 
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const dateInputRef = useRef();
 
   const toggleDatePicker = () => {
-    const dateInput = document.getElementById("analysisDate");
-    if (isPickerOpen) {
-      dateInput.blur(); 
-    } else {
-      dateInput.showPicker(); 
-    }
-    
-    setIsPickerOpen(!isPickerOpen); 
+    const dateInput = dateInputRef.current;
+
+    if (!dateInput || dateInput.disabled || dateInput.readOnly) return;
+
+    dateInput.showPicker?.();
   };
 
   const handleUpdate = () => {
     onUpdate({
-      analysis_id: analysis.analysis_id,
+      analysis_id: analysis.analysisId,
       analysis_status: analysisStatus,
       analysis_description: analysisDescription,
       analysis_date: analysisDate,
@@ -130,6 +127,7 @@ const UpdateAnalysisModal = ({ isOpen, onClose, onUpdate, analysis }) => {
                   <input
                     type="date"
                     id="analysisDate"
+                    ref={dateInputRef}
                     value={analysisDate}
                     onChange={(e) => setAnalysisDate(e.target.value)}
                     placeholder="Enter analysis date"
@@ -156,7 +154,7 @@ const UpdateAnalysisModal = ({ isOpen, onClose, onUpdate, analysis }) => {
               </div>
             </div>
 
-              <div className="form-group">
+              <div className="form-group description-update-group">
                 <label htmlFor="analysisDescription">Analysis Description</label>
                 <div className="textarea-container">
                   <textarea

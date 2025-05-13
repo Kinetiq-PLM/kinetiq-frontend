@@ -24,6 +24,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) 
   const [createdAt, setCreatedAt] = useState(() => {
     return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
+  const [techName, setTechName] = useState("")
   const [ticketType, setTicketType] = useState("Service")
   const [userId, setUserId] = useState("")
 
@@ -86,6 +87,7 @@ const handleToggleDropdownTech = () => {
 const handleSelectTechnician = (technician) => {
   fetchUserId(technician.employee_id)
   setTechnicianId(technician.employee_id); 
+  setTechName(`${technician.first_name} ${technician.last_name}`); 
   setDropdownOpenT(false); 
 };
 
@@ -212,48 +214,6 @@ const handleSelectType = (selectedType) => {
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="ticketType">
-                  Ticket Type <span className="required">*</span>
-                </label>
-                <div className="select-wrapper"  ref={typeRef}>
-                  <input
-                    type="text"
-                    id="ticketType"
-                    value={ticketType}
-                    readOnly
-                    // onChange={(e) => setTicketType(e.target.value)}
-                    placeholder="Select ticket type"
-                  />
-                  {/* <span className="select-arrow" onClick={handleTypeDropdown}>▼</span> */}
-                  {/* {isDropdownOpenType && (
-                    <ul className="dropdown-list">
-                      {["Service", "Sales"].map((type) => (
-                        <li key={type} onClick={() => handleSelectType(type)}>
-                          {type}
-                        </li>
-                      ))}
-                    </ul>
-                  )} */}
-                </div>   
-              </div>         
-              
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  readOnly
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter name"
-                />
-              </div>
-             
-              { /* technician id field should be auto-filled by the one currently logged in but this works for now */}     
-              <div className="form-group">
                 <label htmlFor="technicianId">
                   Technician ID <span className="required">*</span>
                 </label>
@@ -278,6 +238,7 @@ const handleSelectType = (selectedType) => {
                               .filter((technician) =>
                                 technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
                               )
+                              .slice(0, 1)
                               .map((technician) => (
                                 <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
                                   {technician.employee_id}
@@ -289,7 +250,34 @@ const handleSelectType = (selectedType) => {
                         </ul>
                       )}  
                 </div>
+              </div>     
+              
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  readOnly
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter name"
+                />
               </div>
+              <div className="form-group">
+                <label htmlFor="name">Technician Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={techName}
+                  readOnly
+                  onChange={(e) => setTechName(e.target.value)}
+                  placeholder="Enter technician name"
+                />
+              </div>
+              
             </div>
 
             <div className="form-row">

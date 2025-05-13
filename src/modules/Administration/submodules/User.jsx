@@ -18,7 +18,8 @@ import {
   Popover,
   Typography,
   Divider,
-  Pagination
+  Pagination,
+  Tree
 } from "antd";
 import { 
   UserOutlined, 
@@ -52,13 +53,13 @@ const UserManagement = () => {
   // Pagination states
   const [userPagination, setUserPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 20,
     total: 0
   });
   
   const [rolePagination, setRolePagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 20,
     total: 0
   });
 
@@ -278,25 +279,121 @@ const UserManagement = () => {
   };
 
   // Role form handlers
+  // Updated Tree selection logic for the role form
+  const handleTreeCheck = (checkedKeys, info) => {
+    // Convert from ant design's format
+    const actualCheckedKeys = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked;
+    
+    // Create a set for efficient lookups
+    const checkedKeysSet = new Set(actualCheckedKeys);
+    
+    // First, separate parent and child keys
+    const parentKeys = [];
+    const childKeys = [];
+    
+    actualCheckedKeys.forEach(key => {
+      // Trim any whitespace
+      const trimmedKey = key.trim();
+      
+      // Check if this is a parent (has trailing slash)
+      if (trimmedKey.endsWith('/')) {
+        parentKeys.push(trimmedKey);
+      } else {
+        childKeys.push(trimmedKey);
+      }
+    });
+    
+    // Handle parent-child relationships:
+    // 1. First collect all valid permissions without any optimization
+    const allPermissions = [...parentKeys];
+    
+    // 2. Only add child keys if their parent is not selected
+    childKeys.forEach(childKey => {
+      const parentPath = childKey.substring(0, childKey.lastIndexOf('/') + 1);
+      if (!checkedKeysSet.has(parentPath)) {
+        allPermissions.push(childKey);
+      }
+    });
+    
+    // Set the results in the form
+    roleForm.setFieldsValue({ department_permissions: allPermissions });
+  };
+  
+  // Function to convert stored permissions to display checked keys
+  const getExpandedCheckedKeys = (permissions) => {
+    if (!permissions || !Array.isArray(permissions)) return [];
+    
+    const allKeys = [];
+    
+    permissions.forEach(perm => {
+      // Trim any whitespace from the permission
+      const trimmedPerm = perm.trim();
+      
+      // Always add the permission itself
+      allKeys.push(trimmedPerm);
+      
+      // If it's a parent module (ends with '/')
+      if (trimmedPerm.endsWith('/')) {
+        // Find this parent in departmentOptions
+        const parentModule = departmentOptions.find(dept => dept.key === trimmedPerm);
+        if (parentModule && parentModule.children) {
+          // Add all children for display purposes
+          parentModule.children.forEach(child => {
+            allKeys.push(child.key);
+          });
+        }
+      }
+    });
+    
+    return allKeys;
+  };
+
+  // Function to update role form before showing modal
+  const prepareRoleForm = (record = null) => {
+    if (record) {
+      // Edit mode
+      const expandedKeys = getExpandedCheckedKeys(record.department_permissions || []);
+      
+      roleForm.setFieldsValue({
+        role_name: record.role_name,
+        description: record.description,
+        department_permissions: record.department_permissions || []
+      });
+      
+      return expandedKeys;
+    } else {
+      // Add mode
+      roleForm.resetFields();
+      roleForm.setFieldsValue({ department_permissions: [] });
+      return [];
+    }
+  };
+
+  // Add state for tree check management
+  const [checkedKeys, setCheckedKeys] = useState([]);
+
+  // Updated Role Add/Edit handlers
   const handleAddRole = () => {
     setModalMode("add");
-    roleForm.resetFields();
+    setSelectedRecord(null);
+    setCheckedKeys(prepareRoleForm());
     setRoleModalVisible(true);
   };
 
   const handleEditRole = (record) => {
     setModalMode("edit");
     setSelectedRecord(record);
-    roleForm.setFieldsValue({
-      role_name: record.role_name,
-      description: record.description,
-      department_permissions: record.department_permissions,
-    });
+    setCheckedKeys(prepareRoleForm(record));
     setRoleModalVisible(true);
   };
 
   const handleRoleFormSubmit = async (values) => {
     try {
+      // Ensure all permissions are properly trimmed
+      if (values.department_permissions && Array.isArray(values.department_permissions)) {
+        values.department_permissions = values.department_permissions.map(perm => perm.trim());
+      }
+      
       if (modalMode === "add") {
         await roleAPI.createRole(values);
         message.success("Role created successfully");
@@ -345,10 +442,13 @@ const UserManagement = () => {
   const DepartmentPermissions = ({ permissions }) => {
     if (!permissions || permissions.length === 0) return null;
   
-    const displayCount = permissions.length === 4 ? 4 : 3;
-    const hasMore = permissions.length > displayCount;
-    const displayed = permissions.slice(0, displayCount);
-    const hidden = permissions.slice(displayCount);
+    // Ensure permissions are trimmed
+    const cleanedPermissions = permissions.map(perm => perm.trim());
+    
+    const displayCount = cleanedPermissions.length === 4 ? 4 : 3;
+    const hasMore = cleanedPermissions.length > displayCount;
+    const displayed = cleanedPermissions.slice(0, displayCount);
+    const hidden = cleanedPermissions.slice(displayCount);
   
     const content = (
       <div className="popover-tags">
@@ -429,23 +529,6 @@ const UserManagement = () => {
         </Tag>
       ),
       
-    },
-    {
-      title: "Created At",
-      dataIndex: "created_at",
-      key: "created_at",
-      sorter: true,
-      width: 100,
-      render: (text) => text ? new Date(text).toLocaleDateString() : '-',
-    },
-    {
-      title: "Updated At",
-      dataIndex: "updated_at",
-      key: "updated_at",
-      sorter: true,
-      width: 100,
-      render: (text, record) => text ? new Date(text).toLocaleDateString() : 
-        (record.created_at ? new Date(record.created_at).toLocaleDateString() : '-'),
     },
     {
       title: "Actions",
@@ -581,28 +664,238 @@ const UserManagement = () => {
 
   // Available departments for role permissions
   const departmentOptions = [
-    'Accounting',
-    'Administration',
-    'CRM',
-    'Distribution',
-    'Finance',
-    'Human Resources',
-    'Inventory',
-    'Job Posting',
-    'Management',
-    'MRP',
-    'Operations',
-    'Production',
-    'Project Management',
-    'Project Request',
-    'Purchasing',
-    'Purchase Request',
-    'Sales',
-    'Support & Services',
-    'Report Generator',
-    'Workforce Request'
+    {
+      title: 'Accounting',
+      key: 'Accounting/',
+      children: [
+        { title: 'Chart of Accounts', key: 'Accounting/Chart of Accounts' },
+        { title: 'Journal', key: 'Accounting/Journal' },
+        { title: 'Journal Entry', key: 'Accounting/Journal Entry' },
+        { title: 'General Ledger', key: 'Accounting/General Ledger' },
+        { title: 'General Ledger Accounts', key: 'Accounting/General Ledger Accounts' },
+        { title: 'Official Receipts', key: 'Accounting/Official Receipts' },
+        { title: 'Payroll Accounting', key: 'Accounting/Payroll Accounting' },
+        { title: 'Tax and Remittance', key: 'Accounting/Tax and Remittance' },
+        { title: 'Accounts Payable Receipts', key: 'Accounting/Accounts Payable Receipts' },
+      ],
+    },
+    {
+      title: 'Administration',
+      key: 'Administration/',
+      children: [
+        { title: 'User', key: 'Administration/User' },
+        { title: 'Item Masterlist', key: 'Administration/Item Masterlist' },
+        { title: 'Business Partner Masterlist', key: 'Administration/Business Partner Masterlist' },
+        { title: 'Audit Logs', key: 'Administration/Audit Logs' },
+        { title: 'Policy', key: 'Administration/Policy' },
+        { title: 'Currency', key: 'Administration/Currency' },
+        { title: 'Warehouse', key: 'Administration/Warehouse' },
+        { title: 'Notification', key: 'Administration/Notification' },
+      ],
+    },
+    {
+      title: 'CRM',
+      key: 'CRM/',
+      children: [
+        { title: 'Leads', key: 'CRM/Leads' },
+        { title: 'Opportunity', key: 'CRM/Opportunity' },
+        { title: 'Campaign', key: 'CRM/Campaign' },
+        { title: 'Contacts', key: 'CRM/Contacts' },
+        { title: 'Cases', key: 'CRM/Cases' },
+      ],
+    },
+    {
+      title: 'Distribution',
+      key: 'Distribution/',
+      children: [
+        { title: 'External Delivery', key: 'Distribution/External Delivery' },
+        { title: 'Internal Delivery', key: 'Distribution/Internal Delivery' },
+        { title: 'Picking', key: 'Distribution/Picking' },
+        { title: 'Packing', key: 'Distribution/Packing' },
+        { title: 'Shipment', key: 'Distribution/Shipment' },
+        { title: 'Rework', key: 'Distribution/Rework' },
+      ],
+    },
+    {
+      title: 'Financials',
+      key: 'Financials/',
+      children: [
+        { title: 'Reports', key: 'Financials/Reports' },
+        { title: 'Validations', key: 'Financials/Validations' },
+        { title: 'Approvals', key: 'Financials/Approvals' },
+        { title: 'Forms', key: 'Financials/Forms' },
+      ],
+    },
+    {
+      title: 'Human Resources',
+      key: 'Human Resources/',
+      children: [
+        { title: 'Employees', key: 'Human Resources/Employees' },
+        { title: 'Recruitment', key: 'Human Resources/Recruitment' },
+        { title: 'Attendance Tracking', key: 'Human Resources/Attendance Tracking' },
+        { title: 'Payroll', key: 'Human Resources/Payroll' },
+        { title: 'Departments', key: 'Human Resources/Departments' },
+        { title: 'Workforce Allocation', key: 'Human Resources/Workforce Allocation' },
+        { title: 'Leave Requests', key: 'Human Resources/Leave Requests' },
+        { title: 'Employee Performance', key: 'Human Resources/Employee Performance' },
+        { title: 'Employee Salary', key: 'Human Resources/Employee Salary' },
+      ],
+    },
+    {
+      title: 'Inventory',
+      key: 'Inventory/',
+      children: [
+        { title: 'Shelf Life', key: 'Inventory/Shelf Life' },
+        { title: 'P-Counts', key: 'Inventory/P-Counts' },
+        { title: 'Stock Flow', key: 'Inventory/Stock Flow' },
+      ],
+    },
+    {
+      title: 'Job Posting',
+      key: 'Job Posting/',
+      children: [],
+    },
+    {
+      title: 'Management',
+      key: 'Management/',
+      children: [
+        { title: 'Dashboard', key: 'Management/Dashboard' },
+        { title: 'Project Approval', key: 'Management/Project Approval' },
+        { title: 'User Roles', key: 'Management/User Roles' },
+        { title: 'Access Control', key: 'Management/Access Control' },
+        { title: 'Settings', key: 'Management/Settings' },
+      ],
+    },
+    {
+      title: 'MRP',
+      key: 'MRP/',
+      children: [
+        { title: 'Material Requirements Planning', key: 'MRP/Material Requirements Planning' },
+        { title: 'Bills Of Material', key: 'MRP/Bills Of Material' },
+        { title: 'Product Materials', key: 'MRP/Product Materials' },
+      ],
+    },
+    {
+      title: 'Operations',
+      key: 'Operations/',
+      children: [
+        { title: 'Goods Tracking', key: 'Operations/Goods Tracking' },
+        { title: 'Internal Transfer', key: 'Operations/Internal Transfer' },
+        { title: 'Delivery Approval', key: 'Operations/Delivery Approval' },
+        { title: 'Delivery Receipt', key: 'Operations/Delivery Receipt' },
+        { title: 'Item Removal', key: 'Operations/Item Removal' },
+      ],
+    },
+    {
+      title: 'Production',
+      key: 'Production/',
+      children: [
+        { title: 'Equipment and Labor', key: 'Production/Equipment and Labor' },
+        { title: 'Cost of Production', key: 'Production/Cost of Production' },
+      ],
+    },
+    {
+      title: 'Project Management',
+      key: 'Project Management/',
+      children: [
+        { title: 'Project List', key: 'Project Management/Project List' },
+        { title: 'Project Planning', key: 'Project Management/Project Planning' },
+        { title: 'Project Request', key: 'Project Management/Project Request' },
+        { title: 'Tasks', key: 'Project Management/Tasks' },
+        { title: 'Report Monitoring', key: 'Project Management/Report Monitoring' },
+        { title: 'Warranty Monitoring', key: 'Project Management/Warranty Monitoring' },
+        { title: 'Project Cost', key: 'Project Management/Project Cost' },
+      ],
+    },
+    {
+      title: 'Project Request',
+      key: 'Project Request/',
+      children: [],
+    },
+    {
+      title: 'Purchase Request',
+      key: 'Purchase Request/',
+      children: [],
+    },
+    {
+      title: 'Purchasing',
+      key: 'Purchasing/',
+      children: [
+        { title: 'Purchase Request List', key: 'Purchasing/Purchase Request List' },
+        { title: 'Puchase Quotation List', key: 'Purchasing/Puchase Quotation List' },
+        { title: 'Purchase Order Status', key: 'Purchasing/Purchase Order Status' },
+        { title: 'A/P Invoice', key: 'Purchasing/A/P Invoice' },
+        { title: 'Credit Memo', key: 'Purchasing/Credit Memo' },
+        { title: 'Vendor Application Form', key: 'Purchasing/Vendor Application Form' },
+      ],
+    },
+    {
+      title: 'Sales',
+      key: 'Sales/',
+      children: [
+        { title: 'Quotation', key: 'Sales/Quotation' },
+        { title: 'Order', key: 'Sales/Order' },
+        { title: 'Delivery', key: 'Sales/Delivery' },
+        { title: 'Transactions', key: 'Sales/Transactions' },
+      ],
+    },
+    {
+      title: 'Support & Services',
+      key: 'Support & Services/',
+      children: [
+        { title: 'Service Ticket', key: 'Support & Services/Service Ticket' },
+        { title: 'Service Call', key: 'Support & Services/Service Call' },
+        { title: 'Service Request', key: 'Support & Services/Service Request' },
+        { title: 'Warranty Renewal', key: 'Support & Services/Warranty Renewal' },
+        { title: 'Service Analysis', key: 'Support & Services/Service Analysis' },
+        { title: 'Service Billing', key: 'Support & Services/Service Billing' },
+        { title: 'Service Report', key: 'Support & Services/Service Report' },
+        { title: 'Service Contract', key: 'Support & Services/Service Contract' },
+      ],
+    },
+    {
+      title: 'Report Generator',
+      key: 'Report Generator/',
+      children: [],
+    },
+    {
+      title: 'Workforce Request',
+      key: 'Workforce Request/',
+      children: [],
+    },
+    {
+      title: 'Employee Request',
+      key: 'Employee Request/',
+      children: [
+        { title: 'Resignation Request', key: 'Employee Request/Resignation Request' },
+        { title: 'Overtime Request', key: 'Employee Request/Overtime Request' },
+        { title: 'Leave Request', key: 'Employee Request/Leave Request' },
+      ],
+    },
   ];
 
+
+  // Helper function to get all department paths
+  const getAllDepartmentPaths = () => {
+    const paths = [];
+    
+    const extractPaths = (items) => {
+      items.forEach(item => {
+        paths.push(item.key);
+        if (item.children && item.children.length > 0) {
+          extractPaths(item.children);
+        }
+      });
+    };
+    
+    extractPaths(departmentOptions);
+    return paths;
+  };
+  
+  // All department paths for reference
+  const allDepartmentPaths = getAllDepartmentPaths();
+
+  
   // Calculate table data for pagination
   const getUserTableData = () => {
     const { current, pageSize } = userPagination;
@@ -913,15 +1206,16 @@ const UserManagement = () => {
               label="Department Permissions"
               rules={[{ required: true, message: "Please select at least one department" }]}
             >
-              <Checkbox.Group>
-                <div className="department-permissions-grid">
-                  {departmentOptions.map(dept => (
-                    <Checkbox key={dept} value={dept}>
-                      {dept}
-                    </Checkbox>
-                  ))}
-                </div>
-              </Checkbox.Group>
+              <Tree
+                checkable
+                treeData={departmentOptions}
+                defaultExpandAll
+                checkedKeys={checkedKeys}
+                onCheck={(checked, info) => {
+                  setCheckedKeys(checked);
+                  handleTreeCheck(checked, info);
+                }}
+              />
             </Form.Item>
 
             <Form.Item className="form-actions">

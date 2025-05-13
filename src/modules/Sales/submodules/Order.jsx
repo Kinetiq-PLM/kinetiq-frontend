@@ -391,6 +391,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setAddress("");
     setDateIssued("");
     setCanEditTable(true);
+    setOrderID("");
     setOrderInfo({
       customer_id: "",
       quotation_id: "",
@@ -481,7 +482,11 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             dataIssued={dateIssued}
             setAddress={setAddress}
             enabled={canEditTable}
-            date={new Date().toISOString().split("T")[0]}
+            date={
+              new Date(Date.now() + +3 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0]
+            }
             handleCustomerSelection={handleCustomerSelection}
           />
         </div>

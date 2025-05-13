@@ -7,7 +7,6 @@
 
 .approvals .body-content-container {
   width: 100%;
-  height: 100vh;
   border-radius: 0.5rem;
   background-color: white;
   padding: 1rem;
@@ -1001,3 +1000,101 @@ font-size: 12.5px;
   border: none !important;
 }
 
+@media (max-width: 480px) {
+  .approvals .body-content-container {
+    padding: 6px;
+    border-radius: 10px;
+    min-width: 0;
+    height: auto;
+  }
+
+  .approvals .tabs {
+    flex-direction: column;
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .approvals .tab-navigation {
+    gap: 4px;
+  }
+
+  .approvals .content-container {
+    padding: 8px;
+  }
+
+  .approvals .summary-infocard,
+  .approvals .infocard-validation-table,
+  .approvals .filter-infocard,
+  .approvals .table-infocard,
+  .approvals .reject-table {
+    max-width: 98vw;
+    margin: 8px auto;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .summary-details {
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 0;
+  }
+
+  .approvals .summary-total-spent,
+  .approvals .summary-total-budget,
+  .approvals .summary-total-remaining {
+    margin-top: 10px;
+    padding: 1px 10px;
+    font-size: 11px;
+  }
+
+  .approvals .summary-approved,
+  .approvals .summary-pending,
+  .approvals .summary-rejected {
+    padding: 1px 10px;
+    margin-top: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .edit-modal {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .approvals .edit-modal-details {
+    margin-left: 0;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .edit-modal input,
+  .approvals .edit-modal-details input {
+    padding: 6px;
+    border-radius: 4px;
+  }
+
+  .approvals .edit-modal-buttons {
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .approvals .popup-content {
+    width: 95vw;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  .approvals .popup-title {
+    font-size: 18px;
+  }
+
+  .approvals .popup-message {
+    font-size: 12px;
+  }
+}

@@ -77,11 +77,11 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         "Expiring Items": {
-            columns: ["Item Name", "Item Type", "Item Identification", "Expiry Date", "Quantity", "Status"],
+            columns: ["Item Name", "Item Type", "Item No", "Expiry Date", "Quantity", "Status"],
             data: expiringItemsData.map((item) => ({
                 "Item Name": item?.item_name || "---",
                 "Item Type": item?.item_type || "---",
-                "Item Identification": item?.item_management_id || "---",
+                "Item No": item?.item_no || "---",
                 "Expiry Date": item?.expiry,
                 "Quantity": item?.current_quantity,
                 "Status": item?.expiry_report_status,

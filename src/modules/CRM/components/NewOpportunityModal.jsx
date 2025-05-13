@@ -94,7 +94,6 @@ const NewOpportunityModal = ({
       // Reset form fields
       const request = {
         customer: selectedCustomer.customer_id,
-        partner: selectedCustomer.partner.partner_id,
         salesrep: employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
