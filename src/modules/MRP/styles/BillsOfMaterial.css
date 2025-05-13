@@ -209,72 +209,41 @@
 
 
 @media print {
-  .bom body * {
-    visibility: hidden;
+  .bom-print-modal * {
+    position: static !important;   /* reset all absolute positioning */
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+
+  .scroll-container {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .print-row {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
   }
 
   .bom-print-modal {
-    width: 100% !important;
+    overflow: visible !important;
     height: auto !important;
-    overflow: visible !important;
-    position: static !important;
-    background: white !important;
-    page-break-inside: avoid;
-    break-inside: avoid;
   }
 
-  .bom-print-content {
-    position: static !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    break-inside: auto;
-    page-break-inside: auto;
-  }
-
-  .bom .scroll-container {
-    overflow: visible !important;
-    max-height: none !important;
-  }
-
-  .bom .page-break {
-    page-break-before: always;
-    break-before: page;
-  }
-
-  .bom .print-button-container {
+  .print-button-container,
+  .print-button-container2 {
     display: none !important;
   }
 
-  .bom .print-button-container2 {
-    display: none !important;
-  }
-
-  .bom table {
-    width: 100% !important;
-    border-collapse: collapse;
-  }
-
-  .bom tr, td, th {
-    page-break-inside: avoid !important;
-    break-inside: avoid;
-  
-  }
-
-  .bom-print-total {
-    page-break-before: avoid;
-  }
-  
-  .bom .print-page-break {
-    page-break-before: always;
-    break-before: page;
-  }
-
-  .bom .print-row {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  .print-page-break {
+    page-break-before: always !important;
   }
 }
+
 
 @page {
   margin-bottom: 30mm;
