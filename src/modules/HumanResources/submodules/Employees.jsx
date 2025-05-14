@@ -80,12 +80,10 @@ const Employees = () => {
   const [resignationDocType, setResignationDocType] = useState('');
   // Default state for new resignation
   const [newResignation, setNewResignation] = useState({
-    employee_id: "",
+    employee: "",
     notice_period_days: "",
-    hr_approver_id: "",
-    approval_status: "Pending",
     clearance_status: "Not Started",
-    reason: "" // Add reason field
+    reason: ""
   });
 
   /*************************************
@@ -619,13 +617,13 @@ useEffect(() => {
   const fetchResignations = async () => {
     try {
       setLoading(true); // Set loading state when starting to fetch
-      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/");
       
       // Ensure employee names are present in the data
       const enrichedResignations = resignationsRes.data.map(resignation => {
-        if (!resignation.employee_name && resignation.employee_id) {
-          // Find employee by ID to get their name
-          const employee = employees.find(emp => emp.employee_id === resignation.employee_id);
+        // Find employee by ID to get their name
+        if (resignation.employee) {
+          const employee = employees.find(emp => emp.employee_id === resignation.employee);
           if (employee) {
             return {
               ...resignation,
@@ -1112,7 +1110,7 @@ useEffect(() => {
       max_salary: 0,
       employment_type: "Regular",
       typical_duration_days: null,
-      is_active: true
+      is_active: true,
     });
     setShowPositionModal(true);
   };
@@ -1552,11 +1550,11 @@ const handleViewResignationDocuments = async (resignation) => {
     setCurrentResignation(resignation);
     
     // Fetch the resignation to get the latest document data
-    const response = await axios.get(`http://127.0.0.1:8000/api/resignation/resignations/${resignation.resignation_id}/`);
+    const response = await axios.get(`http://127.0.0.1:8000/api/resignation/${resignation.resignation_id}/`);
     const resignationData = response.data;
     
-    // Initialize with proper structure
-    let documents = { required: {}, optional: {} };
+    // Get documents data
+    let documents = null;
     
     if (resignationData.documents) {
       try {
@@ -1564,23 +1562,10 @@ const handleViewResignationDocuments = async (resignation) => {
         documents = typeof resignationData.documents === 'string' 
           ? JSON.parse(resignationData.documents) 
           : resignationData.documents;
-        
-        // Ensure the structure has required properties
-        documents.required = documents.required || {};
-        documents.optional = documents.optional || {};
       } catch (e) {
         console.error("Error parsing documents:", e);
         showToast("Error parsing document data", false);
       }
-    }
-    
-    // Handle legacy document_url field
-    if (resignationData.document_url && !documents.required.resignation_letter) {
-      documents.required.resignation_letter = {
-        path: resignationData.document_url,
-        verified: false,
-        verified_by: null
-      };
     }
     
     setViewingResignationDocs(documents);
@@ -1633,35 +1618,26 @@ const handleResignationUploadSubmit = async (e) => {
     });
     
     // Step 4: Fetch current documents for the resignation
-    const resignationResponse = await axios.get(`http://127.0.0.1:8000/api/resignation/resignations/${currentResignation.resignation_id}/`);
+    const resignationResponse = await axios.get(`http://127.0.0.1:8000/api/resignation/${currentResignation.resignation_id}/`);
     
     // Step 5: Parse existing documents or create a new structure
-    let documents = { required: {}, optional: {} };
+    let documents = resignationResponse.data.documents || {};
     
-    if (resignationResponse.data.documents) {
+    if (typeof documents === 'string') {
       try {
-        documents = typeof resignationResponse.data.documents === 'string' 
-          ? JSON.parse(resignationResponse.data.documents) 
-          : resignationResponse.data.documents;
-          
-        documents.required = documents.required || {};
-        documents.optional = documents.optional || {};
+        documents = JSON.parse(documents);
       } catch (e) {
-        console.error("Error parsing documents:", e);
+        documents = {};
       }
     }
     
     // Step 6: Update the documents structure with the new file
-    documents.required[resignationDocType] = {
-      verified: false,
-      path: fileUrl,
-      verified_by: null
-    };
+    documents[resignationDocType] = fileUrl;
     
     // Step 7: Update the resignation's documents in your backend
     await axios.patch(
-      `http://127.0.0.1:8000/api/resignation/resignations/${currentResignation.resignation_id}/`, 
-      { documents: JSON.stringify(documents) }
+      `http://127.0.0.1:8000/api/resignation/${currentResignation.resignation_id}/`, 
+      { documents }
     );
     
     // Update local state immediately
@@ -1670,7 +1646,7 @@ const handleResignationUploadSubmit = async (e) => {
         if (res.resignation_id === currentResignation.resignation_id) {
           return {
             ...res,
-            documents: JSON.stringify(documents)
+            documents
           };
         }
         return res;
@@ -1688,7 +1664,7 @@ const handleResignationUploadSubmit = async (e) => {
     setTimeout(() => {
       const fetchResignations = async () => {
         try {
-          const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+          const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/");
           setResignations(resignationsRes.data);
         } catch (err) {
           console.error("Error fetching resignations:", err);
@@ -1696,7 +1672,6 @@ const handleResignationUploadSubmit = async (e) => {
       };
       fetchResignations();
     }, 500);
-    
   } catch (err) {
     console.error("Error uploading document:", err);
     const errorMessage = err.response?.data?.detail || 
@@ -1722,23 +1697,17 @@ const handleResignationSubmit = async (e) => {
   
   try {
     // Validate required fields
-    if (!newResignation.employee_id || !newResignation.notice_period_days) {
+    if (!newResignation.employee || !newResignation.notice_period_days) {
       showToast("Please fill all required fields", false);
       return;
     }
     
-    // Find the employee to get their name
-    const selectedEmployee = employees.find(emp => emp.employee_id === newResignation.employee_id);
-    const employeeName = selectedEmployee ? 
-      `${selectedEmployee.first_name} ${selectedEmployee.last_name}` : '';
-    
-    // Send resignation data to the API with employee_name
+    // Send resignation data to the API 
     await axios.post(
-      "http://127.0.0.1:8000/api/resignation/resignations/", 
+      "http://127.0.0.1:8000/api/resignation/", 
       {
         ...newResignation,
-        employee_name: employeeName,
-        reason: newResignation.reason || '' // Ensure reason field exists
+        notice_period_days: parseInt(newResignation.notice_period_days)
       }
     );
     
@@ -1746,7 +1715,7 @@ const handleResignationSubmit = async (e) => {
     setShowAddResignationModal(false);
     
     // Refresh resignations
-    const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+    const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/");
     setResignations(resignationsRes.data);
   } catch (err) {
     console.error("Error creating resignation:", err.response?.data || err);
@@ -1771,7 +1740,7 @@ const handleResignationSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        `http://127.0.0.1:8000/api/resignation/${editingResignation.resignation_id}/`, 
         editingResignation
       );
       
@@ -1779,7 +1748,7 @@ const handleResignationSubmit = async (e) => {
       setShowEditResignationModal(false);
       
       // Refresh resignations
-      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/");
       setResignations(resignationsRes.data);
     } catch (err) {
       console.error("Error updating resignation:", err.response?.data || err);
@@ -1818,7 +1787,7 @@ const handleResignationSubmit = async (e) => {
                 <thead>
                   <tr>
                     <th>Resignation ID</th>
-                    <th>Employee ID</th>
+                    <th>Employee</th>
                     <th>Employee Name</th>
                     <th>Submission Date</th>
                     <th>Notice Period (Days)</th>
@@ -1834,7 +1803,7 @@ const handleResignationSubmit = async (e) => {
                   {paginated.map((resignation, index) => (
                     <tr key={resignation.resignation_id || index}>
                       <td>{resignation?.resignation_id || "-"}</td>
-                      <td>{resignation?.employee_id || "-"}</td>
+                      <td>{resignation?.employee || "-"}</td>
                       <td>{resignation?.employee_name || "-"}</td>
                       <td>{resignation?.submission_date || "-"}</td>
                       <td>{resignation?.notice_period_days || "-"}</td>
@@ -1850,23 +1819,14 @@ const handleResignationSubmit = async (e) => {
                       <div className="hr-document-actions">
                       {(() => {
                         try {
-                          // Parse documents only once if it's a string
                           let hasDocuments = false;
                           
-                          // Check for both document_url and structured documents
-                          if (resignation.document_url) {
-                            hasDocuments = true;
-                          } else if (resignation.documents) {
+                          if (resignation.documents) {
                             const docs = typeof resignation.documents === 'string' 
                               ? JSON.parse(resignation.documents) 
                               : resignation.documents;
                             
-                            // Check both required and optional sections
-                            if (docs) {
-                              const requiredDocs = docs.required || {};
-                              const optionalDocs = docs.optional || {};
-                              hasDocuments = Object.keys(requiredDocs).length > 0 || Object.keys(optionalDocs).length > 0;
-                            }
+                            hasDocuments = docs && Object.keys(docs).length > 0;
                           }
                           
                           if (hasDocuments) {
@@ -3531,8 +3491,8 @@ const handleResignationSubmit = async (e) => {
                 <div className="form-group">
                   <label>Employee *</label>
                   <select 
-                    name="employee_id" 
-                    value={newResignation.employee_id} 
+                    name="employee" 
+                    value={newResignation.employee} 
                     onChange={handleResignationChange}
                     required
                   >
@@ -3559,42 +3519,6 @@ const handleResignationSubmit = async (e) => {
               </div>
               
               <div className="form-column">
-                <div className="form-group">
-                  <label>HR Approver</label>
-                  <select 
-                    name="hr_approver_id" 
-                    value={newResignation.hr_approver_id} 
-                    onChange={handleResignationChange}
-                  >
-                    <option value="">-- Select HR Approver --</option>
-                    {Array.isArray(employees) ? employees
-                      .filter(employee => 
-                        employee.dept_name === "Human Resources" || 
-                        employee.dept_id === "HR-DEPT-2025-e9fa93" ||
-                        employee.dept?.dept_name === "Human Resources" || 
-                        employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
-                      )
-                      .map(employee => (
-                        <option key={employee.employee_id} value={employee.employee_id}>
-                          {employee.first_name} {employee.last_name}
-                        </option>
-                    )) : <option value="">No HR employees available</option>}
-                  </select>
-                </div>
-                
-                <div className="form-group">
-                  <label>Approval Status</label>
-                  <select
-                    name="approval_status"
-                    value={newResignation.approval_status || "Pending"}
-                    onChange={handleResignationChange}
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    
-                  </select>
-                </div>
-                
                 <div className="form-group">
                   <label>Clearance Status</label>
                   <select
@@ -3702,31 +3626,23 @@ const handleResignationSubmit = async (e) => {
                 <h3>Resignation Documents</h3>
                 
                 <div className="documents-section">
-                  <h4>Required Documents</h4>
+                  <h4>Documents</h4>
                   <table className="hr-documents-table">
                     <thead>
                       <tr>
                         <th>Document Type</th>
-                        <th>Status</th>
-                        <th>Verified By</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {viewingResignationDocs && viewingResignationDocs.required && 
-                      Object.entries(viewingResignationDocs.required).map(([docType, docInfo]) => (
+                      {viewingResignationDocs && 
+                      Object.entries(viewingResignationDocs).map(([docType, docUrl]) => (
                         <tr key={docType}>
                           <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
                           <td>
-                            <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
-                              {docInfo.verified ? 'Verified' : 'Pending'}
-                            </span>
-                          </td>
-                          <td>{docInfo.verified_by || '-'}</td>
-                          <td>
-                            {docInfo.path && (
+                            {docUrl && (
                               <a 
-                                href={docInfo.path} 
+                                href={docUrl} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="hr-view-document-btn"
@@ -3737,9 +3653,9 @@ const handleResignationSubmit = async (e) => {
                           </td>
                         </tr>
                       ))}
-                      {(!viewingResignationDocs?.required || Object.keys(viewingResignationDocs.required).length === 0) && (
+                      {(!viewingResignationDocs || Object.keys(viewingResignationDocs).length === 0) && (
                         <tr>
-                          <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                          <td colSpan="2" className="hr-no-documents">No documents uploaded yet</td>
                         </tr>
                       )}
                     </tbody>

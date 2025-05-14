@@ -5,11 +5,10 @@ import "../styles/ResignationRequest.css";
 const ResignationRequest = () => {
   // Form state
   const [formData, setFormData] = useState({
-    employee_id: "",
-    employee_name: "",
+    employee: "",
     submission_date: new Date().toISOString().split('T')[0], // Today's date
-    notice_period_days: "30", // Default to 30 days
-    reason_for_resignation: "",
+    notice_period_days: 30, // Default to 30 days
+    reason: "",
   });
 
   // Document upload state
@@ -53,34 +52,13 @@ const ResignationRequest = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Special handling for employee_id selection
-    if (name === "employee_id" && value) {
-      const selectedEmployee = employees.find(emp => emp.employee_id === value);
-      if (selectedEmployee) {
-        // Update both employee_id and employee_name
-        setFormData(prev => ({
-          ...prev,
-          employee_id: selectedEmployee.employee_id,
-          employee_name: `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-        }));
-        return;
-      }
-    }
-    
-    // Special handling for employee_name selection
-    if (name === "employee_name" && value) {
-      // Find the employee by name
-      const selectedOption = e.target.options[e.target.selectedIndex];
-      const employeeId = selectedOption.getAttribute('data-employee-id');
-      
-      if (employeeId) {
-        setFormData(prev => ({
-          ...prev,
-          employee_id: employeeId,
-          employee_name: value
-        }));
-        return;
-      }
+    // Special handling for employee selection
+    if (name === "employee" && value) {
+      setFormData(prev => ({
+        ...prev,
+        employee: value
+      }));
+      return;
     }
     
     // Normal handling for other fields
@@ -90,7 +68,7 @@ const ResignationRequest = () => {
     }));
   };
 
-  // Handle file selection
+  // Handle file change
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setResignationLetter(e.target.files[0]);
@@ -102,8 +80,7 @@ const ResignationRequest = () => {
     e.preventDefault();
     
     // Validate form
-    if (!formData.employee_id || !formData.employee_name || 
-        !formData.notice_period_days || !formData.reason_for_resignation) {
+    if (!formData.employee || !formData.notice_period_days || !formData.reason) {
       showToast("Please fill all required fields", false);
       return;
     }
@@ -112,12 +89,12 @@ const ResignationRequest = () => {
       setLoading(true);
       setUploadingStatus('uploading');
       
-      let fileUrl = null;
+      // Prepare documents data if a resignation letter is attached
+      let documents = null;
       
-      // If resignation letter is attached, upload it first
       if (resignationLetter) {
         // Define S3 directory path for the document
-        const S3_DIRECTORY = `Human_Resource_Management/Resignations/${formData.employee_id}/`;
+        const S3_DIRECTORY = `Human_Resource_Management/Resignations/${formData.employee}/`;
         
         // Step 1: Get presigned URL from API
         const getUrlResponse = await axios.post(
@@ -138,20 +115,23 @@ const ResignationRequest = () => {
           }
         });
         
-        fileUrl = documentUrl;
+        // Create documents JSON object
+        documents = {
+          resignation_letter: documentUrl
+        };
       }
       
-      // Step 3: Submit resignation request with or without document URL
+      // Step 3: Submit resignation request with updated fields
       const payload = {
-        employee_id: formData.employee_id,
+        employee: formData.employee,
         notice_period_days: parseInt(formData.notice_period_days),
-        reason: formData.reason_for_resignation,
-        document_url: fileUrl // Will be null if no file was uploaded
+        reason: formData.reason,
+        documents: documents
       };
       
-      // Submit to API
+      // Submit to the new API endpoint
       await axios.post(
-        "http://127.0.0.1:8000/api/resignation/resignations/",
+        "http://127.0.0.1:8000/api/resignation/",
         payload
       );
       
@@ -160,11 +140,10 @@ const ResignationRequest = () => {
       
       // Reset form
       setFormData({
-        employee_id: "",
-        employee_name: "",
+        employee: "",
         submission_date: new Date().toISOString().split('T')[0],
-        notice_period_days: "30", // Keep the 30-day default after submission
-        reason_for_resignation: "",
+        notice_period_days: 30,
+        reason: "",
       });
       setResignationLetter(null);
       
@@ -206,44 +185,19 @@ const ResignationRequest = () => {
                 <div className="resig-req-form-columns">
                   <div className="resig-req-form-column">
                     <div className="resig-req-form-group">
-                      <label>Employee ID *</label>
+                      <label>Employee *</label>
                       {fetchingEmployees ? (
                         <div className="resig-req-loading-dropdown">Loading employees...</div>
                       ) : (
                         <select
-                          name="employee_id"
-                          value={formData.employee_id}
+                          name="employee"
+                          value={formData.employee}
                           onChange={handleInputChange}
                           required
                         >
-                          <option value="">-- Select Employee ID --</option>
+                          <option value="">-- Select Employee --</option>
                           {employees.map(emp => (
                             <option key={emp.employee_id} value={emp.employee_id}>
-                              {emp.employee_id}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
-                    
-                    <div className="resig-req-form-group">
-                      <label>Employee Name *</label>
-                      {fetchingEmployees ? (
-                        <div className="resig-req-loading-dropdown">Loading employees...</div>
-                      ) : (
-                        <select
-                          name="employee_name"
-                          value={formData.employee_name}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value="">-- Select Employee Name --</option>
-                          {employees.map(emp => (
-                            <option 
-                              key={emp.employee_id} 
-                              value={`${emp.first_name} ${emp.last_name}`}
-                              data-employee-id={emp.employee_id}
-                            >
                               {emp.first_name} {emp.last_name}
                             </option>
                           ))}
@@ -273,7 +227,6 @@ const ResignationRequest = () => {
                         onChange={handleInputChange}
                         min="1"
                         required
-                        disabled
                       />
                     </div>
                     
@@ -317,8 +270,8 @@ const ResignationRequest = () => {
                 <div className="resig-req-form-group full-width">
                   <label>Reason for Resignation *</label>
                   <textarea
-                    name="reason_for_resignation"
-                    value={formData.reason_for_resignation}
+                    name="reason"
+                    value={formData.reason}
                     onChange={handleInputChange}
                     rows="5"
                     required
@@ -330,11 +283,10 @@ const ResignationRequest = () => {
                     type="button"
                     onClick={() => {
                       setFormData({
-                        employee_id: "",
-                        employee_name: "",
+                        employee: "",
                         submission_date: new Date().toISOString().split('T')[0],
-                        notice_period_days: "30", // Keep the 30-day default when clearing form
-                        reason_for_resignation: "",
+                        notice_period_days: 30,
+                        reason: "",
                       });
                       setResignationLetter(null);
                     }}

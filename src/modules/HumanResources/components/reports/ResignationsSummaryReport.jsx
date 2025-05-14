@@ -7,8 +7,6 @@ import {
 const ResignationsSummaryReport = ({ resignations, employees }) => {
   // Calculate metrics
   const totalResignations = resignations.length;
-  const approvedResignations = resignations.filter(res => res.approval_status === "Approved").length;
-  const pendingResignations = resignations.filter(res => res.approval_status === "Pending").length;
   
   // Calculate turnover rate
   const totalEmployees = employees.length;
@@ -56,12 +54,15 @@ const ResignationsSummaryReport = ({ resignations, employees }) => {
           <div className="metric-value">{totalResignations}</div>
         </div>
         <div className="metric-card">
-          <h3>Approved</h3>
-          <div className="metric-value">{approvedResignations}</div>
-        </div>
-        <div className="metric-card">
-          <h3>Pending</h3>
-          <div className="metric-value">{pendingResignations}</div>
+          <h3>Notice Period (Avg Days)</h3>
+          <div className="metric-value">
+            {resignations.length > 0 ? 
+              Math.round(
+                resignations.reduce((sum, res) => sum + (parseInt(res.notice_period_days) || 0), 0) / 
+                resignations.length
+              ) : 0
+            }
+          </div>
         </div>
         <div className="metric-card">
           <h3>Turnover Rate</h3>
