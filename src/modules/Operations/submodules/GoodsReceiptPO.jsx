@@ -1526,7 +1526,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
           <div className="button-section" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div className="copy-from-container">
+            <div className="copy-from-container dropdown-scrollbar">
               {selectedButton === "Create" ? (
                 <select
                   className="copy-from-sele"
