@@ -365,7 +365,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setCandidates(candidatesRes.data);
 
         // 13. Fetch interviews data
-        const interviewsRes = await axios.get("http://127.0.0.1:8000/api/interviews/interviews/");
+        const interviewsRes = await axios.get("http://127.0.0.1:8000/api/interviews/");
         setInterviews(interviewsRes.data);
 
         // 14. Fetch job postings data

@@ -170,13 +170,13 @@ useEffect(() => {
 
       // Fetch interviews
       try {
-        const [interviewsRes, archivedInterviewsRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/interviews/interviews/"),
-          axios.get("http://127.0.0.1:8000/api/interviews/interviews/archived/")
+        const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+          axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
         ]);
-        setInterviews(ensureArray(interviewsRes.data));
+        setInterviews(ensureArray(activeInterviewsRes.data));
         setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
-        console.log("Interviews data loaded:", ensureArray(interviewsRes.data).length);
+        console.log("Interviews data loaded:", ensureArray(activeInterviewsRes.data).length, "archived:", ensureArray(archivedInterviewsRes.data).length);
       } catch (err) {
         console.error("Error fetching interviews:", err);
         setInterviews([]);
@@ -185,7 +185,7 @@ useEffect(() => {
       try {
         const [onboardingRes, archivedOnboardingRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/onboarding/"),
-          axios.get("http://127.0.0.1:8000/api/onboarding/archived/")
+          // axios.get("http://127.0.0.1:8000/api/onboarding/archived/")
         ]);
         setOnboardingTasks(ensureArray(onboardingRes.data));
         setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
@@ -609,17 +609,17 @@ useEffect(() => {
   // Add these functions for interview management
 const handleArchiveInterview = async (interview) => {
   try {
-    await axios.post(`http://127.0.0.1:8000/api/interviews/interviews/${interview.interview_id}/archive/`);
+    await axios.post(`http://127.0.0.1:8000/api/interviews/${interview.interview_id}/archive/`);
     showToast("Interview archived successfully", true);
     
     // Refresh interview lists
-    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/"),
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/archived/")
+    const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
-    setInterviews(interviewsRes.data);
-    setArchivedInterviews(archivedInterviewsRes.data);
+    setInterviews(ensureArray(activeInterviewsRes.data));
+    setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
   } catch (err) {
     console.error("Error archiving interview:", err);
     showToast("Failed to archive interview", false);
@@ -628,17 +628,17 @@ const handleArchiveInterview = async (interview) => {
 
 const handleRestoreInterview = async (interview) => {
   try {
-    await axios.post(`http://127.0.0.1:8000/api/interviews/interviews/${interview.interview_id}/restore/`);
+    await axios.post(`http://127.0.0.1:8000/api/interviews/${interview.interview_id}/unarchive/`);
     showToast("Interview restored successfully", true);
     
     // Refresh interview lists
-    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/"),
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/archived/")
+    const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
-    setInterviews(interviewsRes.data);
-    setArchivedInterviews(archivedInterviewsRes.data);
+    setInterviews(ensureArray(activeInterviewsRes.data));
+    setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
   } catch (err) {
     console.error("Error restoring interview:", err);
     showToast("Failed to restore interview", false);
@@ -646,17 +646,32 @@ const handleRestoreInterview = async (interview) => {
 };
 
 const handleEditInterview = (interview) => {
+  // Extract time from the interview_date
+  let date = "";
+  let time = "";
+  
+  if (interview.interview_date) {
+    const parts = interview.interview_date.split('T');
+    date = parts[0];
+    time = parts.length > 1 ? parts[1].substring(0, 5) : ""; // Extract HH:MM
+  }
+
   setEditingInterview({
-    ...interview,
-    // Ensure all required fields exist
-    candidate_id: interview.candidate_id || "",
-    interview_date: interview.interview_date ? interview.interview_date.split('T')[0] : "",
-    interview_time: interview.interview_time || "",
-    interview_type: interview.interview_type || "Technical",
-    interviewer_id: interview.interviewer_id || "",
-    status: interview.status || "Scheduled",
-    notes: interview.notes || ""
+    interview_id: interview.interview_id,
+    candidate: interview.candidate_id,
+    job: interview.job_id,
+    interview_date: date,
+    interview_time: time,
+    interviewer: interview.interviewer_id,
+    status: interview.status || 'Scheduled',
+    feedback: interview.feedback || '',
+    rating: interview.rating || null,
+    // Store name values for display purposes
+    candidate_name: interview.candidate_name,
+    job_title: interview.job_title,
+    interviewer_name: interview.interviewer_name
   });
+  
   setShowEditInterviewModal(true);
   setDotsMenuOpen(null);
 };
@@ -666,18 +681,44 @@ const handleEditInterviewSubmit = async (e) => {
   try {
     setLoading(true);
     
+    // Combine date and time for interview_date
+    const combinedData = {
+      ...editingInterview,
+      interview_date: editingInterview.interview_date && editingInterview.interview_time ?
+        `${editingInterview.interview_date}T${editingInterview.interview_time}:00` :
+        editingInterview.interview_date
+    };
+    
+    // Convert field names to match backend model
+    const apiData = {
+      ...combinedData,
+      candidate_id: combinedData.candidate,
+      job_id: combinedData.job,
+      interviewer_id: combinedData.interviewer
+    };
+    
+    // Remove old field names
+    delete apiData.candidate;
+    delete apiData.job;
+    delete apiData.interviewer;
+    delete apiData.interview_time; // This is combined into interview_date
+    
     // Submit to API
-    await axios.patch(
-      `http://127.0.0.1:8000/api/interviews/interviews/${editingInterview.interview_id}/`,
-      editingInterview
+    const response = await axios.patch(
+      `http://127.0.0.1:8000/api/interviews/${editingInterview.interview_id}/`,
+      apiData
     );
     
     showToast("Interview updated successfully", true);
     setShowEditInterviewModal(false);
     
     // Refresh interviews list
-    const interviewsRes = await axios.get("http://127.0.0.1:8000/api/interviews/interviews/");
-    setInterviews(interviewsRes.data);
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
+    ]);
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
     
   } catch (err) {
     console.error("Error updating interview:", err);
@@ -697,7 +738,7 @@ const bulkUnarchiveInterviews = async () => {
     
     // Create an array of promises for each selected interview
     const promises = selectedArchivedInterviews.map(id => 
-      axios.post(`http://127.0.0.1:8000/api/interviews/interviews/${id}/restore/`)
+      axios.post(`http://127.0.0.1:8000/api/interviews/${id}/unarchive/`)
     );
     
     // Execute all promises
@@ -710,13 +751,13 @@ const bulkUnarchiveInterviews = async () => {
     setSelectedArchivedInterviews([]);
     
     // Refresh interview lists
-    const [interviewsRes, archivedInterviewsRes] = await Promise.all([
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/"),
-      axios.get("http://127.0.0.1:8000/api/interviews/interviews/archived/")
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
-    setInterviews(interviewsRes.data);
-    setArchivedInterviews(archivedInterviewsRes.data);
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
   } catch (err) {
     console.error("Error restoring interviews:", err);
     showToast("Failed to restore interviews", false);
@@ -1468,11 +1509,13 @@ const handleAddClick = () => {
   } else if (activeTab === "Candidates") {
     handleAddCandidate();
   } else if (activeTab === "Interviews") {
+    // Initialize with current date
+    const today = new Date().toISOString().split('T')[0];
+    
     setNewInterview({
       candidate_id: "",
-      interview_date: "",
-      interview_time: "",
-      interview_type: "Technical",
+      interview_date: today,
+      interview_time: "09:00",
       interviewer_id: "",
       status: "Scheduled",
       notes: ""
@@ -2078,17 +2121,18 @@ const handleInterviewSubmit = async (e) => {
     const interviewData = {
       candidate_id: newInterview.candidate_id,
       job_id: candidates.find(c => c.candidate_id === newInterview.candidate_id)?.job_id,
-      interview_date: `${newInterview.interview_date}T${newInterview.interview_time}:00`,
-      interview_type: newInterview.interview_type,
+      interview_date: `${newInterview.interview_date}T${newInterview.interview_time || '00:00'}:00`,
       interviewer_id: newInterview.interviewer_id,
-      status: newInterview.status,
+      status: newInterview.status || 'Scheduled',
       feedback: newInterview.notes || "",
       rating: 0 // Default to 0 for new interviews
     };
     
+    console.log("Creating interview with data:", interviewData);
+    
     // Submit to API
-    await axios.post(
-      "http://127.0.0.1:8000/api/interviews/interviews/",
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/interviews/",
       interviewData
     );
     
@@ -2096,8 +2140,13 @@ const handleInterviewSubmit = async (e) => {
     setShowAddInterviewModal(false);
     
     // Refresh interviews list
-    const interviewsRes = await axios.get("http://127.0.0.1:8000/api/interviews/interviews/");
-    setInterviews(interviewsRes.data);
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
+    ]);
+    
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
     
   } catch (err) {
     console.error("Error scheduling interview:", err);
@@ -3181,21 +3230,6 @@ const handleOnboardingTaskSubmit = async (e) => {
                 
                 <div className="form-column">
                   <div className="form-group">
-                    <label>Interview Type *</label>
-                    <select
-                      name="interview_type"
-                      value={newInterview.interview_type}
-                      onChange={handleInterviewChange}
-                      required
-                    >
-                      <option value="Technical">Technical</option>
-                      <option value="HR">HR</option>
-                      <option value="Cultural Fit">Cultural Fit</option>
-                      <option value="Final">Final</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
                     <label>Interviewer *</label>
                     <select
                       name="interviewer_id"
@@ -3232,7 +3266,7 @@ const handleOnboardingTaskSubmit = async (e) => {
                   <label>Notes</label>
                   <textarea
                     name="notes"
-                    value={newInterview.notes}
+                    value={newInterview.notes || ""}
                     onChange={handleInterviewChange}
                     placeholder="Additional notes about the interview..."
                   />
@@ -3240,7 +3274,9 @@ const handleOnboardingTaskSubmit = async (e) => {
               </div>
               
               <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Schedule Interview</button>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Scheduling..." : "Schedule Interview"}
+                </button>
                 <button 
                   type="button" 
                   className="cancel-btn" 
@@ -3264,9 +3300,9 @@ const handleOnboardingTaskSubmit = async (e) => {
             <div className="form-group">
               <label>Candidate *</label>
               <select 
-                name="candidate_id" 
-                value={editingInterview.candidate_id} 
-                onChange={(e) => setEditingInterview({...editingInterview, candidate_id: e.target.value})}
+                name="candidate" 
+                value={editingInterview.candidate || ""} 
+                onChange={(e) => setEditingInterview({...editingInterview, candidate: e.target.value})}
                 required
               >
                 <option value="">-- Select Candidate --</option>
@@ -3283,7 +3319,7 @@ const handleOnboardingTaskSubmit = async (e) => {
               <input 
                 type="date" 
                 name="interview_date" 
-                value={editingInterview.interview_date} 
+                value={editingInterview.interview_date ? editingInterview.interview_date.split('T')[0] : ""} 
                 onChange={(e) => setEditingInterview({...editingInterview, interview_date: e.target.value})}
                 required
               />
@@ -3294,7 +3330,8 @@ const handleOnboardingTaskSubmit = async (e) => {
               <input 
                 type="time" 
                 name="interview_time" 
-                value={editingInterview.interview_time} 
+                value={editingInterview.interview_time || (editingInterview.interview_date && editingInterview.interview_date.includes('T') ? 
+                  editingInterview.interview_date.split('T')[1].substring(0, 5) : "")} 
                 onChange={(e) => setEditingInterview({...editingInterview, interview_time: e.target.value})}
                 required
               />
@@ -3303,26 +3340,11 @@ const handleOnboardingTaskSubmit = async (e) => {
           
           <div className="form-column">
             <div className="form-group">
-              <label>Interview Type *</label>
-              <select
-                name="interview_type"
-                value={editingInterview.interview_type}
-                onChange={(e) => setEditingInterview({...editingInterview, interview_type: e.target.value})}
-                required
-              >
-                <option value="Technical">Technical</option>
-                <option value="HR">HR</option>
-                <option value="Cultural Fit">Cultural Fit</option>
-                <option value="Final">Final</option>
-              </select>
-            </div>
-            
-            <div className="form-group">
               <label>Interviewer *</label>
               <select
-                name="interviewer_id"
-                value={editingInterview.interviewer_id}
-                onChange={(e) => setEditingInterview({...editingInterview, interviewer_id: e.target.value})}
+                name="interviewer"
+                value={editingInterview.interviewer || ""}
+                onChange={(e) => setEditingInterview({...editingInterview, interviewer: e.target.value})}
                 required
               >
                 <option value="">-- Select Interviewer --</option>
