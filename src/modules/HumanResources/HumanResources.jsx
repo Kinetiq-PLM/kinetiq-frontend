@@ -337,7 +337,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setDepartmentSuperiors(departmentSuperiors);
         
         // 6. Fetch resignations data
-        const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+        const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/");
         const resignations = resignationsRes.data;
         
         // 7. Fetch recruitment data
