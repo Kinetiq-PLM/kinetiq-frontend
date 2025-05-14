@@ -44,10 +44,10 @@ const JobPostingReqs = () => {
     const fetchData = async () => {
       try {
         const [postingsRes, archivedRes, deptsRes, posRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/")
+          axios.get("http://127.0.0.1:8000///api/job_posting/job_postings/"),
+          axios.get("http://127.0.0.1:8000///api/job_posting/job_postings/archived/"),
+          axios.get("http://127.0.0.1:8000///api/departments/department/"),
+          axios.get("http://127.0.0.1:8000///api/positions/positions/")
         ]);
 
         setPostings(postingsRes.data);
@@ -146,7 +146,7 @@ const JobPostingReqs = () => {
       
       // Send to API
       const response = await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/", 
+        "http://127.0.0.1:8000///api/job_posting/job_postings/", 
         jobPostingData
       );
       
@@ -157,7 +157,7 @@ const JobPostingReqs = () => {
       handleCancel();
       
       // Refresh data
-      const postingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
+      const postingsRes = await axios.get("http://127.0.0.1:8000///api/job_posting/job_postings/");
       setPostings(postingsRes.data);
       
     } catch (err) {

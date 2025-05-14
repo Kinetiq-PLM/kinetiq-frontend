@@ -44,7 +44,7 @@ const AttendanceTracking = () => {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
+      const res = await axios.get("http://127.0.0.1:8000///api/attendance_tracking/attendance_tracking/");
       setAttendanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
@@ -57,7 +57,7 @@ const AttendanceTracking = () => {
   const fetchCalendarDates = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/");
+      const res = await axios.get("http://127.0.0.1:8000///api/calendar_dates/calendar_dates/");
       setCalendarDatesData(res.data);
     } catch (err) {
       console.error("Failed to fetch calendar dates:", err);
@@ -70,7 +70,7 @@ const AttendanceTracking = () => {
   const fetchOvertimeRequests = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/");
+      const res = await axios.get("http://127.0.0.1:8000///api/overtime_requests/");
       setOvertimeRequestsData(res.data);
     } catch (err) {
       console.error("Failed to fetch overtime requests:", err);
@@ -178,7 +178,7 @@ const AttendanceTracking = () => {
       
       // Submit the form data
       const response = await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/",
+        "http://127.0.0.1:8000///api/calendar_dates/calendar_dates/",
         newCalendarDate
       );
       

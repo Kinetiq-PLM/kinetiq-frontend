@@ -40,7 +40,7 @@ const LeaveRequest = () => {
         setFetchingEmployees(true);
         
         // Use the real API endpoint to fetch employees
-        const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees");
+        const response = await axios.get("http://127.0.0.1:8000///api/employees");
 
         if (!response || !response.data) {
           throw new Error("Invalid response from employees API");
@@ -71,7 +71,7 @@ const LeaveRequest = () => {
         setFetchingDepartments(true);
         
         // Use the real API endpoint to fetch departments
-        const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/");
+        const response = await axios.get("http://127.0.0.1:8000///api/departments/department/");
         setDepartments(response.data);
       } catch (err) {
         console.error("Error fetching departments:", err);
@@ -93,7 +93,7 @@ const LeaveRequest = () => {
         setFetchingSuperiors(true);
         
         // Use the real API endpoint to fetch department superiors
-        const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/`);
+        const response = await axios.get(`http://127.0.0.1:8000///api/department_superiors/department-superiors/`);
         // Filter superiors by the selected department
         const filteredSuperiors = response.data.filter(sup => 
           sup.dept_id === formData.dept_id && !sup.is_archived
@@ -296,7 +296,7 @@ const LeaveRequest = () => {
 
       // Use the actual API request
       await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/",
+        "http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/",
         payload
       );
 

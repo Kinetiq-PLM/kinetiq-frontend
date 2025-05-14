@@ -53,7 +53,7 @@ const LeaveRequests = () => {
     setLoading(true);
     try {
       // Fetch all leave requests
-      const leaveResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/");
+      const leaveResponse = await axios.get("http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/");
       
       // Explicitly filter active requests - make sure is_archived exists before using it
       const activeLeaveRequests = leaveResponse.data.filter(request => {
@@ -62,11 +62,11 @@ const LeaveRequests = () => {
       setLeaveRequests(activeLeaveRequests);
   
       // Fetch archived leave requests separately
-      const archivedResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/archived/");
+      const archivedResponse = await axios.get("http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/archived/");
       setArchivedLeaveRequests(archivedResponse.data);
   
       // Fetch leave balances
-      const balancesResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_balances/employee_leave_balances/");
+      const balancesResponse = await axios.get("http://127.0.0.1:8000///api/employee_leave_balances/employee_leave_balances/");
       setLeaveBalances(balancesResponse.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -78,7 +78,7 @@ const LeaveRequests = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+      const res = await axios.get("http://127.0.0.1:8000///api/employees/");
       setEmployees(res.data);
     } catch (err) {
       console.error("Failed to fetch employees:", err);
@@ -259,7 +259,7 @@ const LeaveRequests = () => {
       setLoading(true); // Show loading state
       
       const response = await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/", 
+        "http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/", 
         requestPayload,
         {
           headers: {
@@ -323,7 +323,7 @@ const LeaveRequests = () => {
     if (!window.confirm("Are you sure you want to archive this leave request?")) return;
     
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/${leaveId}/archive/`);
+      await axios.post(`http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/${leaveId}/archive/`);
       showToast("Leave request archived successfully");
       fetchData(); // Refresh data after archiving
     } catch (err) {
@@ -336,7 +336,7 @@ const LeaveRequests = () => {
     if (!window.confirm("Are you sure you want to unarchive this leave request?")) return;
     
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
       showToast("Leave request unarchived successfully");
       fetchData(); // Refresh data after unarchiving
     } catch (err) {
@@ -379,7 +379,7 @@ const LeaveRequests = () => {
       // Process each selected leave request
       for (const leaveId of selectedLeaveRequests) {
         try {
-          await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
+          await axios.post(`http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
           successCount++;
         } catch (err) {
           console.error(`Failed to unarchive leave request ${leaveId}:`, err);
@@ -900,7 +900,7 @@ const handleEditLeaveRequest = async (e) => {
     
     // Make API call with only the fields we want to update
     await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/${editingRequest.leave_id}/`,
+      `http://127.0.0.1:8000///api/employee_leave_requests/leave_requests/${editingRequest.leave_id}/`,
       requestData
     );
     
