@@ -5,6 +5,8 @@ import { saveAs } from 'file-saver';
 import "../styles/ProjectForms.css";
 import logoUrl from "/public/icons/Kinetiq-Logo.png";
 
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
+
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 

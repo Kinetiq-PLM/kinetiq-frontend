@@ -16,7 +16,7 @@ import {
   FaDownload,
   FaExclamationCircle
 } from "react-icons/fa";
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
 
 
 const ProjectGanttChart = ({ onBack }) => {
