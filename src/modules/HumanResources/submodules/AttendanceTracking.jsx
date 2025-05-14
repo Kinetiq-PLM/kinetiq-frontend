@@ -14,6 +14,7 @@ const AttendanceTracking = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [calendarDatesData, setCalendarDatesData] = useState([]);
   const [overtimeRequestsData, setOvertimeRequestsData] = useState([]);
+  const [employeesData, setEmployeesData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // UI States
@@ -95,6 +96,21 @@ const AttendanceTracking = () => {
     }
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/employees/");
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Employees data:", responseData);
+      setEmployeesData(responseData);
+    } catch (err) {
+      console.error("Failed to fetch employees:", err);
+      showToast("Failed to fetch employees data", false);
+      // Set empty array on error
+      setEmployeesData([]);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "Attendance") {
       fetchAttendance();
@@ -102,6 +118,7 @@ const AttendanceTracking = () => {
       fetchCalendarDates();
     } else if (activeTab === "OvertimeRequests") {
       fetchOvertimeRequests();
+      fetchEmployees();
     }
   }, [activeTab]);
 
@@ -364,6 +381,12 @@ const AttendanceTracking = () => {
       return <div className="hr-attendance-no-results">No overtime requests found.</div>;
     }
 
+    // Create a map of employee_id to employee names for easier lookup
+    const employeeMap = {};
+    employeesData.forEach(emp => {
+      employeeMap[emp.employee_id] = `${emp.first_name} ${emp.last_name}`;
+    });
+
     return (
       <>
         <div className="hr-attendance-no-scroll-wrapper">
@@ -374,15 +397,12 @@ const AttendanceTracking = () => {
                   <th>Request ID</th>
                   <th>Employee ID</th>
                   <th>Employee Name</th>
-                  <th>Date</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Hours</th>
+                  <th>Request Date</th>
+                  <th>Overtime Hours</th>
                   <th>Reason</th>
                   <th>Status</th>
                   <th>Approved By</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
+                  <th>Approval Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -390,20 +410,17 @@ const AttendanceTracking = () => {
                   <tr key={request.request_id || index}>
                     <td>{request.request_id}</td>
                     <td>{request.employee_id}</td>
-                    <td>{request.employee_name}</td>
-                    <td>{request.date}</td>
-                    <td>{request.start_time}</td>
-                    <td>{request.end_time}</td>
-                    <td>{request.hours}</td>
+                    <td>{employeeMap[request.employee_id] || "-"}</td>
+                    <td>{request.request_date}</td>
+                    <td>{request.overtime_hours}</td>
                     <td>{request.reason}</td>
                     <td>
                       <span className={`hr-attendance-tag ${request.status?.toLowerCase()}`}>
                         {request.status}
                       </span>
                     </td>
-                    <td>{request.approved_by}</td>
-                    <td>{request.created_at}</td>
-                    <td>{request.updated_at}</td>
+                    <td>{employeeMap[request.approved_by] || "-"}</td>
+                    <td>{request.approval_date || "-"}</td>
                   </tr>
                 ))}
               </tbody>
