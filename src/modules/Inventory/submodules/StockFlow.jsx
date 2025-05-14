@@ -99,7 +99,7 @@ import TransferStockForm from "../components/TransferStockForm";
         useEffect(() => {
             const fetchData = async () => {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/warehousemovement-data/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
@@ -118,7 +118,7 @@ import TransferStockForm from "../components/TransferStockForm";
         useEffect(() => {
             const fetchWarehouseItemsData = async () => { 
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-item-list/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
                     
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
@@ -141,7 +141,7 @@ import TransferStockForm from "../components/TransferStockForm";
         useEffect(() => {
             const fetchWarehouseListData = async () => {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseListData(data);
@@ -260,7 +260,7 @@ import TransferStockForm from "../components/TransferStockForm";
                 <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
                     <div className="flex-col w-full">
                     <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY: STOCKFLOW</h2>
-                    <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{}</span></p>
+                    <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{selectedWarehouse}</span></p>
                     </div>
 
                     <div className="w-[450px] h-full flex flex-col gap-2">

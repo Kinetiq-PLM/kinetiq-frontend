@@ -38,6 +38,10 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
     });
   };
 
+  // Local: http://127.0.0.1:8000/
+  // AWS: https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
