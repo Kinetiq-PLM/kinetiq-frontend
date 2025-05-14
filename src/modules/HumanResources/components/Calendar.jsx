@@ -53,7 +53,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8000///api/calendar_dates/calendar_dates/"
+          "http://127.0.0.1:8000/api/calendar_dates/calendar_dates/"
         );
         setCalendarData(data);
         setError(null);

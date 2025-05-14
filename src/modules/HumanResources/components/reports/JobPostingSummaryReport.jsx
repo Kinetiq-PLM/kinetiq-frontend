@@ -24,7 +24,7 @@ const JobPostingSummaryReport = ({ jobPostings: propsJobPostings = [] }) => {
 
       try {
         console.log("Fetching job postings data directly...");
-        const response = await axios.get("http://127.0.0.1:8000///api/job_posting/job_postings/");
+        const response = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
         setJobPostings(response.data || []);
       } catch (err) {
         console.error("Error fetching job postings data:", err);
@@ -39,7 +39,7 @@ const JobPostingSummaryReport = ({ jobPostings: propsJobPostings = [] }) => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000///api/departments/department/");
+        const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
         setDepartments(response.data || []);
       } catch (err) {
         console.error("Error fetching departments data:", err);

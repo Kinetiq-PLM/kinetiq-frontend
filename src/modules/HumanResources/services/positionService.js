@@ -1,7 +1,7 @@
 // src/services/positionService.js
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000///api';
+const API_URL = 'http://127.0.0.1:8000/api';
 
 // Create axios instance with default config
 const apiClient = axios.create({

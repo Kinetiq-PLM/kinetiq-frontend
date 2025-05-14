@@ -28,7 +28,7 @@ const ResignationRequest = () => {
     const fetchEmployees = async () => {
       try {
         setFetchingEmployees(true);
-        const response = await axios.get("http://127.0.0.1:8000///api/employees");
+        const response = await axios.get("http://127.0.0.1:8000/api/employees");
         // Filter only active employees
         const activeEmployees = response.data.filter(emp => emp.status === "Active");
         setEmployees(activeEmployees);
@@ -151,7 +151,7 @@ const ResignationRequest = () => {
       
       // Submit to API
       await axios.post(
-        "http://127.0.0.1:8000///api/resignation/resignations/",
+        "http://127.0.0.1:8000/api/resignation/resignations/",
         payload
       );
       

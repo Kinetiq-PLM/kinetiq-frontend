@@ -23,7 +23,7 @@ const CandidatesSummaryReport = ({ candidates: propsCandidates = [] }) => {
 
       try {
         console.log("Fetching candidates data directly...");
-        const response = await axios.get("http://127.0.0.1:8000///api/candidates/candidates/");
+        const response = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
         setCandidates(response.data || []);
       } catch (err) {
         console.error("Error fetching candidates data:", err);

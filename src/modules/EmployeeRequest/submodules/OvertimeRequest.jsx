@@ -25,7 +25,7 @@ const OvertimeRequest = () => {
     const fetchEmployees = async () => {
       try {
         setFetchingEmployees(true);
-        const response = await axios.get("http://127.0.0.1:8000///api/employees");
+        const response = await axios.get("http://127.0.0.1:8000/api/employees");
         // Filter only active employees
         const activeEmployees = response.data.filter(emp => emp.status === "Active");
         setEmployees(activeEmployees);
@@ -111,7 +111,7 @@ const OvertimeRequest = () => {
       };
       
       await axios.post(
-        "http://127.0.0.1:8000///api/overtime_requests/",
+        "http://127.0.0.1:8000/api/overtime_requests/",
         payload
       );
       

@@ -27,9 +27,9 @@ const PositionsSummaryReport = ({ positions: propsPositions = [], employees: pro
         try {
           console.log("Fetching positions and employees data directly...");
           const [positionsRes, employeesRes, deptsRes] = await Promise.all([
-            axios.get("http://127.0.0.1:8000///api/positions/positions/"),
-            axios.get("http://127.0.0.1:8000///api/employees/employees/"),
-            axios.get("http://127.0.0.1:8000///api/departments/department/")
+            axios.get("http://127.0.0.1:8000/api/positions/positions/"),
+            axios.get("http://127.0.0.1:8000/api/employees/"),
+            axios.get("http://127.0.0.1:8000/api/departments/department/")
           ]);
           
           console.log("Positions data fetched:", positionsRes.data);

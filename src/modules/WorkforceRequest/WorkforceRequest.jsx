@@ -45,7 +45,7 @@ const WorkforceRequest = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000///api/departments/department/");
+        const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
         setDepartments(response.data.filter(dept => !dept.is_archived));
       } catch (err) {
         console.error("Error fetching departments:", err);
@@ -55,7 +55,7 @@ const WorkforceRequest = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000///api/employees/");
+        const response = await axios.get("http://127.0.0.1:8000/api/employees/");
         setEmployees(response.data);
       } catch (err) {
         console.error("Error fetching employees:", err);
@@ -65,7 +65,7 @@ const WorkforceRequest = () => {
 
     const fetchRequests = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000///api/workforce_allocation/workforce_allocations/");
+        const response = await axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/");
         setRequests(response.data);
       } catch (err) {
         console.error("Error fetching requests:", err);
@@ -124,7 +124,7 @@ const WorkforceRequest = () => {
     }
     
     try {
-      await axios.post("http://127.0.0.1:8000///api/workforce_allocation/workforce_allocations/", formData);
+      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", formData);
       showToast("Request submitted successfully");
       setFormData({
         requesting_dept_id: "",

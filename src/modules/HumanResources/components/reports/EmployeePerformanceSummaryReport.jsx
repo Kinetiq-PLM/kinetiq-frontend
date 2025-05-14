@@ -25,7 +25,7 @@ const EmployeePerformanceSummaryReport = ({ performanceData: propsPerformanceDat
 
       try {
         console.log("Fetching performance data directly...");
-        const response = await axios.get("http://127.0.0.1:8000///api/employee_performance/employee_performance/");
+        const response = await axios.get("http://127.0.0.1:8000/api/employee_performance/employee_performance/");
         setPerformanceData(response.data || []);
       } catch (err) {
         console.error("Error fetching performance data:", err);

@@ -514,8 +514,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000///api/employees/employees/"),
-        axios.get("http://127.0.0.1:8000///api/employees/employees/archived/")
+        axios.get("http://127.0.0.1:8000/api/employees/"),
+        axios.get("http://127.0.0.1:8000/api/employees/archived/")
       ]);
       console.log("Fetched employee data:", activeRes.data);
       setEmployees(activeRes.data);
@@ -551,7 +551,7 @@ const Employees = () => {
 
   const fetchDepartmentSuperiors = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000///api/department_superiors/department-superiors/");
+      const response = await axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/");
       setDepartmentSuperiors(response.data.filter(sup => !sup.is_archived && sup.status === "Active"));
     } catch (err) {
       console.error("Fetch department superiors error:", err);
@@ -566,8 +566,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000///api/positions/positions/"),
-        axios.get("http://127.0.0.1:8000///api/positions/positions/archived/")
+        axios.get("http://127.0.0.1:8000/api/positions/positions/"),
+        axios.get("http://127.0.0.1:8000/api/positions/positions/archived/")
       ]);
       setPositions(activeRes.data);
       setArchivedPositions(archivedRes.data);
@@ -581,7 +581,7 @@ const Employees = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000///api/departments/department/");
+      const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
       
       // Handle both array and object responses
       const departmentsData = response.data;
@@ -619,7 +619,7 @@ useEffect(() => {
   const fetchResignations = async () => {
     try {
       setLoading(true); // Set loading state when starting to fetch
-      const resignationsRes = await axios.get("http://127.0.0.1:8000///api/resignation/resignations/");
+      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
       
       // Ensure employee names are present in the data
       const enrichedResignations = resignationsRes.data.map(resignation => {
@@ -921,7 +921,7 @@ useEffect(() => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("http://127.0.0.1:8000///api/employees/employees/", employeeData);
+      const response = await axios.post("http://127.0.0.1:8000/api/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -1003,7 +1003,7 @@ useEffect(() => {
       };
 
       await axios.patch(
-        `http://127.0.0.1:8000///api/employees/employees/${editingEmployee.employee_id}/`,
+        `http://127.0.0.1:8000/api/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -1020,7 +1020,7 @@ useEffect(() => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000///api/employees/employees/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       
       // Immediately update state to reflect changes
@@ -1045,7 +1045,7 @@ useEffect(() => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000///api/employees/employees/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       
@@ -1075,7 +1075,7 @@ useEffect(() => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`http://127.0.0.1:8000///api/employees/employees/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -1285,7 +1285,7 @@ useEffect(() => {
     };
     
     try {
-      const response = await fetch("http://127.0.0.1:8000///api/positions/positions/", {
+      const response = await fetch("http://127.0.0.1:8000/api/positions/positions/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1446,7 +1446,7 @@ useEffect(() => {
       };
 
       await axios.patch(
-        `http://127.0.0.1:8000///api/positions/positions/${editingPosition.position_id}/`,
+        `http://127.0.0.1:8000/api/positions/positions/${editingPosition.position_id}/`,
         formattedData
       );
       setShowEditPositionModal(false);
@@ -1463,7 +1463,7 @@ useEffect(() => {
   const handleArchivePosition = async (id) => {
     if (!window.confirm("Archive this position?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000///api/positions/positions/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/archive/`);
       showToast("Position archived successfully");
       
       // Immediately update state to reflect changes
@@ -1489,7 +1489,7 @@ useEffect(() => {
   const handleUnarchivePosition = async (id) => {
     try {
       const encodedId = encodeURIComponent(id);
-      await axios.post(`http://127.0.0.1:8000///api/positions/positions/${encodedId}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${encodedId}/unarchive/`);
       setShowConfirmUnarchivePosition(null);
       showToast("Position unarchived successfully");
       
@@ -1519,7 +1519,7 @@ useEffect(() => {
     try {
       await Promise.all(
         selectedArchivedPositions.map((id) =>
-          axios.post(`http://127.0.0.1:8000///api/positions/positions/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/unarchive/`)
         )
       );
       showToast("Positions unarchived successfully");
@@ -1552,7 +1552,7 @@ const handleViewResignationDocuments = async (resignation) => {
     setCurrentResignation(resignation);
     
     // Fetch the resignation to get the latest document data
-    const response = await axios.get(`http://127.0.0.1:8000///api/resignation/resignations/${resignation.resignation_id}/`);
+    const response = await axios.get(`http://127.0.0.1:8000/api/resignation/resignations/${resignation.resignation_id}/`);
     const resignationData = response.data;
     
     // Initialize with proper structure
@@ -1633,7 +1633,7 @@ const handleResignationUploadSubmit = async (e) => {
     });
     
     // Step 4: Fetch current documents for the resignation
-    const resignationResponse = await axios.get(`http://127.0.0.1:8000///api/resignation/resignations/${currentResignation.resignation_id}/`);
+    const resignationResponse = await axios.get(`http://127.0.0.1:8000/api/resignation/resignations/${currentResignation.resignation_id}/`);
     
     // Step 5: Parse existing documents or create a new structure
     let documents = { required: {}, optional: {} };
@@ -1660,7 +1660,7 @@ const handleResignationUploadSubmit = async (e) => {
     
     // Step 7: Update the resignation's documents in your backend
     await axios.patch(
-      `http://127.0.0.1:8000///api/resignation/resignations/${currentResignation.resignation_id}/`, 
+      `http://127.0.0.1:8000/api/resignation/resignations/${currentResignation.resignation_id}/`, 
       { documents: JSON.stringify(documents) }
     );
     
@@ -1688,7 +1688,7 @@ const handleResignationUploadSubmit = async (e) => {
     setTimeout(() => {
       const fetchResignations = async () => {
         try {
-          const resignationsRes = await axios.get("http://127.0.0.1:8000///api/resignation/resignations/");
+          const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
           setResignations(resignationsRes.data);
         } catch (err) {
           console.error("Error fetching resignations:", err);
@@ -1734,7 +1734,7 @@ const handleResignationSubmit = async (e) => {
     
     // Send resignation data to the API with employee_name
     await axios.post(
-      "http://127.0.0.1:8000///api/resignation/resignations/", 
+      "http://127.0.0.1:8000/api/resignation/resignations/", 
       {
         ...newResignation,
         employee_name: employeeName,
@@ -1746,7 +1746,7 @@ const handleResignationSubmit = async (e) => {
     setShowAddResignationModal(false);
     
     // Refresh resignations
-    const resignationsRes = await axios.get("http://127.0.0.1:8000///api/resignation/resignations/");
+    const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
     setResignations(resignationsRes.data);
   } catch (err) {
     console.error("Error creating resignation:", err.response?.data || err);
@@ -1771,7 +1771,7 @@ const handleResignationSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.patch(
-        `http://127.0.0.1:8000///api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        `http://127.0.0.1:8000/api/resignation/resignations/${editingResignation.resignation_id}/`, 
         editingResignation
       );
       
@@ -1779,7 +1779,7 @@ const handleResignationSubmit = async (e) => {
       setShowEditResignationModal(false);
       
       // Refresh resignations
-      const resignationsRes = await axios.get("http://127.0.0.1:8000///api/resignation/resignations/");
+      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
       setResignations(resignationsRes.data);
     } catch (err) {
       console.error("Error updating resignation:", err.response?.data || err);
@@ -2467,7 +2467,7 @@ const handleResignationSubmit = async (e) => {
       setCurrentEmployee(employee);
       
       // Fetch the employee to get the latest document data
-      const response = await axios.get(`http://127.0.0.1:8000///api/employees/employees/${employee.employee_id}/`);
+      const response = await axios.get(`http://127.0.0.1:8000/api/employees/${employee.employee_id}/`);
       const employeeData = response.data;
       
       console.log("Employee documents data:", employeeData.documents);
@@ -2547,7 +2547,7 @@ const handleResignationSubmit = async (e) => {
       });
       
       // Step 4: Fetch current documents for the employee
-      const employeeResponse = await axios.get(`http://127.0.0.1:8000///api/employees/employees/${currentEmployee.employee_id}/`);
+      const employeeResponse = await axios.get(`http://127.0.0.1:8000/api/employees/${currentEmployee.employee_id}/`);
       
       // Step 5: Parse existing documents or create a new structure
       let documents = { required: {}, optional: {} };
@@ -2578,7 +2578,7 @@ const handleResignationSubmit = async (e) => {
       
       // Step 7: Update the employee's documents in your backend
       await axios.patch(
-        `http://127.0.0.1:8000///api/employees/employees/${currentEmployee.employee_id}/`, 
+        `http://127.0.0.1:8000/api/employees/${currentEmployee.employee_id}/`, 
         { documents: JSON.stringify(documents) }
       );
       
