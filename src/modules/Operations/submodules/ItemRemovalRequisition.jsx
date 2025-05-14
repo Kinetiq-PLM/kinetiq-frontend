@@ -42,7 +42,7 @@ const ItemRemoval = () => {
         status: "pending"
       }
       try {
-          const response = await fetch(`http://127.0.0.1:8000/operation/send-to-management/`, {
+          const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/send-to-management/`, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json"
@@ -70,7 +70,7 @@ const ItemRemoval = () => {
           setLoading(true);
           setError(null); 
   
-          const response = await fetch("http://127.0.0.1:8000/operation/item-removal/");
+          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-removal/");
           if (!response.ok) throw new Error("Connection to database failed");
   
           const data = await response.json();

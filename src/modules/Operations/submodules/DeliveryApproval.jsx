@@ -60,7 +60,7 @@ const BodyContent = ({employee_id}) => {
             approved_by
         };
         try {
-            const response = await fetch(`http://127.0.0.1:8000/operation/update-delivery-approval/${selectedData.approval_request_id}/`, {
+            const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-approval/${selectedData.approval_request_id}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -85,7 +85,7 @@ const BodyContent = ({employee_id}) => {
             setLoading(true);
             setError(null); // Reset error state
    
-            const response = await fetch("http://127.0.0.1:8000/operation/delivery-approval/");
+            const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/delivery-approval/");
             if (!response.ok) throw new Error("Connection to database failed");
    
             const data = await response.json();
@@ -111,7 +111,7 @@ const BodyContent = ({employee_id}) => {
     const fetchEmployee = async () => {
         try {
           setLoading(true);
-          const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
+          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
           if (!response.ok) throw new Error("Connection to database failed");
    
           const data = await response.json();

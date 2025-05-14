@@ -79,7 +79,7 @@ const GoodsTracking = ({employee_id}) => {
       try {
           setLoading(true);
           setError(null); // Reset error state
-          const response = await fetch("http://127.0.0.1:8000/operation/goods-tracking/");
+          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/");
           if (!response.ok) throw new Error("Connection to database failed");
  
           const data = await response.json();

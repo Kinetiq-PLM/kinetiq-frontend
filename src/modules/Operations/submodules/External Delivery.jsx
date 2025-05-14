@@ -21,15 +21,15 @@ const TabSystem = () => {
             setError(null);
 
 
-            const response = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/`);
+            const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/`);
             if (endpoint === "DeliveryReturnOrder"){
-                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliveryreworkorder/`);
+                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreworkorder/`);
             }else if (endpoint === "DeliveryReceipt"){
-                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliveryreceipt/`);
+                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreceipt/`);
             }else if (endpoint === "BillingReceipt"){
-                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-billingreceipt/`);
+                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-billingreceipt/`);
             }else if (endpoint === "GoodsIssue"){
-                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliverygoodsissue/`);
+                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliverygoodsissue/`);
             }
             
             if (!response.ok) throw new Error("Connection to database failed");
