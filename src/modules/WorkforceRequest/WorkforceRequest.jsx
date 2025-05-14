@@ -4,6 +4,7 @@ import { FiSearch } from "react-icons/fi";
 import "./styles/WorkforceRequest.css";
 
 const WorkforceRequest = () => {
+  const [activeTab, setActiveTab] = useState("form");
   // States for form data
   const [formData, setFormData] = useState({
     requesting_dept_id: "",
@@ -39,12 +40,12 @@ const WorkforceRequest = () => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
   };
-  useEffect(() => {
-    // This ensures activeTab always stays as "form" since it's the only option
-    if (activeTab !== "form") {
-      setActiveTab("form");
-    }
-  }, [activeTab]);
+  // useEffect(() => {
+  //   // This ensures activeTab always stays as "form" since it's the only option
+  //   if (activeTab !== "form") {
+  //     setActiveTab("form");
+  //   }
+  // }, [activeTab]);
   // Fetch departments, employees, and requests
   useEffect(() => {
     const fetchDepartments = async () => {
