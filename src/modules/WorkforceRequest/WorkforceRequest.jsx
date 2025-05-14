@@ -26,7 +26,6 @@ const WorkforceRequest = () => {
   const [requests, setRequests] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [activeTab, setActiveTab] = useState("form");
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +39,12 @@ const WorkforceRequest = () => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
   };
-
+  useEffect(() => {
+    // This ensures activeTab always stays as "form" since it's the only option
+    if (activeTab !== "form") {
+      setActiveTab("form");
+    }
+  }, [activeTab]);
   // Fetch departments, employees, and requests
   useEffect(() => {
     const fetchDepartments = async () => {
