@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const ApprovalTable = ({employee_id}) => {
+const ApprovalTable = ({employee_id, role_name, user}) => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
 
 
@@ -17,7 +17,7 @@ const ApprovalTable = ({employee_id}) => {
   const [selectedData, setSelectedData] = useState(null);
   const [warehouseList, setWarehouseList] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
-
+  const [userPositionID, setPositionID] = useState("");
 
   const [ITReworkOrderData, setITReworkOrder] = useState([]);
 
@@ -82,11 +82,13 @@ const ApprovalTable = ({employee_id}) => {
           const syncDataResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/sync-production/");
           const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/internal-transfer-delivery-request/");
           const reworkResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/rework-order/");
-          if (!response.ok || !syncDataResponse || !reworkResponse) throw new Error("Connection to database failed");
- 
+          const employeeResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+          if (!response.ok || !syncDataResponse || !reworkResponse || !employeeResponse) throw new Error("Connection to database failed");
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
-
+          const employeeData = await employeeResponse.json();
+          const position_id = employeeData.employees.find(emp => emp.employee_id === employee_id)?.position_id;
+          setPositionID(position_id);
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
           }
@@ -99,7 +101,7 @@ const ApprovalTable = ({employee_id}) => {
             return dateA - dateB;
           });
           setDeliveryRequest(sortedRequestData);
-          setITReworkOrder(reworkorderData)
+          setITReworkOrder(reworkorderData);
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
       } finally {
@@ -251,7 +253,12 @@ const ApprovalTable = ({employee_id}) => {
     }
   };
   
-
+  useEffect(() => {
+    if (userPositionID === 'REG-2504-d988' || userPositionID === 'REG-2504-5417') {
+      setActivePrimaryTab('Rework Order');
+    }
+    console.log("HELLO", activePrimaryTab, userPositionID)
+  }, [userPositionID, activePrimaryTab]);
   return (
     <div className={`InternalTransfer ${activePrimaryTab === "Rework Order" ? "rework" : ""}`}>
       <div className="body-content-container">
@@ -259,12 +266,28 @@ const ApprovalTable = ({employee_id}) => {
 
         {/* Primary Tabs */}
         <div className="tabs">
-          <div
-            className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
-            onClick={() => setActivePrimaryTab("Delivery Request")}
-          >
-            Delivery Request
-          </div>
+          {userPositionID !== "REG-2504-d988" && userPositionID !== "REG-2504-5417"? (
+            <div
+              className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
+              onClick={() => setActivePrimaryTab("Delivery Request")}
+              style={{
+                cursor: 'pointer',
+                opacity: 1,
+              }}
+            >
+              Delivery Request
+            </div>
+          ) : (
+            <div
+              className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
+              style={{
+                cursor: 'not-allowed',
+                opacity: 0.5,
+              }}
+            >
+              Delivery Request
+            </div>
+          )}
           <div
             className={`tab ${activePrimaryTab === "Rework Order" ? "active" : ""}`}
             onClick={() => setActivePrimaryTab("Rework Order")}
