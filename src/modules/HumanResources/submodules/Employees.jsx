@@ -3559,41 +3559,6 @@ const handleResignationSubmit = async (e) => {
               </div>
               
               <div className="form-column">
-                <div className="form-group">
-                  <label>HR Approver</label>
-                  <select 
-                    name="hr_approver_id" 
-                    value={newResignation.hr_approver_id} 
-                    onChange={handleResignationChange}
-                  >
-                    <option value="">-- Select HR Approver --</option>
-                    {Array.isArray(employees) ? employees
-                      .filter(employee => 
-                        employee.dept_name === "Human Resources" || 
-                        employee.dept_id === "HR-DEPT-2025-e9fa93" ||
-                        employee.dept?.dept_name === "Human Resources" || 
-                        employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
-                      )
-                      .map(employee => (
-                        <option key={employee.employee_id} value={employee.employee_id}>
-                          {employee.first_name} {employee.last_name}
-                        </option>
-                    )) : <option value="">No HR employees available</option>}
-                  </select>
-                </div>
-                
-                <div className="form-group">
-                  <label>Approval Status</label>
-                  <select
-                    name="approval_status"
-                    value={newResignation.approval_status || "Pending"}
-                    onChange={handleResignationChange}
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    
-                  </select>
-                </div>
                 
                 <div className="form-group">
                   <label>Clearance Status</label>
