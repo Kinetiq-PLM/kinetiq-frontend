@@ -210,13 +210,13 @@ const AuditLog = () => {
             sorter: true,
             width: 100,
         },
-        {
-            title: "User ID",
-            dataIndex: "user_id",
-            key: "user_id",
-            sorter: true,
-            width: 120,
-        },
+        // {
+        //     title: "User ID",
+        //     dataIndex: "user_id",
+        //     key: "user_id",
+        //     sorter: true,
+        //     width: 120,
+        // },
         {
             title: "Action",
             dataIndex: "action",
