@@ -33,18 +33,14 @@ const WorkforceRequest = () => {
   const [sortField, setSortField] = useState("all");
   const [toast, setToast] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("form");
 
   // Toast notification helper
   const showToast = (message, success = true) => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
   };
-  useEffect(() => {
-    // This ensures activeTab always stays as "form" since it's the only option
-    if (activeTab !== "form") {
-      setActiveTab("form");
-    }
-  }, [activeTab]);
+
   // Fetch departments, employees, and requests
   useEffect(() => {
     const fetchDepartments = async () => {
