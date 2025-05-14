@@ -13,7 +13,7 @@ const LaborTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchLaborData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/labor/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/");
         setLaborData(response.data);
       } catch (err) {
         setError("Failed to fetch labor data.");
@@ -28,7 +28,7 @@ const LaborTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchEmployeeData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/employees/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
         const map = {};
         response.data.forEach((emp) => {
           map[emp.employee_id] = `${emp.first_name} ${emp.last_name}`;
@@ -48,7 +48,7 @@ const LaborTable = ({ searchTerm }) => {
     setLaborData(updatedData);
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${labor_id}/`,
         { date_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -65,7 +65,7 @@ const LaborTable = ({ searchTerm }) => {
     setLaborData(updatedData);
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${labor_id}/`,
         { days_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );

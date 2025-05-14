@@ -20,11 +20,11 @@ const BodyContent = () => {
         const fetchProductionData = async () => {
             try {
                 // Fetch production data
-                const productionResponse = await axios.get("http://127.0.0.1:8000/api/production/");
+                const productionResponse = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/");
                 const productionData = productionResponse.data;
 
                 // Fetch rework notes data
-                const reworkResponse = await axios.get("http://127.0.0.1:8000/api/cost-of-production/");
+                const reworkResponse = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/");
                 const reworkData = reworkResponse.data;
 
                 // Merge rework notes into production data
@@ -55,7 +55,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/tasks/");
+                const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/tasks/");
                 setTasks(response.data);
                 setTasksLoading(false);
             } catch (error) {
@@ -69,7 +69,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchBOMs = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/bom/");
+                const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/bom/");
                 setBoms(response.data);
                 setBomsLoading(false);
             } catch (error) {
@@ -94,7 +94,7 @@ const BodyContent = () => {
 
         try {
             // Make an API call to update the status in the database
-            await axios.patch(`http://127.0.0.1:8000/api/production/${productionOrderId}/`, {
+            await axios.patch(`https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/${productionOrderId}/`, {
                 status: newStatus.trim(),
             });
             console.log("Status updated successfully in the database.");
@@ -128,14 +128,14 @@ const BodyContent = () => {
                 // When newValue is blank, send null
                 const payload = { rework_notes: newValue.trim() === "" ? null : newValue };
                 await axios.patch(
-                    `http://127.0.0.1:8000/api/cost-of-production/${orderToUpdate.rework_id}/`,
+                    `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${orderToUpdate.rework_id}/`,
                     payload,
                     { headers: { "Content-Type": "application/json" } }
                 );
                 console.log("rework_notes updated successfully in the database.");
             } else {
                 await axios.patch(
-                    `http://127.0.0.1:8000/api/production/${productionOrderId}/`,
+                    `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/${productionOrderId}/`,
                     { [fieldName]: newValue },
                     { headers: { "Content-Type": "application/json" } }
                 );
@@ -158,13 +158,39 @@ const BodyContent = () => {
 
         try {
             await axios.patch(
-                `http://127.0.0.1:8000/api/production/${productionOrderId}/`,
+                `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/${productionOrderId}/`,
                 { target_quantity: value },
                 { headers: { "Content-Type": "application/json" } }
             );
             console.log("Target quantity updated successfully");
         } catch (error) {
             console.error("Failed to update target quantity", error);
+        }
+    };
+
+    const handleAddProductionOrder = async (task, bom) => {
+        // Generate a new unique production_order_id (e.g., using timestamp or uuid)
+        const newProductionOrderId = `PO-${Date.now()}`;
+        const now = new Date().toISOString();
+        const newOrder = {
+            production_order_id: newProductionOrderId,
+            task_id: task.task_id,
+            bom_id: bom.bom_id,
+            start_date: now,
+            end_date: now,
+            status: "Pending",
+            target_quantity: 0,
+            notes: "",
+        };
+
+        try {
+            // Send to backend
+            await axios.post("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/", newOrder);
+            // Add to local state
+            setProductionData(prev => [...prev, newOrder]);
+        } catch (error) {
+            alert("Failed to add new production order.");
+            console.error(error);
         }
     };
 
@@ -380,7 +406,20 @@ const BodyContent = () => {
                                                     <td>
                                                         {(boms.find(bom => bom.project_id === task.project_id) || {}).bom_id || ""}
                                                     </td>
-                                                    <td className="rwaddbutton"><button>Add</button></td>
+                                                    <td className="rwaddbutton">
+                                                        <button
+                                                            onClick={() => {
+                                                                const bom = boms.find(bom => bom.project_id === task.project_id);
+                                                                if (bom) {
+                                                                    handleAddProductionOrder(task, bom);
+                                                                } else {
+                                                                    alert("No BOM found for this project.");
+                                                                }
+                                                            }}
+                                                        >
+                                                            Add
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}

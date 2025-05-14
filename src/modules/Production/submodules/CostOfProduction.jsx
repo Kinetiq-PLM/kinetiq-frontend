@@ -6,6 +6,7 @@ const BodyContent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [productionData, setProductionData] = useState([]);
   const [reworkCostData, setReworkCostData] = useState([]); // State for rework_cost data
+  const [bomData, setBomData] = useState([]); // State for BOM data
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [extraRows, setExtraRows] = useState({});
@@ -14,30 +15,79 @@ const BodyContent = () => {
     setSearchQuery(event.target.value);
   };
 
-  // Fetch production data from the backend
+  // Fetch production data from the backend and merge with cost-of-production data
   useEffect(() => {
-    const fetchProductionData = async () => {
+    const fetchAndMergeData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/api/cost-of-production/");
-        setProductionData(response.data);
+        // Fetch all production orders
+        const prodRes = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/");
+        const allProductionOrders = prodRes.data;
+
+        // Fetch all cost-of-production rows
+        const copRes = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/");
+        const allCostOfProduction = copRes.data;
+
+        // Fetch BOM data
+        const bomRes = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/bom/");
+        const bomDataFetched = bomRes.data;
+        setBomData(bomDataFetched);
+
+        // Merge: for each production_order_id, use cost-of-production data if exists, else blank fields
+        const merged = allProductionOrders.map(prod => {
+          const cop = allCostOfProduction.find(
+            c => c.production_order_id === prod.production_order_id
+          );
+          const bom = bomDataFetched.find(
+            b => b.bom_id === prod.bom_id
+          );
+          // If BOM row doesn't exist, add a blank one
+          if (!bom && prod.bom_id) {
+            setBomData(prev => [
+              ...prev,
+              {
+                bom_id: prod.bom_id,
+                production_order_detail_id: cop ? cop.production_order_detail_id : `POD-${prod.production_order_id}-${Date.now()}`,
+                total_cost_of_raw_materials: "",
+                // ...other BOM fields as needed
+              }
+            ]);
+          }
+          return cop
+            ? cop
+            : {
+                production_order_id: prod.production_order_id,
+                bom_id: prod.bom_id,
+                actual_quantity: "",
+                miscellaneous_costs: "",
+                cost_of_production: "",
+                rework_required: "",
+                rework_notes: "",
+                production_order_detail_id: cop ? cop.production_order_detail_id : `POD-${prod.production_order_id}-${Date.now()}`
+              };
+        });
+
+        setProductionData(merged);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch production data.");
+        setError("Failed to fetch and merge production data.");
         setLoading(false);
       }
     };
 
+    fetchAndMergeData();
+  }, []);
+
+  useEffect(() => {
     const fetchReworkCostData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/rework-cost/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/rework-cost/");
         setReworkCostData(response.data);
       } catch (err) {
         console.error("Failed to fetch rework cost data.");
       }
     };
 
-    fetchProductionData();
     fetchReworkCostData();
   }, []);
 
@@ -77,19 +127,19 @@ const BodyContent = () => {
   };
 
   // Handler for Actual Quantity change
-  const handleActualQuantityChange = async (production_order_id, value) => {
+  const handleActualQuantityChange = async (production_order_detail_id, value) => {
     const updatedData = productionData.map((item) =>
-      item.production_order_id === production_order_id
+      item.production_order_detail_id === production_order_detail_id
         ? { ...item, actual_quantity: value }
         : item
     );
     setProductionData(updatedData);
     const itemToUpdate = updatedData.find(
-      (item) => item.production_order_id === production_order_id
+      (item) => item.production_order_detail_id === production_order_detail_id
     );
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/cost-of-production/${production_order_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${production_order_detail_id}/`,
         itemToUpdate
       );
       console.log("Actual quantity updated successfully");
@@ -111,7 +161,7 @@ const BodyContent = () => {
     );
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/cost-of-production/${production_order_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${production_order_id}/`,
         itemToUpdate
       );
       console.log("Cost of production updated successfully");
@@ -121,24 +171,49 @@ const BodyContent = () => {
   };
 
   // Handler for Miscellaneous Costs change
-  const handleMiscellaneousCostsChange = async (production_order_id, value) => {
+  const handleMiscellaneousCostsChange = async (production_order_detail_id, value) => {
     const updatedData = productionData.map((item) =>
-      item.production_order_id === production_order_id
+      item.production_order_detail_id === production_order_detail_id
         ? { ...item, miscellaneous_costs: value }
         : item
     );
     setProductionData(updatedData);
     const itemToUpdate = updatedData.find(
-      (item) => item.production_order_id === production_order_id
+      (item) => item.production_order_detail_id === production_order_detail_id
     );
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/cost-of-production/${production_order_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${production_order_detail_id}/`,
         itemToUpdate
       );
       console.log("Miscellaneous costs updated successfully");
     } catch (error) {
       console.error("Failed to update miscellaneous costs", error);
+    }
+  };
+
+  // Handler for Raw Material Cost change
+  const handleRawMaterialCostChange = async (production_order_detail_id, value) => {
+    // Update local state
+    const updatedBOM = bomData.map(bom =>
+      bom.production_order_detail_id === production_order_detail_id
+        ? { ...bom, total_cost_of_raw_materials: value }
+        : bom
+    );
+    setBomData(updatedBOM);
+
+    // Update backend
+    const itemToUpdate = updatedBOM.find(
+      bom => bom.production_order_detail_id === production_order_detail_id
+    );
+    try {
+      await axios.put(
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/bom/${itemToUpdate.bom_id}/`,
+        itemToUpdate
+      );
+      console.log("Total cost of raw materials updated successfully");
+    } catch (error) {
+      console.error("Failed to update total cost of raw materials", error);
     }
   };
 
@@ -168,6 +243,8 @@ const BodyContent = () => {
                 <tr>
                   <th>Production Order ID</th>
                   <th>Actual Quantity</th>
+                  <th>Equipment Cost per Use</th>
+                  <th>Total Cost of Raw Materials</th>
                   <th>Cost of Production</th>
                 </tr>
               </thead>
@@ -190,17 +267,8 @@ const BodyContent = () => {
                         <input
                           type="text"
                           value={item.actual_quantity || ""}
-                          onChange={(e) =>
-                            handleActualQuantityChange(item.production_order_id, e.target.value)
-                          }
-                        />
-                      </td>
-                      <td className="cost-of-production">
-                        <input
-                          type="text"
-                          value={item.cost_of_production || ""}
-                          onChange={(e) =>
-                            handleCostChange(item.production_order_id, e.target.value)
+                          onChange={e =>
+                            handleActualQuantityChange(item.production_order_detail_id, e.target.value)
                           }
                         />
                       </td>
@@ -208,10 +276,35 @@ const BodyContent = () => {
                         <input
                           type="text"
                           value={item.miscellaneous_costs || ""}
-                          onChange={(e) =>
-                            handleMiscellaneousCostsChange(item.production_order_id, e.target.value)
+                          onChange={e =>
+                            handleMiscellaneousCostsChange(item.production_order_detail_id, e.target.value)
                           }
                         />
+                      </td>
+                      <td className="total-cost-per-raw-material">
+                        {
+                          bomData.find(
+                            bom => bom.production_order_detail_id === item.production_order_detail_id
+                          )?.total_cost_of_raw_materials || ""
+                        }
+                        </td>
+                      <td className="cost-of-production">
+                        <strong>
+                          {
+                            (() => {
+                              const misc = parseFloat(item.miscellaneous_costs) || 0;
+                              const bom = parseFloat(
+                                bomData.find(
+                                  bom =>
+                                    (item.production_order_detail_id && bom.production_order_detail_id === item.production_order_detail_id) ||
+                                    (!item.production_order_detail_id && item.bom_id && bom.bom_id === item.bom_id)
+                                )?.total_cost_of_raw_materials || ""
+                              ) || 0;
+                              const qty = parseFloat(item.actual_quantity) || 0;
+                              return ((misc + bom) * qty).toFixed(2);
+                            })()
+                          }
+                        </strong>
                       </td>
                     </tr>
                   ))
@@ -221,182 +314,7 @@ const BodyContent = () => {
           </div>
         </div>
 
-        <div className="raw-cost-material">
-          <div className="raw-material-header ">Raw Materials </div>
-          <div className="raw-material-table">
-            {filteredData.map((item) => (
-              <div key={item.production_order_id} className="rawmaterial-content">
-                <table>
-                  <tr>
-                    <h1>{item.production_order_id}</h1>
-                    <table className="raw-material-details">
-                      <thead>
-                        <th>Raw Material</th>
-                        <th>Quantity</th>
-                        <th>Cost</th>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <input
-                              type="text"
-                              value="Medical-grade Plastic" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="93" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="5000" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <input
-                              type="text"
-                              value="LED Light" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="102" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="200" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <input
-                              type="text"
-                              value="Acrylic" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="93" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="text"
-                              value="5000" // Replace with dynamic value if needed
-                              onChange={(e) => console.log(e.target.value)}
-                              className="rawmaterial-input"
-                            />
-                          </td>
-                        </tr>
-                        {extraRows[item.production_order_id] &&
-                          extraRows[item.production_order_id].map((row, idx) => (
-                            <tr key={idx}>
-                              <td>
-                                <input
-                                  type="text"
-                                  value={row.material}
-                                  onChange={(e) =>
-                                    handleExtraRowChange(
-                                      item.production_order_id,
-                                      idx,
-                                      "material",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="rawmaterial-input"
-                                />
-                              </td>
-                              <td>
-                                <input
-                                  type="text"
-                                  value={row.quantity}
-                                  onChange={(e) =>
-                                    handleExtraRowChange(
-                                      item.production_order_id,
-                                      idx,
-                                      "quantity",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="rawmaterial-input"
-                                />
-                              </td>
-                              <td>
-                                <input
-                                  type="text"
-                                  value={row.cost}
-                                  onChange={(e) =>
-                                    handleExtraRowChange(
-                                      item.production_order_id,
-                                      idx,
-                                      "cost",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="rawmaterial-input"
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        <tr>
-                          <td colSpan="3" style={{ textAlign: "center" }}>
-                            <button
-                              onClick={() => handleAddRow(item.production_order_id)}
-                              className="add-rowprod-button"
-                            >
-                              Add Row
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </tr>
-                  <tr>
-                    <div className="prodtotal-cost">
-                      <td>
-                        <h3>Total Cost</h3>
-                      </td>
-                      <td>
-                        <input
-                          type="totalcostofrawmaterial"
-                          value="5000" // Replace with dynamic value if needed
-                          onChange={(e) => console.log(e.target.value)}
-                          className="totalcostofrawmaterial-input"
-                        />
-                      </td>
-                    </div>
-                  </tr>
-                </table>
-              </div>
-            ))}
-          </div>
-        </div>
+        
       </div>
     </div>
   );

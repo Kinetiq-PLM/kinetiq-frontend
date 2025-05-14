@@ -131,7 +131,7 @@ h1 {
   font-weight: 600; /* Make headers bold */
   position: sticky; /* Keep headers visible when scrolling vertically */
   top: 0;
-  z-index: 2;
+  z-index: 0;
 }
 
 .rwprotable td {
@@ -174,7 +174,7 @@ h1 {
   text-align: center;
   width: 100px;
   box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
 .rw-rework-required select:focus {
@@ -190,6 +190,20 @@ h1 {
   box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
   cursor: pointer;
 }
+
+/* New classes for selected value color */
+.rw-rework-required.rw-yes select {
+  background-color: #d0f4ff;
+  color: #093e8c;
+  border-color: #d0f4ff;
+}
+
+.rw-rework-required.rw-no select {
+  background-color: #b0f6b0;
+  color: #2da800;
+  border-color: #b0f6b0;
+}
+
 
 .rework-actual-quantity input[type="text"] {
   padding: 6px 10px;
@@ -321,4 +335,11 @@ h1 {
 .rework-notes-textarea::-webkit-scrollbar-thumb {
   background: #00a8a8; /* Set the scrollbar thumb color */
   border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.production-id-cell h1 {
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
 }

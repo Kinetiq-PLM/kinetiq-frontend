@@ -11,7 +11,7 @@ const EquipmentTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchEquipmentData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/equipment/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/");
         setEquipmentData(response.data);
         setLoading(false);
       } catch (err) {
@@ -30,7 +30,7 @@ const EquipmentTable = ({ searchTerm }) => {
     const equipmentToUpdate = updatedData.find(item => item.equipment_id === id);
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${id}/`,
         equipmentToUpdate
       );
       console.log("Availability status updated successfully");
@@ -47,7 +47,7 @@ const EquipmentTable = ({ searchTerm }) => {
     const equipmentToUpdate = updatedData.find(item => item.equipment_id === id);
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${id}/`,
         equipmentToUpdate
       );
       console.log("Maintenance date updated successfully");
@@ -64,7 +64,7 @@ const EquipmentTable = ({ searchTerm }) => {
     const equipmentToUpdate = updatedData.find(item => item.equipment_id === id);
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${id}/`,
         equipmentToUpdate
       );
       console.log("Equipment cost updated successfully");
@@ -184,7 +184,7 @@ const BodyContent = () => {
   // Fetch project equipment data
   const fetchProjectEquipment = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/project-equipment/");
+      const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/project-equipment/");
       setProjectEquipmentData(response.data);
       setPeLoading(false);
     } catch (error) {
@@ -197,7 +197,7 @@ const BodyContent = () => {
   useEffect(() => {
     const fetchEquipmentData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/equipment/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/");
         const map = {};
         response.data.forEach((equipment) => {
           map[equipment.equipment_id] = equipment.equipment_name;
@@ -214,7 +214,7 @@ const BodyContent = () => {
   useEffect(() => {
     const fetchItemData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/item/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/item/");
         const map = {};
         response.data.forEach((item) => {
           const normalizedKey = item.item_id.trim().toLowerCase(); // Normalize the key
@@ -337,9 +337,11 @@ const BodyContent = () => {
                     <tr key={index}>
                       <td>{equipmentName}</td>
                       <td>
-                        {productNames.map((productName, idx) => (
-                          <div key={idx}>{productName}</div> // Each product name on a new line
-                        ))}
+                        <ul style={{ textAlign: "left", margin: 0, paddingLeft: "20px", listStyleType: "disc" }}>
+                          {[...productNames].sort((a, b) => a.localeCompare(b)).map((productName, idx) => (
+                            <li key={idx}>{productName}</li>
+                          ))}
+                        </ul>
                       </td>
                     </tr>
                   ));

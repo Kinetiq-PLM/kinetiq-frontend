@@ -35,6 +35,33 @@ function App() {
   // landing page
   const [showLanding, setShowLanding] = useState(true);
 
+  // log out at time out
+  useEffect(() => {
+    let logoutTimeout;
+  
+    const resetTimeout = () => {
+      if (logoutTimeout) clearTimeout(logoutTimeout);
+      logoutTimeout = setTimeout(() => {
+        console.log("No activity detected for 10 minutes. Logging out.");
+        handleLogout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+  
+    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    activityEvents.forEach(event =>
+      window.addEventListener(event, resetTimeout)
+    );
+  
+    resetTimeout();
+  
+    return () => {
+      clearTimeout(logoutTimeout);
+      activityEvents.forEach(event =>
+        window.removeEventListener(event, resetTimeout)
+      );
+    };
+  }, []);
+
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
@@ -219,13 +246,59 @@ function App() {
     }
   };
 
+  // const loadMainModule = (moduleId) => {
+  //   if (moduleFileNames[moduleId] && !activeSubModule) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+
+  //     setModuleComponent(() => WrappedComponent);
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+  // const loadSubModule = (submoduleId, mainModule = activeModule) => {
+  //   if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+  //     setModuleComponent(() => WrappedComponent);
+
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+
+  const mainModules = import.meta.glob('./modules/*/*.jsx');
+  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
+
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !activeSubModule) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-        )
-      );
+    const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
+
+    if (mainModules[moduleFile]) {
+      const LazyComponent = lazy(mainModules[moduleFile]);
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -238,16 +311,17 @@ function App() {
 
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
+    } else {
+      console.warn(`Module file not found: ${moduleFile}`);
     }
   };
 
+
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
-    if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
-        )
-      );
+    const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
+
+    if (subModules[submoduleFile]) {
+      const LazyComponent = lazy(subModules[submoduleFile]);
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -257,9 +331,11 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
-      setModuleComponent(() => WrappedComponent);
 
+      setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
+    } else {
+      console.warn(`Submodule file not found: ${submoduleFile}`);
     }
   };
 
@@ -284,23 +360,14 @@ function App() {
     "Purchase Request": "PurchaseRequest",
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
-    "Job Posting": "JobPosting"
+    "Job Posting": "JobPosting",
+    "Employee Request": "EmployeeRequest"
   };
 
   const moduleSubmoduleFileNames = {
-    "Management": {
+    Management: {
       "Dashboard": "ManagementDashboard",
-      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
-      "Salary Release Approval": "ManagementSalaryReleaseApproval",
-      "Budget Review Approval": "ManagementBudgetReviewApproval",
-      "Purchasing Approval": "ManagementPurchasingApproval",
-      "Project Approval": "ManagementProjectApproval",
-      "Project Monitoring": "ManagementProjectMonitoring",
-      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
-      "AssetRemoval": "ManagementAssetRemoval",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      "Settings": "Settings",
+      "Project Approval": "ManagementApprovals"
     },
     Administration: {
       "User": "User",
@@ -309,6 +376,7 @@ function App() {
       "Audit Logs": "AuditLogs",
       "Policy": "Policy",
       "Currency": "Currency",
+      "Warehouse": "Warehouse",
       "Notification": "Notification",
     },
     "Accounting": {
@@ -317,55 +385,58 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
-      "Budgeting": "Budgeting",
-      "Cash Flow": "CashFlow",
-      "Financial Reports": "FinancialReports",
+      "Reports": "Reports",
+      "Validations": "Validations",
+      "Approvals": "Approvals",
+      "Forms": "Forms"
     },
     "Purchasing": {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
+      "Purchase Request List": "PurchaseReqList",
+      "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
     },
     Operations: {
       "Goods Tracking": "GoodsTracking",
       "Internal Transfer": "InternalTransfer",
       "Delivery Approval": "DeliveryApproval",
-      "Delivery Receipt": "DeliveryReceipt",
-      "Item Removal": "ItemRemoval",
+      "External Delivery": "External Delivery",
+      "Item Removal Requisition ": "ItemRemovalRequisition",
     },
     Sales: {
       Quotation: "Quotation",
       Order: "Order",
       Delivery: "Delivery",
-      // Invoice: "Invoice",
-      // "Blanket Agreement": "BlanketAgreement",
-      "Master List": "MasterList",
-      Reporting: "Reporting",
-      // Return: "Return",
+      Transactions: "Transactions",
     },
     CRM: {
-      Ticket: "Ticket",
-      Campaign: "Campaign",
-      "Partner Master Data": "PartnerMasterData",
+      Leads: "Leads",
       Opportunity: "Opportunity",
-      Support: "Support",
+      Campaign: "Campaign",
+      Contacts: "Contacts",
+      Cases: "Cases",
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
       "Service Call": "ServiceCall",
-      "Service Request": "ServiceRequest",
       "Warranty Renewal": "WarrantyRenewal",
-      "Service Analysis": "ServiceAnalysis",
+      "Service Request": "ServiceRequest",
       "Service Billing": "ServiceBilling",
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
     },
     "Inventory": {
-      "Stock Levels": "StockLevels",
+      "Shelf Life": "ShelfLife",
       "P-Counts": "PCounts",
       "Stock Flow": "StockFlow",
     },
@@ -386,10 +457,16 @@ function App() {
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
-      "Task Assignments": "TaskAssignments",
-      "Gantt Charts": "GanttCharts",
+      "Project List": "Project List",
+      "Project Planning": "ProjectPlanning",
+      "Project Request": "Projectrequest",
+      "Tasks": "TaskMonitoring",
+      "Report Monitoring": "Reports",
+      "Warranty Monitoring": "Warranties",
+      "Project Cost":"ProjectCost",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -403,8 +480,11 @@ function App() {
       "Employee Salary": "EmployeeSalary"
     },
     "Report Generator": {
-      "Custom Reports": "CustomReports",
-      "Data Visualization": "DataVisualization",
+    },
+    "Employee Request": {
+      "Resignation Request": "ResignationRequest",
+      "Overtime Request": "OvertimeRequest",
+      "Leave Request": "LeaveRequest"
     },
   };
 
@@ -412,7 +492,32 @@ function App() {
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  console.log('raw permissions...')
+  console.log(rawPermissions)
+  console.log("allowed modules...")
+  console.log(allowedModules)
 
+  const filteredModuleFileNames = {};
+
+  allowedModules.forEach((permission) => {
+    const [main, sub] = permission.split('/')
+
+    if (!filteredModuleFileNames[main]) {
+      filteredModuleFileNames[main] = {};
+    }
+
+    if (!sub) {
+      filteredModuleFileNames[main] = {
+      ...moduleSubmoduleFileNames[main]
+      }
+    } else {
+      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
+    }
+  });
+
+  console.log('filtered modules...')
+  console.log(filteredModuleFileNames)
+/*
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
@@ -420,11 +525,15 @@ function App() {
         allowedModules.includes(key)
       )
     );
+*/
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
+
+  console.log('module icons...')
+  console.log(modulesIcons)
 
   return (
     <div className="shell">
