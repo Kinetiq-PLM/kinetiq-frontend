@@ -3,7 +3,8 @@ import { Doughnut, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Legend, Filler } from 'chart.js';
 import "./styles/ProjectManagement.css";
 import axios from "axios";
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
+
 
 ChartJS.register(
   ArcElement, 
@@ -42,8 +43,6 @@ const BodyContent = () => {
         complete: [],
         incomplete: []
     });
-
-    
     
     // Employee details state
     const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -76,39 +75,7 @@ const BodyContent = () => {
     });
     
     // Reminder states
-    const [activeTab, setActiveTab] = useState('Notes');
-    const [reminderItems, setReminderItems] = useState([
-        {
-            id: 1,
-            title: 'Project Scheduling',
-            description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
-            overdue: '2 days',
-            task: 'Review project timeline',
-            deadline: '2023-11-30',
-            employee: 'John Smith',
-            completed: false,
-        },
-        {
-            id: 2,
-            title: 'Project Scheduling',
-            description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
-            overdue: '1 day',
-            task: 'Assign team resources',
-            deadline: '2023-11-29',
-            employee: 'Jane Doe',
-            completed: true,
-        }
-    ]);
-    const [showForm, setShowForm] = useState(false);
-    const [newTitle, setNewTitle] = useState('');
-    const [newDescription, setNewDescription] = useState('');
-    const [newOverdue, setNewOverdue] = useState('');
-    const [newTask, setNewTask] = useState('');
-    const [newDeadline, setNewDeadline] = useState('');
-    const [newEmployee, setNewEmployee] = useState('');
-    const [newStatus, setNewStatus] = useState('');
-    const [newAssignedto, setNewAssignedto] = useState('');
-
+    const [activeTab, setActiveTab] = useState('Today');
   
     // Fetch data on component mount
     useEffect(() => {
@@ -211,7 +178,6 @@ const BodyContent = () => {
     const fetchTodayTasks = async () => {
         setIsLoading(prev => ({ ...prev, todayTasks: true }));
         try {
-            // Get only today's tasks from the today-tasks endpoint
             const response = await axios.get('/api/dashboard/today-tasks/');
             setTodayTasks(Array.isArray(response.data) ? response.data : []);
             setErrors(prev => ({ ...prev, todayTasks: null }));
@@ -343,12 +309,6 @@ const BodyContent = () => {
             .join('')
             .toUpperCase()
             .substring(0, 2);
-    };
-    
-    // Format task deadline
-    const formatDeadline = (deadline) => {
-        if (!deadline) return 'N/A';
-        return deadline;
     };
     
     // Updated Employee Display Component
@@ -530,7 +490,6 @@ const BodyContent = () => {
     // Render pagination controls
     const renderPagination = (section, currentPage, totalPages) => {
         if (totalPages <= 1) return null;
-
         
         return (
             <div className="pagination-controls">
@@ -554,51 +513,6 @@ const BodyContent = () => {
             </div>
         );
     };
-
-    // Reminder form handlers
-    const handleAddClick = () => {
-        setShowForm(true);
-    };
-
-    const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (newTitle.trim() !== '') {
-        const newItem = {
-            id: Date.now(),
-            title: newTitle,
-            description: newDescription,
-            overdue: newOverdue,
-            task: newTask,
-            deadline: newDeadline,
-            employee: newEmployee, // Fix: newEmpployee -> newEmployee
-            status: newStatus,
-            assignedTo: newAssignedto,
-            completed: false
-        };
-        
-        setReminderItems([...reminderItems, newItem]);
-        setNewTitle('');
-        setNewDescription('');
-        setNewOverdue('');
-        setNewTask('');
-        setNewDeadline('');
-        setNewEmployee('');
-        setNewStatus('');
-        setNewAssignedto('');
-        setShowForm(false);
-    }
-};
-
-    const handleCancel = () => {
-        setShowForm(false);
-        setNewTitle('');
-        setNewDescription('');
-        setNewOverdue('');
-        setNewTask('');
-        setNewDeadline('');
-        setNewEmployee('');
-    };
     
     return (
         <div className="project-management-container">
@@ -609,329 +523,214 @@ const BodyContent = () => {
                 </div>
 
                 {/* Main Dashboard Sections */}
-                <div className="dashboard-sections">
-                    {/* Overall Progress Section */}
-                    <div className="dashboard-section overall-progress-section">
-                        <div className="section-header">
-                            <h2><b>Overall Progress</b></h2>
-                        </div>
-                        <div className="chart-wrapper">
-                            <div className="doughnut-wrapper">
-                                <Doughnut data={progressChartData} options={doughnutOptions} />
-                                <div className="progress-text">
-                                    <div className="progress-percentage">{dashboardStats.overallProgress}%</div>
-                                    <div className="progress-label">Activity Progress</div>
+                <div className="dashboard-wrapper">
+                    <div className="dashboard-row">
+                        {/* Overall Progress Section */}
+                        <div className="dashboard-section overall-progress-section">
+                            <div className="section-header">
+                                <h2>Overall Progress</h2>
+                            </div>
+                            <div className="chart-wrapper">
+                                <div className="doughnut-wrapper">
+                                    <Doughnut data={progressChartData} options={doughnutOptions} />
+                                    <div className="progress-text">
+                                        <div className="progress-percentage">{dashboardStats.overallProgress}%</div>
+                                        <div className="progress-label">Activity Progress</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="stats-container">
-                            <div className="stat-box">
-                                <div className="stat-value">{dashboardStats.delayedProjects}</div>
-                                <div className="stat-label">Pending</div>
+                            <div className="stats-container">
+                                <div className="stat-box">
+                                    <div className="stat-value">{dashboardStats.delayedProjects}</div>
+                                    <div className="stat-label">Pending</div>
+                                </div>
+                                <div className="divider"></div>
+                                <div className="stat-box">
+                                    <div className="stat-value">{dashboardStats.ongoingProjects}</div>
+                                    <div className="stat-label">Need Action</div>
+                                </div>
                             </div>
-                            <div className="divider"></div>
-                            <div className="stat-box">
-                                <div className="stat-value">{dashboardStats.ongoingProjects}</div>
-                                <div className="stat-label">Need Action</div>
+
+                            <div className="improvement-text">
+                                You completed <strong>{weeklyImprovement}%</strong> more task this week
                             </div>
                         </div>
+                        
+                        {/* Right Column - Stats Cards */}
+                        <div className="dashboard-column">
+                            <div className="dashboard-row">
+                                {/* Existing Projects Card */}
+                                <div className="dashboard-section existing-project-section">
+                                    <div className="section-header">
+                                        <h2>Existing Project</h2>
+                                    </div>
+                                    <div className="center-stat">
+                                        <div className="big-stat">{dashboardStats.existingProjects}</div>
+                                    </div>
+                                </div>
 
-                        <div className="improvement-text">
-                            You completed <strong>{weeklyImprovement}%</strong> more task this week
+                                {/* Ongoing Projects Card */}
+                                <div className="dashboard-section ongoing-project-section">
+                                    <div className="section-header">
+                                        <h2>Ongoing</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={ongoingChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.ongoingProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="dashboard-row">
+                                {/* Delayed Projects Card */}
+                                <div className="dashboard-section delayed-project-section">
+                                    <div className="section-header">
+                                        <h2>Delayed</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={delayedChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.delayedProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Completed Projects Card */}
+                                <div className="dashboard-section completed-project-section">
+                                    <div className="section-header">
+                                        <h2>Completed</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={completedChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.completedProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    {/* Project Stats Cards */}
-                    <div className="dashboard-column">
-                        <div className="dashboard-section-monitoring">
-                            {/* Existing Projects Card */}
-                            <div className="dashboard-section existing-project-section">
-                                <div className="section-header">
-                                    <h2><b>Existing Project</b></h2>
-                                </div>
-                                <div className="center-stat">
-                                    <div className="big-stat">{dashboardStats.existingProjects}</div>
-                                </div>
-                            </div>
 
-                            {/* Ongoing Projects Card */}
-                            <div className="dashboard-section ongoing-project-section">
-                                <div className="section-header">
-                                    <h2><b>Ongoing</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={ongoingChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.ongoingProjects}</div>
-                                        </div>
+                    <div className="dashboard-row">
+                        {/* Reminder Card */}
+                        <div className="dashboard-section reminder-section">
+                             <div className="reminder-content">
+                            <div className="section-header">
+                                <h2>Reminder</h2>
+                            </div>
+                           
+                                <div className="reminder-tabs">
+                                    <div 
+                                        className={`reminder-tab ${activeTab === 'Today' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('Today')}
+                                    >
+                                        <div className="tab-icon today">📅</div>
+                                        <span>Today</span>
+                                    </div>
+                                    <div 
+                                        className={`reminder-tab ${activeTab === 'Overdue' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('Overdue')}
+                                    >
+                                        <div className="tab-icon overdue">⚠️</div>
+                                        <span>Overdue</span>
                                     </div>
                                 </div>
                                 
-                            </div>
-                        </div>
-
-                        <div className="dashboard-section-monitoring">
-                            {/* Delayed Projects Card */}
-                            <div className="dashboard-section delayed-project-section">
-                                <div className="section-header">
-                                    <h2><b>Delayed</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={delayedChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.delayedProjects}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Completed Projects Card */}
-                            <div className="dashboard-section completed-project-section">
-                                <div className="section-header">
-                                    <h2><b>Completed</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={completedChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.completedProjects}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                       
-                        </div>
-                    </div>
-
-                    <div className="reminder-card">
-                        <div className="reminder-header">
-                            <h2>Reminder</h2>
-                            <button className="add-button" onClick={handleAddClick}>
-                                <span><b>+</b></span>
-                            </button>
-                        </div>
-                        
-                        <div className="tabs-container">
-                            <div className={`tab ${activeTab === 'Notes' ? 'active' : ''}`} onClick={() => setActiveTab('Notes')}>
-                                <div className="tab-icon">✓</div>
-                                <div className="tab-text"><b>Notes</b></div>
-                            </div>
-                        </div>
-                        
-                        {showForm && (
-                            <div className="reminder-form">
-                                <form onSubmit={handleSubmit} className="reminder-form-container">
-                                    <div className="form-header">
-                                        <h3>Add New Reminder</h3>
-                                        <button 
-                                            type="button" 
-                                            className="close-button" 
-                                            onClick={handleCancel}
-                                            aria-label="Close form"
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
+                                <div className="reminder-items">
+                                    {activeTab === 'Today' && (
+                                        isLoading.todayTasks ? (
+                                            <div className="loading-message">Loading today's tasks...</div>
+                                        ) : errors.todayTasks ? (
+                                            <div className="error-message">{errors.todayTasks}</div>
+                                        ) : todayTasks.length === 0 ? (
+                                            <div className="empty-message">No tasks scheduled for today</div>
+                                        ) : (
+                                            todayTasks.slice(0, 5).map(task => (
+                                                <div className="reminder-item" key={task.TaskID}>
+                                                    <div className="reminder-item-content">
+                                                        <h3>{task.Task}</h3>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Deadline:</span>
+                                                            <span className="detail-value">{task.Deadline}</span>
+                                                        </div>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Employee:</span>
+                                                            <span className="detail-value">{task.EmployeeName}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="reminder-status">
+                                                        <div 
+                                                            className={`status-circle ${task.Status === 'completed' ? 'completed' : ''}`}
+                                                            onClick={() => handleTaskStatusChange(
+                                                                task.TaskID, 
+                                                                task.Status === 'completed' ? 'in progress' : 'completed'
+                                                            )}
+                                                        >
+                                                            {task.Status === 'completed' ? '✓' : ''}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )
+                                    )}
                                     
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-title">Title</label>
-                                        <input
-                                            id="reminder-title"
-                                            type="text"
-                                            placeholder="Enter reminder title"
-                                            value={newTitle}
-                                            onChange={(e) => setNewTitle(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-description">Description</label>
-                                        <textarea
-                                            id="reminder-description"
-                                            placeholder="Enter reminder details"
-                                            value={newDescription}
-                                            onChange={(e) => setNewDescription(e.target.value)}
-                                            className="form-control"
-                                            rows="4"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-overdue">Overdue</label>
-                                        <input
-                                            id="reminder-overdue"
-                                            type="text"
-                                            placeholder="Enter Due Date"
-                                            value={newOverdue}
-                                            onChange={(e) => setNewOverdue(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                     <div className="form-group">
-                                        <label htmlFor="reminder-task">Task</label>
-                                        <input
-                                            id="reminder-task"
-                                            type="text"
-                                            placeholder="Enter Task"
-                                            value={newTask}
-                                            onChange={(e) => setNewTask(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-deadline">Deadline</label>
-                                        <input
-                                            id="reminder-deadline"
-                                            type=""
-                                            placeholder="Enter Deadline"
-                                            value={newDeadline}
-                                            onChange={(e) => setNewDeadline(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-employee">Employee</label>
-                                        <input
-                                            id="reminder-employee"
-                                            type="text"
-                                            placeholder="Enter Employee"
-                                            value={newEmployee}
-                                            onChange={(e) => setNewEmployee(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-status">Status</label>
-                                        <input
-                                            id="reminder-status"
-                                            type="text"
-                                            placeholder="Enter Status"
-                                            value={newStatus}
-                                            onChange={(e) => setNewStatus(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-assignedto">Assigned To</label>
-                                        <input
-                                            id="reminder-assignedto"
-                                            type="text"
-                                            placeholder="Assigned To:"
-                                            value={newAssignedto}
-                                            onChange={(e) => setNewAssignedto(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-                                    
-                                    <div className="form-buttons">
-                                        <button 
-                                            type="button" 
-                                            onClick={handleCancel}
-                                            className="btn btn-secondary"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button 
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
-                                            Add Reminder
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-                        
-                        <div className="reminder-list">
-                            {reminderItems.map(item => (
-                                <div className="reminder-item" key={item.id}>
-                                    <div className="reminder-content">
-                                        <h3><b>{item.title}</b></h3>
-                                        <p>{item.description}</p>
-                                        {item.overdue && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Overdue:</span>
-                                                <span className="detail-value">{item.overdue}</span>
-                                            </div>
-                                        )}
-                                        {item.task && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Task:</span>
-                                                <span className="detail-value">{item.task}</span>
-                                            </div>
-                                        )}
-                                        {item.deadline && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Deadline:</span>
-                                                <span className="detail-value">{item.deadline}</span>
-                                            </div>
-                                        )}
-                                        {item.employee && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Employee:</span>
-                                                <span className="detail-value">{item.employee}</span>
-                                            </div>
-                                        )}
-
-                                         {item.Status && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Status:</span>
-                                                <span className="detail-value">{item.Status}</span>
-                                            </div>
-                                        )}
-
-                                        {item.Assignedto && (
-                                            <div className="reminder-detail">
-                                                <span className="detail-label">Assigned To:</span>
-                                                <span className="detail-value">{item.Assignedto}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="reminder-actions">
-                                        <div 
-                                            className={`status-indicator-dashboard ${item.completed ? 'completed' : ''}`}
-                                            onClick={() => {
-                                                const updatedItems = reminderItems.map(i => 
-                                                    i.id === item.id ? {...i, completed: !i.completed} : i
-                                                );
-                                                setReminderItems(updatedItems);
-                                            }}
-                                        >
-                                            {item.completed ? '✓' : ''}
-                                        </div>
-                                    </div>
+                                    {activeTab === 'Overdue' && (
+                                        isLoading.overdueTasks ? (
+                                            <div className="loading-message">Loading overdue tasks...</div>
+                                        ) : errors.overdueTasks ? (
+                                            <div className="error-message">{errors.overdueTasks}</div>
+                                        ) : overdueTasks.length === 0 ? (
+                                            <div className="empty-message">No overdue tasks</div>
+                                        ) : (
+                                            overdueTasks.slice(0, 5).map(task => (
+                                                <div className="reminder-item" key={task.TaskID}>
+                                                    <div className="reminder-item-content">
+                                                        <h3><span className="overdue-text">Overdue: {task.Overdue}</span></h3>
+                                                        <p>{task.Task}</p>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Deadline:</span>
+                                                            <span className="detail-value">{task.Deadline}</span>
+                                                        </div>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Employee:</span>
+                                                            <span className="detail-value">{task.Employee}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="reminder-status">
+                                                        <div 
+                                                            className="status-circle overdue"
+                                                            onClick={() => handleTaskStatusChange(task.TaskID, 'completed')}
+                                                        >
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )
+                                    )}
                                 </div>
-                            ))}
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Task Completion Overtime Chart */}
-                    <div className="dashboard-section task-completion-section">
-                        <div className="section-header">
-                            <h2><b>Task Completion Overtime</b></h2>
-                        </div>
-                        <div className="chart-wrapper2">
-                            <Line data={lineChartData} options={lineChartOptions} />
+                                        
+                        {/* Task Completion Overtime Chart */}
+                        <div className="dashboard-section task-completion-section">
+                            <div className="section-header">
+                                <h2>Task Completion Overtime</h2>
+                            </div>
+                            <div className="chart-wrapper2">
+                                <Line data={lineChartData} options={lineChartOptions} />
+                            </div>
                         </div>
                     </div>
                     
-
                     {/* Project Summary Section */}
                     <div className="dashboard-section project-summary-section">
                         <div className="section-header">
