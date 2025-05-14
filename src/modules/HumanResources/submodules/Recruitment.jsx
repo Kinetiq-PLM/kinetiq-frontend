@@ -185,11 +185,11 @@ useEffect(() => {
       try {
         const [onboardingRes, archivedOnboardingRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/onboarding/"),
-          // axios.get("http://127.0.0.1:8000/api/onboarding/archived/")
+          axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true")
         ]);
         setOnboardingTasks(ensureArray(onboardingRes.data));
         setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
-        console.log("Onboarding data loaded:", ensureArray(onboardingRes.data).length);
+        console.log("Onboarding data loaded:", ensureArray(onboardingRes.data).length, "archived:", ensureArray(archivedOnboardingRes.data).length);
       } catch (err) {
         console.error("Error fetching onboarding tasks:", err);
         setOnboardingTasks([]);
@@ -1523,13 +1523,19 @@ const handleAddClick = () => {
     setShowAddInterviewModal(true);
   } else if (activeTab === "Onboarding") {
     setNewOnboardingTask({
-      employee_id: "",
-      task_name: "",
-      description: "",
-      due_date: "",
+      candidate_id: "",
+      job_id: "",
       status: "Pending",
-      assigned_to: "",
-      priority: "Medium"
+      offer_details: {
+        salary: "",
+        start_date: "",
+        benefits: ""
+      },
+      contract_details: {
+        type: "",
+        duration: "",
+        terms: ""
+      }
     });
     setShowAddOnboardingModal(true);
   }
@@ -2162,36 +2168,214 @@ const handleInterviewSubmit = async (e) => {
 // Onboarding task handlers
 const handleOnboardingTaskChange = (e) => {
   const { name, value } = e.target;
-  setNewOnboardingTask(prev => ({
-    ...prev,
-    [name]: value
-  }));
+  
+  if (name.startsWith('offer_details.') || name.startsWith('contract_details.')) {
+    const [objName, field] = name.split('.');
+    setNewOnboardingTask(prev => ({
+      ...prev,
+      [objName]: {
+        ...(prev[objName] || {}),
+        [field]: value
+      }
+    }));
+  } else {
+    setNewOnboardingTask(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleEditOnboardingTaskChange = (e) => {
+  const { name, value } = e.target;
+  
+  if (name.startsWith('offer_details.') || name.startsWith('contract_details.')) {
+    const [objName, field] = name.split('.');
+    setEditingOnboardingTask(prev => ({
+      ...prev,
+      [objName]: {
+        ...(prev[objName] || {}),
+        [field]: value
+      }
+    }));
+  } else {
+    setEditingOnboardingTask(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
 };
 
 const handleOnboardingTaskSubmit = async (e) => {
   e.preventDefault();
   try {
     setLoading(true);
-    // API call would go here
-    // const response = await axios.post("your-api-endpoint", newOnboardingTask);
     
-    // For now, simulate adding the task
-    const mockResponse = {
-      ...newOnboardingTask,
-      task_id: Date.now(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+    // Format data for API
+    const onboardingData = {
+      candidate: newOnboardingTask.candidate_id,
+      job: newOnboardingTask.job_id,
+      offer_details: newOnboardingTask.offer_details || {},
+      contract_details: newOnboardingTask.contract_details || {},
+      status: newOnboardingTask.status || 'Pending'
     };
     
-    setOnboardingTasks(prev => [...prev, mockResponse]);
-    setShowAddOnboardingModal(false);
+    // Submit to API
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/onboarding/",
+      onboardingData
+    );
+    
     showToast("Onboarding task created successfully", true);
-  } catch (error) {
-    console.error("Error creating onboarding task:", error);
-    showToast("Failed to create onboarding task", false);
+    setShowAddOnboardingModal(false);
+    
+    // Refresh onboarding tasks list
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+  } catch (err) {
+    console.error("Error creating onboarding task:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to create onboarding task";
+    showToast(errorMessage, false);
   } finally {
     setLoading(false);
   }
+};
+
+const handleEditOnboardingTaskSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    
+    // Format data for API
+    const onboardingData = {
+      candidate: editingOnboardingTask.candidate,
+      job: editingOnboardingTask.job,
+      offer_details: editingOnboardingTask.offer_details || {},
+      contract_details: editingOnboardingTask.contract_details || {},
+      status: editingOnboardingTask.status || 'Pending'
+    };
+    
+    // Submit to API
+    const response = await axios.patch(
+      `http://127.0.0.1:8000/api/onboarding/${editingOnboardingTask.onboarding_id}/`,
+      onboardingData
+    );
+    
+    showToast("Onboarding task updated successfully", true);
+    setShowEditOnboardingModal(false);
+    
+    // Refresh onboarding tasks list
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+  } catch (err) {
+    console.error("Error updating onboarding task:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to update onboarding task";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleArchiveOnboardingTask = async (task) => {
+  try {
+    await axios.post(`http://127.0.0.1:8000/api/onboarding/${task.onboarding_id}/archive/`);
+    showToast("Onboarding task archived successfully", true);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error archiving onboarding task:", err);
+    showToast("Failed to archive onboarding task", false);
+  }
+};
+
+const handleRestoreOnboardingTask = async (task) => {
+  try {
+    await axios.post(`http://127.0.0.1:8000/api/onboarding/${task.onboarding_id}/unarchive/`);
+    showToast("Onboarding task restored successfully", true);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error restoring onboarding task:", err);
+    showToast("Failed to restore onboarding task", false);
+  }
+};
+
+const bulkUnarchiveOnboardingTasks = async () => {
+  try {
+    setLoading(true);
+    
+    // Create an array of promises for each selected onboarding task
+    const promises = selectedArchivedOnboardingTasks.map(id => 
+      axios.post(`http://127.0.0.1:8000/api/onboarding/${id}/unarchive/`)
+    );
+    
+    // Execute all promises
+    await Promise.all(promises);
+    
+    // Show success message
+    showToast("Selected onboarding tasks restored successfully", true);
+    
+    // Reset selection
+    setSelectedArchivedOnboardingTasks([]);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error restoring onboarding tasks:", err);
+    showToast("Failed to restore onboarding tasks", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleEditOnboardingTask = (task) => {
+  setEditingOnboardingTask({
+    onboarding_id: task.onboarding_id,
+    candidate: task.candidate_id,
+    job: task.job_id,
+    candidate_name: task.candidate,
+    job_title: task.job,
+    offer_details: task.offer_details || {},
+    contract_details: task.contract_details || {},
+    status: task.status || 'Pending',
+  });
+  setShowEditOnboardingModal(true);
+  setDotsMenuOpen(null);
 };
 
   return (
@@ -3516,6 +3700,308 @@ const handleOnboardingTaskSubmit = async (e) => {
               
               <div className="recruitment-modal-buttons">
                 <button type="submit" className="submit-btn">Create Task</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddOnboardingModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Onboarding Modal */}
+      {showEditOnboardingModal && editingOnboardingTask && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Edit Onboarding Task</h3>
+            <form onSubmit={handleEditOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate" 
+                      value={editingOnboardingTask.candidate || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Job *</label>
+                    <select 
+                      name="job" 
+                      value={editingOnboardingTask.job || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={editingOnboardingTask.status || "Pending"}
+                      onChange={handleEditOnboardingTaskChange}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Sent">Offer Sent</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Pending">Contract Pending</option>
+                      <option value="Contract Signed">Contract Signed</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={editingOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={editingOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={editingOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={editingOnboardingTask.contract_details?.type || ""}
+                      onChange={handleEditOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={editingOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={editingOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Saving..." : "Save Changes"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowEditOnboardingModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Create Onboarding Modal */}
+      {showAddOnboardingModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Create Onboarding Task</h3>
+            <form onSubmit={handleOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate_id" 
+                      value={newOnboardingTask.candidate_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Job *</label>
+                    <select 
+                      name="job_id" 
+                      value={newOnboardingTask.job_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newOnboardingTask.status || "Pending"}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Sent">Offer Sent</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Pending">Contract Pending</option>
+                      <option value="Contract Signed">Contract Signed</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={newOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={newOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={newOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={newOnboardingTask.contract_details?.type || ""}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={newOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={newOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Creating..." : "Create Onboarding Task"}
+                </button>
                 <button 
                   type="button" 
                   className="cancel-btn" 
