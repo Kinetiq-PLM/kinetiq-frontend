@@ -34,7 +34,6 @@ const WorkforceRequest = () => {
   const [sortField, setSortField] = useState("all");
   const [toast, setToast] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("form");
 
   // Toast notification helper
   const showToast = (message, success = true) => {
