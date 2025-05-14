@@ -70,62 +70,6 @@ const BodyContent = () => {
     }
   };
 
-  // Handlers that update local state first (making the field editable), then call the API
-  const handleActualQuantityChange = (production_order_id, value) => {
-    setMergedData((prev) =>
-      prev.map((item) =>
-        item.production_order_id === production_order_id
-          ? { ...item, actual_quantity: value }
-          : item
-      )
-    );
-    updateProductionDetails(production_order_id, "actual_quantity", value);
-  };
-
-  const handleReworkRequiredChange = (production_order_id, isYes) => {
-    setMergedData((prev) =>
-      prev.map((item) =>
-        item.production_order_id === production_order_id
-          ? { ...item, rework_required: isYes }
-          : item
-      )
-    );
-    updateProductionDetails(production_order_id, "rework_required", isYes);
-  };
-
-  const handleReworkNotesChange = (production_order_id, value) => {
-    setMergedData((prev) =>
-      prev.map((item) =>
-        item.production_order_id === production_order_id
-          ? { ...item, rework_notes: value }
-          : item
-      )
-    );
-    updateProductionDetails(production_order_id, "rework_notes", value);
-  };
-
-  const handleAdditionalCostChange = (production_order_id, value) => {
-    setMergedData((prev) =>
-      prev.map((item) =>
-        item.production_order_id === production_order_id
-          ? { ...item, additional_cost: value }
-          : item
-      )
-    );
-    updateReworkCost(production_order_id, "additional_cost", value);
-  };
-
-  const handleAdditionalMiscChange = (production_order_id, value) => {
-    setMergedData((prev) =>
-      prev.map((item) =>
-        item.production_order_id === production_order_id
-          ? { ...item, additional_misc: value }
-          : item
-      )
-    );
-    updateReworkCost(production_order_id, "additional_misc", value);
-  };
-
   const filteredData = mergedData.filter((item) => {
     const search = searchQuery.toLowerCase();
     return (

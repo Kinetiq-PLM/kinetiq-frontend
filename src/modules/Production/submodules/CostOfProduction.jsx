@@ -169,7 +169,6 @@ const BodyContent = () => {
                   <th>Production Order ID</th>
                   <th>Actual Quantity</th>
                   <th>Cost of Production</th>
-                  <th>Miscellaneous Cost</th>
                 </tr>
               </thead>
               <tbody>
