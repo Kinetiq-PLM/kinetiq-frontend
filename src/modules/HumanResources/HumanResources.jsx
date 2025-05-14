@@ -30,6 +30,7 @@ import PayrollSummaryReport from './components/reports/PayrollSummaryReport';
 import PositionsSummaryReport from './components/reports/PositionsSummaryReport';
 import ResignationsSummaryReport from './components/reports/ResignationsSummaryReport';
 import EmployeePerformanceTable from './components/EmployeePerformanceTable';
+
 // Define Kinetiq brand colors for charts
 const kinetiqColors = {
   primary: "#00a9ac",
@@ -710,68 +711,8 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
                   onViewAll={() => navigateTo('/employee-performance')} 
                 />
                 
-                {/* Leave requests section - Department KPIs section removed */}
-                <div className="hr-leave-requests-section">
-                  <div className="hr-section-header">
-                    <h3><strong>Leave Requests</strong></h3>
-                    <button 
-                      className="hr-view-all-btn" 
-                      onClick={() => navigateTo('/leave-requests')}
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="hr-leave-requests-table hr-table-responsive">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Employee Name</th>
-                          <th>Immediate Superior</th>
-                          <th>Leave Type</th>
-                          <th>Start Date</th>
-                          <th>End Date</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {loading ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>Loading leave requests...</td>
-                          </tr>
-                        ) : error ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>Error loading leave requests</td>
-                          </tr>
-                        ) : leaveRequests.length === 0 ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>No leave requests found</td>
-                          </tr>
-                        ) : (
-                          leaveRequests.map((lr) => (
-                            <tr key={lr.leave_id} 
-                                className="interactive-row" 
-                                onClick={() => navigateTo('/leave-requests', { filterValue: lr.leave_id })}>
-                              <td>{lr.employee_name}</td>
-                              <td>{lr.immediate_superior_name}</td>
-                              <td>
-                                <span className={`hr-tag ${lr.leave_type.toLowerCase()}`}>
-                                  {lr.leave_type}
-                                </span>
-                              </td>
-                              <td>{lr.start_date}</td>
-                              <td>{lr.end_date}</td>
-                              <td>
-                                <span className={`hr-tag ${lr.status.toLowerCase().replace(/\s/g, "-")}`}>
-                                  {lr.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                {/* Candidates table - Add this section */}
+                
               </div>
               
               <div className="hr-column-side">
