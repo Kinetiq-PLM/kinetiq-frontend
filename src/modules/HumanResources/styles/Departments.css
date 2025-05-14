@@ -523,30 +523,35 @@
   }
 }
 
-/* Hierarchy Level tag colors */
+/* Hierarchy Level tag colors with darker borders */
 .hr-tag.level-1 {
   background-color: #e1f5fe;
   color: #0277bd;
+  border: 1px solid rgba(2, 119, 189, 0.5); /* Darker border based on text color */
 }
 
 .hr-tag.level-2 {
   background-color: #e8f5e9;
   color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.5); /* Darker border based on text color */
 }
 
 .hr-tag.level-3 {
   background-color: #fff3e0;
   color: #ef6c00;
+  border: 1px solid rgba(239, 108, 0, 0.5); /* Darker border based on text color */
 }
 
 .hr-tag.level-4 {
   background-color: #f3e5f5;
   color: #7b1fa2;
+  border: 1px solid rgba(123, 31, 162, 0.5); /* Darker border based on text color */
 }
 
 .hr-tag.level-5 {
   background-color: #ffebee;
   color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.5); /* Darker border based on text color */
 }
 
 /* ---------------------------------------------------------

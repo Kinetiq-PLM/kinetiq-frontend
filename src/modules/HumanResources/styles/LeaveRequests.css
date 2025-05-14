@@ -357,6 +357,8 @@
   color: #6B7280;
 }
 
+/* Add borders to all tag types to improve visual definition */
+
 .hr-tag {
   padding: 0.3rem 0.6rem;
   border-radius: 1rem;
@@ -364,67 +366,108 @@
   font-weight: 500;
   display: inline-block;
   text-align: center;
+  border: 1px solid; /* Add border property to all tags */
 }
 
+/* Leave Type tags */
 .hr-tag.sick {
   background-color: #d1e7dd;
   color: #0f5132;
+  border-color: #9ccab8; /* Darker shade of background */
 }
 
 .hr-tag.vacation {
   background-color: #cfe2ff;
   color: #084298;
+  border-color: #a6c4f2; /* Darker shade of background */
 }
 
 .hr-tag.personal {
   background-color: #e2e3e5;
   color: #343a40;
+  border-color: #c2c4c8; /* Darker shade of background */
 }
 
 .hr-tag.maternity,
 .hr-tag.paternity {
   background-color: #f8d7da;
   color: #842029;
+  border-color: #e5b1b5; /* Darker shade of background */
 }
 
 .hr-tag.unpaid {
   background-color: #fff3cd;
   color: #664d03;
+  border-color: #ffe69c; /* Darker shade of background */
 }
 
+.hr-tag.solo-parent {
+  background-color: #e0cffc;
+  color: #5a2ca0;
+  border-color: #c4a7ea; /* Darker shade of background */
+}
+
+/* Total Days & Leave Balance tags */
+.hr-tag.high-leave {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-color: #9ccab8; /* Darker shade of background */
+}
+
+.hr-tag.medium-leave {
+  background-color: #fff3cd;
+  color: #664d03;
+  border-color: #ffe69c; /* Darker shade of background */
+}
+
+.hr-tag.low-leave {
+  background-color: #f8d7da;
+  color: #842029;
+  border-color: #e5b1b5; /* Darker shade of background */
+}
+
+/* Is Paid status tags */
 .hr-tag.yes {
   background-color: #d1e7dd;
   color: #0f5132;
+  border-color: #9ccab8; /* Darker shade of background */
 }
 
 .hr-tag.no {
   background-color: #f8d7da;
   color: #842029;
+  border-color: #e5b1b5; /* Darker shade of background */
 }
 
 .hr-tag.pending {
   background-color: #fff3cd;
   color: #664d03;
+  border-color: #ffe69c; /* Darker shade of background */
 }
 
+/* Status tags */
 .hr-tag.approved-by-superior {
   background-color: #d1e7dd;
   color: #0f5132;
+  border-color: #9ccab8; /* Darker shade of background */
 }
 
 .hr-tag.rejected-by-superior {
   background-color: #f8d7da;
   color: #842029;
+  border-color: #e5b1b5; /* Darker shade of background */
 }
 
 .hr-tag.approved-by-management {
   background-color: #cfe2ff;
   color: #084298;
+  border-color: #a6c4f2; /* Darker shade of background */
 }
 
 .hr-tag.rejected-by-management {
   background-color: #f5c2c7;
   color: #842029;
+  border-color: #e79da3; /* Darker shade of background */
 }
 
 .hr-tag.recorded-in-hris {
@@ -464,17 +507,20 @@
 
 .hr-tag.low-unpaid {
   background-color: #d1e7dd;
-  color: #0f5132; /* Green - Low unpaid is good */
+  color: #0f5132;
+  border-color: #9ccab8; /* Darker shade of background */
 }
 
 .hr-tag.medium-unpaid {
   background-color: #fff3cd;
-  color: #664d03; /* Yellow - Medium unpaid */
+  color: #664d03;
+  border-color: #ffe69c; /* Darker shade of background */
 }
 
 .hr-tag.high-unpaid {
   background-color: #f8d7da;
-  color: #842029; /* Red - High unpaid is concerning */
+  color: #842029;
+  border-color: #e5b1b5; /* Darker shade of background */
 }
 
 .leave-requests-actions {

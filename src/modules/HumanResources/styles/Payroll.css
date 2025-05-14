@@ -224,69 +224,88 @@
   font-weight: 500;
   display: inline-block;
   text-align: center;
+  white-space: nowrap;
 }
 
 .hr-tag.pending {
   background-color: #fff3cd;
   color: #664d03;
+  border: 1px solid #e6c60a; /* Updated border format */
 }
 
 .hr-tag.processing {
   background-color: #cfe2ff;
   color: #084298;
+  border: 1px solid #6ea8fe; /* Updated border format */
 }
 
 .hr-tag.completed {
   background-color: #d1e7dd;
   color: #0f5132;
+  border: 1px solid #75c895; /* Updated border format */
+}
+
+.hr-tag.draft {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffd591; /* Added border format */
 }
 
 /* Employment Type Tags */
 .hr-tag.employment-regular {
   background-color: #e6f3ff;
   color: #0066cc;
+  border: 1px solid #91d5ff;
 }
 
 .hr-tag.employment-contractual {
   background-color: #fff3e6;
   color: #cc6600;
+  border: 1px solid #ffd591;
 }
 
 .hr-tag.employment-seasonal {
   background-color: #ffb6f0;
   color: #3d0033;
+  border: 1px solid #ff80e5;
 }
 
 /* Payment Range Tags */
 .hr-tag.payment-high {
   background-color: #d1e7dd;
   color: #0f5132;
+  border: 1px solid #75c895; /* Updated border format */
 }
 
 .hr-tag.payment-medium {
   background-color: #cfe2ff;
   color: #084298;
+  border: 1px solid #6ea8fe; /* Updated border format */
 }
 
 .hr-tag.payment-low {
   background-color: #e2e3e5;
   color: #41464b;
+  border: 1px solid #9da2a8; /* Updated border format */
 }
 
 /* Deduction Tags */
 .hr-tag.deduction-high {
   background-color: #f8d7da;
   color: #842029;
+  border: 1px solid #ea868f; /* Updated border format */
 }
 
 .hr-tag.deduction-medium {
   background-color: #fff3cd;
   color: #664d03;
+  border: 1px solid #e6c60a; /* Updated border format */
 }
 
 .hr-tag.deduction-low {
   background-color: #d1e7dd;
   color: #0f5132;
+  border: 1px solid #75c895; /* Updated border format */
 }
 
 /* Toast */
