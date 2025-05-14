@@ -507,6 +507,7 @@ function App() {
     }
 
     if (!sub) {
+      console.log('including all submodules of ' + main)
       filteredModuleFileNames[main] = {
       ...moduleSubmoduleFileNames[main]
       }
@@ -606,8 +607,8 @@ function App() {
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                    {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (submodule, index) => (
                         <div
                           key={index}
@@ -681,8 +682,8 @@ function App() {
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                  {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (sub, index) => (
                         <div
                           key={index}
