@@ -97,26 +97,42 @@ const OvertimeRequest = () => {
       showToast("Please fill all required fields", false);
       return;
     }
-    
-    try {
-      setLoading(true);
-      
-      // Submit to API
-      const payload = {
-        employee_id: formData.employee_id,
-        date: formData.date,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        reason: formData.reason
-      };
-      
-      await axios.post(
-        "http://127.0.0.1:8000/api/overtime_requests/",
-        payload
-      );
-      
-      showToast("Overtime request submitted successfully", true);
-      setSubmitted(true);
+    // Add time validation
+    const hours = calculateHours();
+    if (hours <= 0) {
+      showToast("End time must be after start time", false);
+      return;
+    }
+      try {
+        setLoading(true);
+        
+        // Submit to API with the required field names
+        const payload = {
+          employee_id: formData.employee_id,
+          employee_name: formData.employee_name, // Add this line
+          request_date: formData.date,
+          request_id: `OT-${new Date().getTime()}`,
+          start_time: formData.start_time + ":00",
+          end_time: formData.end_time + ":00",
+          reason: formData.reason,
+          overtime_hours: calculateHours().toFixed(2),
+          status: "Pending"
+        };
+        
+        await axios.post(
+          "http://127.0.0.1:8000/api/overtime_requests/",
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+        
+        showToast("Overtime request submitted successfully", true);
+        setSubmitted(true);
+  
+  // Reset form
       
       // Reset form
       setFormData({
@@ -129,12 +145,24 @@ const OvertimeRequest = () => {
       });
       
     } catch (err) {
-      console.error("Error submitting overtime request:", err);
-      const errorMessage = err.response?.data?.detail || 
-                         Object.values(err.response?.data || {}).flat().join(", ") || 
-                         "Failed to submit overtime request";
-      showToast(errorMessage, false);
-    } finally {
+  console.error("Error submitting overtime request:", err);
+  console.error("Error response:", err.response?.data);  // Add this line to see full error details
+  
+  // Improve error message display to show exactly which field is required
+  const errorData = err.response?.data || {};
+  let errorMessage;
+  
+  if (typeof errorData === 'object') {
+    // Extract field-specific errors
+    errorMessage = Object.entries(errorData)
+      .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+      .join('; ');
+  } else {
+    errorMessage = err.response?.data?.detail || "Failed to submit overtime request";
+  }
+  
+  showToast(errorMessage, false);
+} finally {
       setLoading(false);
     }
   };

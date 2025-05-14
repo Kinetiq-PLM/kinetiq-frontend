@@ -78,23 +78,62 @@ const AttendanceTracking = () => {
     }
   };
 
-  const fetchOvertimeRequests = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get("http://127.0.0.1:8000/api/overtime_requests/");
-      // Ensure we're setting an array, even if the response is unexpected
-      const responseData = Array.isArray(res.data) ? res.data : [];
-      console.log("Overtime requests data:", responseData);
-      setOvertimeRequestsData(responseData);
-    } catch (err) {
-      console.error("Failed to fetch overtime requests:", err);
-      showToast("Failed to fetch overtime requests data", false);
-      // Set empty array on error
-      setOvertimeRequestsData([]);
-    } finally {
-      setLoading(false);
+// Modify the fetchOvertimeRequests function to ensure employee data is properly loaded
+
+const fetchOvertimeRequests = async () => {
+  setLoading(true);
+  try {
+    // First ensure we have employee data
+    if (employeesData.length === 0) {
+      await fetchEmployees();
     }
-  };
+    
+    const res = await axios.get("http://127.0.0.1:8000/api/overtime_requests/");
+    const responseData = Array.isArray(res.data) ? res.data : [];
+    
+    // Process the data to ensure employee_id and employee_name are properly set
+    const processedData = responseData.map(request => {
+      const processedRequest = {...request};
+      
+      // Only try to add missing information
+      // If employee_name is missing but we have employee_id
+      if (!processedRequest.employee_name && processedRequest.employee_id) {
+        const employee = employeesData.find(emp => 
+          emp.employee_id.toString() === processedRequest.employee_id.toString());
+        if (employee) {
+          processedRequest.employee_name = `${employee.first_name} ${employee.last_name}`;
+        }
+      }
+      
+      // If employee_id is missing but we have employee_name
+      if (!processedRequest.employee_id && processedRequest.employee_name) {
+        const nameParts = processedRequest.employee_name.split(' ');
+        if (nameParts.length >= 2) {
+          const firstName = nameParts[0];
+          const lastName = nameParts.slice(1).join(' ');
+          const employee = employeesData.find(emp => 
+            emp.first_name.toLowerCase() === firstName.toLowerCase() && 
+            emp.last_name.toLowerCase() === lastName.toLowerCase()
+          );
+          if (employee) {
+            processedRequest.employee_id = employee.employee_id;
+          }
+        }
+      }
+      
+      return processedRequest;
+    });
+    
+    console.log("Processed overtime requests data:", processedData);
+    setOvertimeRequestsData(processedData);
+  } catch (err) {
+    console.error("Failed to fetch overtime requests:", err);
+    showToast("Failed to fetch overtime requests data", false);
+    setOvertimeRequestsData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchEmployees = async () => {
     try {
@@ -112,15 +151,18 @@ const AttendanceTracking = () => {
   };
 
   useEffect(() => {
+    // First, fetch employees data
+    fetchEmployees();
+    
+    // Then load tab-specific data
     if (activeTab === "Attendance") {
       fetchAttendance();
     } else if (activeTab === "CalendarDates") {
       fetchCalendarDates();
     } else if (activeTab === "OvertimeRequests") {
-      fetchOvertimeRequests();
-      fetchEmployees();
+      fetchOvertimeRequests(); // Always fetch overtime requests when tab is active
     }
-  }, [activeTab]);
+  }, [activeTab]); // Remove employeesData.length dependency
 
   useEffect(() => {
     // Check if there's a selected date in sessionStorage
@@ -409,8 +451,8 @@ const AttendanceTracking = () => {
                 {paginated.map((request, index) => (
                   <tr key={request.request_id || index}>
                     <td>{request.request_id}</td>
-                    <td>{request.employee_id}</td>
-                    <td>{employeeMap[request.employee_id] || "-"}</td>
+                    <td>{request.employee_id || "-"}</td>
+                    <td>{request.employee_name || employeeMap[request.employee_id] || "-"}</td>
                     <td>{request.request_date}</td>
                     <td>{request.overtime_hours}</td>
                     <td>{request.reason}</td>
