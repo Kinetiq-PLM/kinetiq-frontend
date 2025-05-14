@@ -38,7 +38,7 @@ const EmployeeSalary = () => {
       
       for (const employeeId of employeeIds) {
         try {
-          const empRes = await axios.get(`http://127.0.0.1:8000/api/employees//${employeeId}/`);
+          const empRes = await axios.get(`http://127.0.0.1:8000/api/employees/${employeeId}/`);
           typesObj[employeeId] = empRes.data.employment_type;
         } catch (err) {
           console.error(`Failed to fetch employment type for ${employeeId}:`, err);

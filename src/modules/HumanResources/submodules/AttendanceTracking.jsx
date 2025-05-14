@@ -45,10 +45,15 @@ const AttendanceTracking = () => {
     setLoading(true);
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/attendance_tracking/attendance_tracking/");
-      setAttendanceData(res.data);
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Attendance data:", responseData);
+      setAttendanceData(responseData);
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
       showToast("Failed to fetch attendance data", false);
+      // Set empty array on error
+      setAttendanceData([]);
     } finally {
       setLoading(false);
     }
@@ -58,10 +63,15 @@ const AttendanceTracking = () => {
     setLoading(true);
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/calendar_dates/calendar_dates/");
-      setCalendarDatesData(res.data);
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Calendar dates data:", responseData);
+      setCalendarDatesData(responseData);
     } catch (err) {
       console.error("Failed to fetch calendar dates:", err);
       showToast("Failed to fetch calendar dates", false);
+      // Set empty array on error
+      setCalendarDatesData([]);
     } finally {
       setLoading(false);
     }
@@ -71,10 +81,15 @@ const AttendanceTracking = () => {
     setLoading(true);
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/overtime_requests/");
-      setOvertimeRequestsData(res.data);
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Overtime requests data:", responseData);
+      setOvertimeRequestsData(responseData);
     } catch (err) {
       console.error("Failed to fetch overtime requests:", err);
       showToast("Failed to fetch overtime requests data", false);
+      // Set empty array on error
+      setOvertimeRequestsData([]);
     } finally {
       setLoading(false);
     }
@@ -121,6 +136,12 @@ const AttendanceTracking = () => {
    * 3) Sorting + Pagination + Filtering
    ******************************************/
   const filterAndPaginate = (dataArray) => {
+    // Make sure dataArray is an array
+    if (!Array.isArray(dataArray)) {
+      console.error("Expected array but got:", typeof dataArray, dataArray);
+      return { paginated: [], totalPages: 0, totalCount: 0 };
+    }
+    
     // Filter by searchTerm
     const filtered = dataArray.filter((item) =>
       Object.values(item).some((val) => 

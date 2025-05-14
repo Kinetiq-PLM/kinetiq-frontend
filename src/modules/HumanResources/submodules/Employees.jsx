@@ -3,6 +3,27 @@ import axios from "axios";
 import "../styles/Employees.css";
 import { FiSearch } from "react-icons/fi";
 import { FiUpload } from 'react-icons/fi';
+
+// Add a utility function for date formatting
+const formatDateTime = (dateString) => {
+  if (!dateString) return "—";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return dateString;
+  }
+};
+
 const Employees = () => {
   /*************************************
    * States for Employees
@@ -1851,8 +1872,8 @@ const handleResignationSubmit = async (e) => {
                         </button>
                       </div>
                     </td>
-                      <td>{resignation?.created_at || "-"}</td>
-                      <td>{resignation?.updated_at || "-"}</td>
+                      <td>{formatDateTime(resignation?.created_at)}</td>
+                      <td>{formatDateTime(resignation?.updated_at)}</td>
                       <td className="hr-employee-actions">
                         <div
                           className="hr-employee-dots"
@@ -2019,8 +2040,8 @@ const handleResignationSubmit = async (e) => {
                       )}
                     </div>
                   </td>
-                  <td>{emp.created_at}</td>
-                  <td>{emp.updated_at}</td>
+                  <td>{formatDateTime(emp.created_at)}</td>
+                  <td>{formatDateTime(emp.updated_at)}</td>
                   <td className="hr-employee-actions">
                     <div
                       className="hr-employee-dots"
@@ -2250,8 +2271,8 @@ const handleResignationSubmit = async (e) => {
                       {pos.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td>{pos.created_at}</td>
-                  <td>{pos.updated_at}</td>
+                  <td>{formatDateTime(pos.created_at)}</td>
+                  <td>{formatDateTime(pos.updated_at)}</td>
                   <td className="hr-employee-actions">
                     <div
                       className="hr-employee-dots"
@@ -3146,7 +3167,7 @@ const handleResignationSubmit = async (e) => {
                     <label>Created At</label>
                     <div className="input-with-icon readonly">
                       <i className="calendar-icon">📅</i>
-                      <input type="text" value={editingEmployee.created_at || ""} disabled />
+                      <input type="text" value={formatDateTime(editingEmployee.created_at)} disabled />
                     </div>
                   </div>
                   
@@ -3154,7 +3175,7 @@ const handleResignationSubmit = async (e) => {
                     <label>Last Updated</label>
                     <div className="input-with-icon readonly">
                       <i className="calendar-icon">🕒</i>
-                      <input type="text" value={editingEmployee.updated_at || ""} disabled />
+                      <input type="text" value={formatDateTime(editingEmployee.updated_at)} disabled />
                     </div>
                   </div>
                 </div>
@@ -3436,11 +3457,11 @@ const handleResignationSubmit = async (e) => {
               </div>
               <div className="form-group">
                 <label>Created At</label>
-                <input type="text" value={editingPosition.created_at || ""} disabled />
+                <input type="text" value={formatDateTime(editingPosition.created_at)} disabled />
               </div>
               <div className="form-group">
                 <label>Updated At</label>
-                <input type="text" value={editingPosition.updated_at || ""} disabled />
+                <input type="text" value={formatDateTime(editingPosition.updated_at)} disabled />
               </div>
               <div className="hr-employee-modal-buttons hr-two-col-buttons">
                 <button type="submit" className="submit-btn">Save</button>
