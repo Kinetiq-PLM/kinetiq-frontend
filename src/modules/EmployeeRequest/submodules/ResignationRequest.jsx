@@ -126,7 +126,8 @@ const ResignationRequest = () => {
         employee: formData.employee,
         notice_period_days: parseInt(formData.notice_period_days),
         reason: formData.reason,
-        documents: documents
+        documents: documents,
+        submission_date: new Date().toISOString()
       };
       
       // Submit to the new API endpoint

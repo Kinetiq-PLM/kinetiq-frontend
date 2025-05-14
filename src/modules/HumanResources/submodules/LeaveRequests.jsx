@@ -245,13 +245,13 @@ const LeaveRequests = () => {
     };
     
     // Add immediate_superior_id and management_approval_id only if they're not empty
-    if (newLeaveRequest.immediate_superior_id) {
-      requestPayload.immediate_superior_id = newLeaveRequest.immediate_superior_id;
-    }
+    // if (newLeaveRequest.immediate_superior_id) {
+    //   requestPayload.immediate_superior_id = newLeaveRequest.immediate_superior_id;
+    // }
     
-    if (newLeaveRequest.management_approval_id) {
-      requestPayload.management_approval_id = newLeaveRequest.management_approval_id;
-    }
+    // if (newLeaveRequest.management_approval_id) {
+    //   requestPayload.management_approval_id = newLeaveRequest.management_approval_id;
+    // }
     
     // Console log for debugging
     console.log("Sending leave request payload:", requestPayload);
@@ -277,7 +277,7 @@ const LeaveRequests = () => {
         end_date: "",
         is_paid: false,
         immediate_superior_id: "",
-        management_approval_id: ""
+        // management_approval_id: ""
       });
       
       setShowAddModal(false);
@@ -1254,8 +1254,8 @@ const handleEditLeaveRequest = async (e) => {
                       <option value="Pending">Pending</option>
                       <option value="Approved by Superior">Approved by Superior</option>
                       <option value="Rejected by Superior">Rejected by Superior</option>
-                      <option value="Approved by Management">Approved by Management</option>
-                      <option value="Rejected by Management">Rejected by Management</option>
+                      {/* <option value="Approved by Management">Approved by Management</option>
+                      <option value="Rejected by Management">Rejected by Management</option> */}
                       <option value="Recorded in HRIS">Recorded in HRIS</option>
                     </select>
                   </div>
