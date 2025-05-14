@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import "../styles/CreateTransferForm.css";
+import "../styles/CreateTransferForm.css";
 
 const CreateTransferStockForm = ({ onClose, warehouseList, successCTD }) => {
 

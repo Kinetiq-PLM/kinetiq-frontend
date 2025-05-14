@@ -1,5 +1,5 @@
     import React, { useState, useEffect, use } from "react";
-    import InvTransferStockForm from "../components/InvTransferStockForm";
+    import InvNoSelectedItem from "../components/InvNoSelectedItem";
     import CreateTransferStockForm from "../components/CreateTransferStockForm";
     import "../styles/StockFlow.css";
 import { ContinuousColorLegend } from "@mui/x-charts";
@@ -38,7 +38,7 @@ import TransferStockForm from "../components/TransferStockForm";
         const [showModal, setShowModal] = useState(false);
 
         // Create Transfer Modal
-        const[showCreateTransferForm, setShowCreateTransferForm] = useState(false);
+        const[showNoSelectedItem, setShowNoSelectedItem] = useState(false);
 
         // active create transfer form to hide it
         const[isActiveCTF, setCTFActive] = useState(false);
@@ -50,9 +50,9 @@ import TransferStockForm from "../components/TransferStockForm";
             setShowModal(!showModal)
         };
 
-        const toggleCreateTransferModal = () => {
-            setShowCreateTransferForm(!showCreateTransferForm)
-        };
+        // const toggleNoSelectedItemModal = () => {
+        //     setShowNoSelectedItem(!showNoSelectedItem)
+        // };
 
         const successCTD = (something) => {
             setCTFActive(!isActiveCTF);
@@ -85,17 +85,21 @@ import TransferStockForm from "../components/TransferStockForm";
               toggleModal(); // Open the transfer form
             } else {
               console.log("No item selected!");
+              setShowNoSelectedItem(!showNoSelectedItem); // Show the no selected item modal
+             
             }
           };
 
-
+          
+        // Local: http://127.0.0.1:8000/
+        // AWS: https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev
 
 
         // Fetch data from Warehouse Movements view 
         useEffect(() => {
             const fetchData = async () => {
                 try {
-                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehousemovement-data/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
@@ -114,7 +118,7 @@ import TransferStockForm from "../components/TransferStockForm";
         useEffect(() => {
             const fetchWarehouseItemsData = async () => { 
                 try {
-                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-item-list/");
                     
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
@@ -137,7 +141,7 @@ import TransferStockForm from "../components/TransferStockForm";
         useEffect(() => {
             const fetchWarehouseListData = async () => {
                 try {
-                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseListData(data);
@@ -259,7 +263,9 @@ import TransferStockForm from "../components/TransferStockForm";
                     <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{}</span></p>
                     </div>
 
-                    <div className="w-[450px] h-full">
+                    <div className="w-[450px] h-full flex flex-col gap-2">
+
+                    {/* Select Warehouse & Transfer Form Parent Box */}
                     <select name="" id="" className="w-full border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
                                         setWarehouse(e.target.value);
                                         setSelectedItem(null);
@@ -270,7 +276,14 @@ import TransferStockForm from "../components/TransferStockForm";
                                             {warehouse.warehouse_location}
                                         </option>
                                     ))}
-                                </select>   
+                    </select>   
+                    
+                   
+                    {/* Transfer Form Button */}
+                        <button onClick={toggleModal} className={`w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                                    Transfer Form
+                        </button>
+                    
                     </div>
                 </div>
                 </div>
@@ -292,9 +305,10 @@ import TransferStockForm from "../components/TransferStockForm";
                         </div>
                         <div className={`flex gap-2 w-[290px] ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                         
-                        <button onClick={handleAddTransferItem} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
+                        {/* Transfer Form Button */}
+                        {/* <button onClick={handleAddTransferItem} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
                                     Transfer Form
-                        </button>
+                        </button> */}
 
                         </div>
                     </nav>
@@ -309,7 +323,7 @@ import TransferStockForm from "../components/TransferStockForm";
                      
                     {/* Data Table Section */}
                     <main className="flex flex-wrap w-full h-full  rounded-lg">
-                        <div className="stockflow-table w-full h-120 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
+                        <div className="stockflow-table w-full min-h-100 max-h-110 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
                             {loading ? (
                                 <p className="text-center text-gray-600">Loading data...</p>
                             ) //: error ? (
@@ -352,7 +366,7 @@ import TransferStockForm from "../components/TransferStockForm";
                         
                         
                         {/* side section for filters and item details */}
-                        <div className={`flex flex-col gap-3 rounded-lg min-h-full w-[300px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <div className={`flex flex-col gap-3 rounded-lg min-h-full w-[300px] ml-4 px-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                             
                                 
 
@@ -364,7 +378,7 @@ import TransferStockForm from "../components/TransferStockForm";
                                 
                                 
                                 {/* Selected Items Container */}
-                                <div className="min-h-[300px] border rounded-lg border-gray-300 p-4">
+                                <div className="min-h-90 max-h-auto border rounded-lg border-gray-300 p-4">
                                 <h3 className="text-center text-gray-600 mt-2 mb-4">ITEM DETAILS</h3>
                                 {
                                     selectedItem !== null ? (
@@ -403,7 +417,7 @@ import TransferStockForm from "../components/TransferStockForm";
 
                 </div>          
 
-                {showCreateTransferForm && (
+                {/* {showCreateTransferForm && (
                 <CreateTransferStockForm
                     onClose={() => {
                         // toggleModal();
@@ -416,6 +430,16 @@ import TransferStockForm from "../components/TransferStockForm";
                     successCTD={successCTD}
                     
                  />
+            )} */}
+
+
+            {/* Render the "No item selected" modal */}
+            {showNoSelectedItem && (
+            <InvNoSelectedItem
+                onClose={() => {
+                setShowNoSelectedItem(!showNoSelectedItem);
+                }}
+            />
             )}
             
             {showModal && (
