@@ -391,31 +391,38 @@
   display: inline-block;
   text-align: center;
   white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
 }
 
 .hr-rating-tag.rating-5 {
   background-color: #d1e7dd;
   color: #0f5132; /* Outstanding - Green */
+  border-color: #0f5132;
 }
 
 .hr-rating-tag.rating-4 {
   background-color: #cfe2ff;
   color: #084298; /* Very Satisfactory - Blue */
+  border-color: #084298;
 }
 
 .hr-rating-tag.rating-3 {
   background-color: #e2e3e5;
   color: #41464b; /* Satisfactory - Gray */
+  border-color: #41464b;
 }
 
 .hr-rating-tag.rating-2 {
   background-color: #fff3cd;
   color: #664d03; /* Fair - Yellow */
+  border-color: #664d03;
 }
 
 .hr-rating-tag.rating-1 {
   background-color: #f8d7da;
   color: #842029; /* Poor - Red */
+  border-color: #842029;
 }
 
 /* ---------------------------------------------------------

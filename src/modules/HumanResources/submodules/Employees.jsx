@@ -3540,6 +3540,7 @@ const handleResignationSubmit = async (e) => {
               </div>
               
               <div className="form-column">
+                
                 <div className="form-group">
                   <label>Clearance Status</label>
                   <select

@@ -162,7 +162,7 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
           L309.8076889531935,75.67291502493362
           L339.8076889531935,75.67291502493362
         `
-        : ["Support & Services", "Distribution", "Report Generator", "MRP", "Management"].includes(name)
+        : ["Support & Services", "Distribution", "Report Generator", "MRP", "Management", "Financials"].includes(name)
         ? `
           M${outerPoint.x},${outerPoint.y}
           L${straightPoint.x},${straightPoint.y}
@@ -184,13 +184,13 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
 
     if (name === "Support & Services") {
       labelX = 145.2231257441751;
-      labelY = 244.11652914800334;
+      labelY = 239.11652914800334;
     } else if (name === "Distribution") {
       labelX = 145.92130545571004;
-      labelY = 200.06884411360636;
+      labelY = 195.06884411360636;
     } else if (name === "Report Generator") {
       labelX = 179.04279268613877;
-      labelY = 128.6421228617093;
+      labelY = 123.6421228617093;
     } else if (name === "MRP") {
       labelX = 253.81723175730775;
       labelY = 78.39140226099033;
@@ -200,7 +200,10 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
     } else if (name === "Purchasing") {
       labelX = 429.8076889531935;
       labelY = 73.672915024933616;
-    }
+    } else if (name === "Financials") {
+      labelX = 230.37963824754408;
+      labelY = 87.53811642035849;
+    } 
         
     return (
       <g>

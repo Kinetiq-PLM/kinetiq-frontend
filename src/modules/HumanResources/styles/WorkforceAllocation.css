@@ -141,49 +141,52 @@
   font-weight: 500;
   display: inline-block;
   text-align: center;
+  border: 1px solid; /* Add a border with automatic color inheritance */
 }
 
 /* Approval Status Tags */
 .hr-tag.pending {
   background-color: #fff3cd;
   color: #664d03;
+  border-color: #e6c755; /* Darker border color */
 }
 
 .hr-tag.approved {
   background-color: #d1e7dd;
   color: #0f5132;
+  border-color: #75c097; /* Darker border color */
 }
 
 .hr-tag.rejected {
   background-color: #f8d7da;
   color: #842029;
+  border-color: #dc9599; /* Darker border color */
 }
 
 /* Allocation Status Tags */
 .hr-tag.active {
   background-color: #cfe2ff;
   color: #084298;
+  border-color: #9ec5fe; /* Darker border color */
 }
 
 .hr-tag.completed {
   background-color: #e2e3e5;
   color: #343a40;
+  border-color: #c1c2c5; /* Darker border color */
 }
 
 .hr-tag.canceled {
   background-color: #f5c2c7;
   color: #842029;
+  border-color: #e5909a; /* Darker border color */
 }
 
-/* Availability Tags */
-.hr-tag.available {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.hr-tag.occupied {
-  background-color: #f8d7da;
-  color: #842029;
+/* If you have "under review" status */
+.hr-tag.under-review {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border-color: #b1b3b6; /* Darker border color */
 }
 
 /* Dots dropdown */
