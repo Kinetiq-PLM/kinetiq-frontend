@@ -191,6 +191,15 @@ const PolicyManagement = () => {
     setUploadModalVisible(true);
   };
 
+  const handleEditDocument = () => {
+    // Close the view modal
+    setDocumentViewModalVisible(false);
+    
+    // Open the upload modal with the selected record
+    uploadForm.resetFields();
+    setUploadModalVisible(true);
+  };
+
   const handleViewDocument = (record) => {
     setSelectedRecord(record);
     if (record.policy_document) {
@@ -685,6 +694,14 @@ const handleUploadFormSubmit = async () => {
           <div className="policy-info-display">
             <p><strong>Policy ID:</strong> {selectedRecord?.policy_id}</p>
             <p><strong>Policy Name:</strong> {selectedRecord?.policy_name}</p>
+            {selectedRecord?.policy_document && (
+              <p>
+                <strong>Current Document:</strong> 
+                <span className="current-document-info">
+                  Document already exists. Uploading a new file will replace the current one.
+                </span>
+              </p>
+            )}
           </div>
           
           <Form
@@ -712,7 +729,7 @@ const handleUploadFormSubmit = async () => {
             <Form.Item className="form-actions">
               <Space>
                 <Button type="primary" htmlType="submit">
-                  Upload
+                  {selectedRecord?.policy_document ? "Replace Document" : "Upload Document"}
                 </Button>
                 <Button onClick={() => setUploadModalVisible(false)}>
                   Cancel
@@ -766,38 +783,48 @@ const handleUploadFormSubmit = async () => {
         </Modal>
   
         {/* Document View Modal */}
-<Modal
-  title="Policy Document"
-  visible={documentViewModalVisible}
-  centered
-  onCancel={() => setDocumentViewModalVisible(false)}
-  footer={[
-    <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
-      Close
-    </Button>
-  ]}
-  width={900}
-  className="document-modal"
->
-  {viewDocumentUrl ? (
-    <div className="document-viewer">
-      <iframe
-        src={viewDocumentUrl}
-        title="Policy Document"
-        width="100%"
-        height="600"
-        frameBorder="0"
-        style={{ border: "1px solid #d9d9d9" }}
-      />
-    </div>
-  ) : (
-    <div className="no-document-message" style={{ textAlign: 'center', padding: '40px' }}>
-      <Typography.Title level={4}>No File Available</Typography.Title>
-      <Typography.Paragraph>There is no document attached to this policy.</Typography.Paragraph>
-    </div>
-  )}
-</Modal>
-
+        <Modal
+          title="Policy Document"
+          visible={documentViewModalVisible}
+          centered
+          onCancel={() => setDocumentViewModalVisible(false)}
+          footer={[
+            <Space key="footer-actions">
+              {viewDocumentUrl && (
+                <Button 
+                  type="primary" 
+                  icon={<EditOutlined />}
+                  onClick={handleEditDocument}
+                >
+                  Replace Document
+                </Button>
+              )}
+              <Button onClick={() => setDocumentViewModalVisible(false)}>
+                Close
+              </Button>
+            </Space>
+          ]}
+          width={900}
+          className="document-modal"
+        >
+          {viewDocumentUrl ? (
+            <div className="document-viewer">
+              <iframe
+                src={viewDocumentUrl}
+                title="Policy Document"
+                width="100%"
+                height="600"
+                frameBorder="0"
+                style={{ border: "1px solid #d9d9d9" }}
+              />
+            </div>
+          ) : (
+            <div className="no-document-message" style={{ textAlign: 'center', padding: '40px' }}>
+              <Typography.Title level={4}>No File Available</Typography.Title>
+              <Typography.Paragraph>There is no document attached to this policy.</Typography.Paragraph>
+            </div>
+          )}
+        </Modal>
       </div>
     </div>
   );
