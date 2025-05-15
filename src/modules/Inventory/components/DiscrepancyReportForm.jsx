@@ -13,15 +13,44 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [users, setUsers] = useState([]);
-    const [selectedUserId, setSelectedUserId] = useState("");
+    const [recipientIds, setRecipientIds] = useState([]); // State to hold target recipient IDs
+
+    // Define the roles that should be notified
+    const targetRolesForNotification = [
+        'Inventory Manager',
+        'Warehouse Manager',
+        'Inventory Control Specialist',
+        'Warehouse Supervisor'
+    ];
+
+    // Fetch logged-in user's employee_id from localStorage on mount
+    useEffect(() => {
+        try {
+            const rawStoredUser = localStorage.getItem("user");
+            if (rawStoredUser) {
+                const storedUser = JSON.parse(rawStoredUser);
+                if (storedUser && storedUser.employee_id) {
+                    setEmployeeId(storedUser.employee_id); // Auto-fill employeeId
+                    console.log("DiscrepancyReportForm: Auto-set employeeId from localStorage:", storedUser.employee_id);
+                } else {
+                    console.warn("DiscrepancyReportForm: employee_id not found in stored user data.");
+                }
+            } else {
+                console.warn("DiscrepancyReportForm: No 'user' item found in localStorage for employee_id.");
+            }
+        } catch (error) {
+            console.error("DiscrepancyReportForm: Error reading user data from localStorage for employee_id:", error);
+        }
+    }, []); // Empty dependency array means this runs once on mount
 
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
         return date.toISOString().split('T')[0];
     };
+
     useEffect(() => {
-        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/users/")
+        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/users/")
             .then((res) => {
                 if (!res.ok) {
                     throw new Error(`Error fetching users: ${res.status}`);
@@ -31,10 +60,13 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
             .then((data) => {
                 console.log("Users data:", data);
                 if (data && data.length > 0) {
-                    setUsers(data);
-                    if (data.length > 0 && !selectedUserId) {
-                        setSelectedUserId(data[0].user_id);
-                    }
+                    setUsers(data); // Keep full list if needed elsewhere
+
+                    // Filter users based on target roles and update recipientIds state
+                    const filteredUsers = data.filter(user => user.role_name && targetRolesForNotification.includes(user.role_name));
+                    const ids = filteredUsers.map(user => user.user_id);
+                    setRecipientIds(ids);
+                    console.log("DiscrepancyReportForm: Target recipient IDs:", ids);
                 }
             })
             .catch((err) => {
@@ -48,7 +80,7 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
             const itemsList = Object.values(inventoryItems);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
+            fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -115,7 +147,6 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
         setInventoryItemId("");
         setDiscrepancyType("");
         setSeverity("");
-        setEmployeeId("");
         setDescription("");
         setSelectedInventoryItem(null);
         setSuccessMessage("");
@@ -134,32 +165,43 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
             !discrepancyType ||
             !severity ||
             !employeeId ||
-            !description || !selectedUserId
+            !description
         ) {
             setErrorMessage("Please fill in all required fields.");
             return;
         }
 
+        // --- Use recipientIds state ---
+        if (recipientIds.length === 0) {
+            setErrorMessage("Could not find any users with the target roles to notify. Please check configuration.");
+            console.warn("DiscrepancyReportForm: No recipients found for roles:", targetRolesForNotification);
+            return;
+        }
+        // console.log("DiscrepancyReportForm: Notifying recipient IDs:", recipientIds);
+        // --- End check ---
+
         const itemDetails = selectedInventoryItem
-            ? `${selectedInventoryItem.item_type || 'Item'} (${inventoryItemId})`
+            ? `${selectedInventoryItem.item_name || selectedInventoryItem.inventory_item_id || 'Item'} (${inventoryItemId})`
             : inventoryItemId;
 
-        const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Type: ${discrepancyType}, Severity: ${severity}, Reported by: ${employeeId}, Description: ${description}, Reported on: ${new Date().toISOString()}`;
+        const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Type: ${discrepancyType}, Severity: ${severity}, Reported by Employee ID: ${employeeId}, Description: ${description}, Reported on: ${new Date().toISOString()}`;
 
-
-        const notification = {
-            module: "INVENTORY",
-            to_user_id: selectedUserId,
-            message: formattedMessage,
-            notifications_status: "Unread"
+        // Construct payload for the batch notification API
+        const notificationPayload = {
+            module: "Inventory", // Adjust if needed based on App.jsx
+            submodule: "Discrepancy Report", // Adjust if needed, or set to null
+            recipient_ids: recipientIds, // Use IDs from state
+            msg: formattedMessage
         };
 
-        try {
+        console.log("[DiscrepancyReportForm] Sending Batch Notification: ", notificationPayload);
 
-            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/", {
+        try {
+            // Use the batch notification API endpoint
+            const response = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/send-notif-batch/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(notification),
+                body: JSON.stringify(notificationPayload),
             });
 
             if (!response.ok) {
@@ -218,41 +260,29 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
                         <option value="">Select Inventory Item</option>
                         {inventoryItemsList.map((item) => (
                             <option key={item.inventory_item_id} value={item.inventory_item_id}>
-                                {item.inventory_item_id} - {item.item_type || "Unknown"}
+                                {/* Attempt to display item name, fallback to ID, then add type */}
+                                {item.item_name || item.item_display_name || item.inventory_item_id} {item.item_type ? `- ${item.item_type}` : ''}
                             </option>
                         ))}
                     </select>
 
-                    {selectedInventoryItem && (
-                        <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                            <h3 className="font-medium text-gray-700 mb-2">Selected Item Details</h3>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                                <p><span className="font-medium">Type:</span> {selectedInventoryItem.item_type}</p>
-                                <p><span className="font-medium">Current Qty:</span> {selectedInventoryItem.current_quantity}</p>
-                                {selectedInventoryItem.expiry && (
-                                    <p className={new Date(selectedInventoryItem.expiry) < new Date() ? 'text-red-500' : ''}>
-                                        <span className="font-medium">Expiry:</span> {formatDate(selectedInventoryItem.expiry)}
-                                    </p>
-                                )}
+                    {/* Display which ROLES will be notified */}
+                    {recipientIds.length > 0 && (
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Will Notify Roles:</label>
+                            {/* Use tag-like elements for roles */}
+                            <div className="flex flex-wrap gap-2 p-2 bg-gray-50 border border-gray-200 rounded-md">
+                                {targetRolesForNotification.map((role) => (
+                                    <span
+                                        key={role}
+                                        className="inline-block bg-cyan-100 text-cyan-800 text-xs font-medium px-2.5 py-0.5 rounded border border-cyan-300"
+                                    >
+                                        {role}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     )}
-
-                    <label>
-                        Notify User <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={selectedUserId}
-                        onChange={(e) => setSelectedUserId(e.target.value)}
-                        required
-                    >
-                        <option value="">Select User to Notify</option>
-                        {users.map((user) => (
-                            <option key={user.user_id} value={user.user_id}>
-                                {user.name}
-                            </option>
-                        ))}
-                    </select>
 
                     <label>
                         Discrepancy Type <span className="text-red-500">*</span>
@@ -296,8 +326,9 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
                                 type="text"
                                 placeholder="Enter Employee ID"
                                 value={employeeId}
-                                onChange={(e) => setEmployeeId(e.target.value)}
+                                readOnly
                                 required
+                                className="block w-full border-gray-300 rounded-md p-2 mb-2 bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0 focus:outline-none"
                             />
                         </span>
 

@@ -1,7 +1,9 @@
     import React, { useState, useEffect, use } from "react";
-    import InvTransferStockForm from "../components/InvTransferStockForm";
+    import InvNoSelectedItem from "../components/InvNoSelectedItem";
+    import CreateTransferStockForm from "../components/CreateTransferStockForm";
     import "../styles/StockFlow.css";
 import { ContinuousColorLegend } from "@mui/x-charts";
+import TransferStockForm from "../components/TransferStockForm";
 
 
     const BodyContent = () => {
@@ -9,7 +11,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         // State to store warehouse movements data
         const [warehouseMovementsView, setWarehouseMovementsView] = useState([]);
 
-        // State to store warehouse data\
+        // State to store warehouse data
         const[warehouseItemsData, setWarehouseItemsData] = useState([]); 
 
         // State management to store warehouse loc data
@@ -24,30 +26,80 @@ import { ContinuousColorLegend } from "@mui/x-charts";
 
         // State to manage the selected item/row sa table
         const [selectedItem, setSelectedItem] = useState(null); 
+        const [transferItems, settransferItems] = useState([]);
 
         // Filter States
         const [selectedWarehouse, setWarehouse] = useState("");
         const [selectedExpiry, setExpiry] = useState("");
 
-        const[caputredItem, setCapturedItem] = useState(null);
+        const[activeTransferForm, setactiveTransferForm] = useState(false);
         
+        // Transfer Modal
         const [showModal, setShowModal] = useState(false);
-        const toggleModal = () => {
-            setShowModal(!showModal
-        )};
 
+        // Create Transfer Modal
+        const[showNoSelectedItem, setShowNoSelectedItem] = useState(false);
+
+        // active create transfer form to hide it
+        const[isActiveCTF, setCTFActive] = useState(false);
+
+        const[warehouseMovementID, setWarehouseMovementID] = useState("");
+
+        // Transfer Item Modal
+        const toggleModal = () => {
+            setShowModal(!showModal)
+        };
+
+        // const toggleNoSelectedItemModal = () => {
+        //     setShowNoSelectedItem(!showNoSelectedItem)
+        // };
+
+        const successCTD = (something) => {
+            setCTFActive(!isActiveCTF);
+            setWarehouseMovementID(something);
+            console.log("GOT IT UGH: ", something)
+            toggleCreateTransferModal(); 
+        };
+        
+
+       
         useEffect(() => {
             setSelectedItem(null);
         }, [activeTab]);
 
 
 
+        const handleAddTransferItem = () => {
+            if (selectedItem) {
+              settransferItems((prevItems) => {
+                // Check for duplicates based on inventory_item_id
+                const isDuplicate = prevItems.some(
+                  (item) => item.inventory_item_id === selectedItem.inventory_item_id
+                );
+                if (isDuplicate) {
+                  console.log("Item already added!");
+                  return prevItems;
+                }
+                return [...prevItems, selectedItem];
+              });
+              toggleModal(); // Open the transfer form
+            } else {
+              console.log("No item selected!");
+              setShowNoSelectedItem(!showNoSelectedItem); // Show the no selected item modal
+             
+            }
+          };
+
+          
+        // Local: http://127.0.0.1:8000/
+        // AWS: https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev
+
 
         // Fetch data from Warehouse Movements view 
         useEffect(() => {
             const fetchData = async () => {
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
@@ -66,7 +118,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         useEffect(() => {
             const fetchWarehouseItemsData = async () => { 
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
                     
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
@@ -89,7 +141,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         useEffect(() => {
             const fetchWarehouseListData = async () => {
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+                    const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseListData(data);
@@ -197,34 +249,24 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         // console.log(stockFlowTableConfigs)
         const activeConfig = stockFlowTableConfigs[activeTab];
        
-
+        
         return (
             <div className={`stockflow ${showModal ? "blurred" : ""}`}>
                 
                 <div className="body-content-container">
-                
-                    {/* Navigation Tabs */}
-                    <nav className="top-0 left-0 flex flex-wrap justify-between  space-x-8 w-full p-2 mt-15">
-                        <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
-                            {Object.keys(stockFlowTableConfigs).map((tab) => (
-                                <span
-                                    key={tab}
-                                    className={`cursor-pointer text-sm md:text-md font-semibold transition-colors ${
-                                        activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
-                                    }`}
-                                    onClick={() => setActiveTab(tab)}
-                                >
-                                    {tab}
-                                </span>
-                            ))}
-                        </div>
-                    </nav>
 
-                    <section className="flex flex-wrap w-full h-auto space-y-3 md:space-x-4 ">
+                {/* Header Section */}
+                <div className=" w-full max-h-[80px]">
+                <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
+                    <div className="flex-col w-full">
+                    <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY: STOCKFLOW</h2>
+                    <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{selectedWarehouse}</span></p>
+                    </div>
 
-                                {/* Warehouse Filter */}
-                                
-                                <select name="" id="" className="w-full sm:w-[170px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                    <div className="w-[450px] h-full flex flex-col gap-2">
+
+                    {/* Select Warehouse & Transfer Form Parent Box */}
+                    <select name="" id="" className="w-full border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
                                         setWarehouse(e.target.value);
                                         setSelectedItem(null);
                                 }}>
@@ -234,24 +276,45 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                             {warehouse.warehouse_location}
                                         </option>
                                     ))}
-                                </select>
-
-                                {/* Expiry */}
-                                <select name="" id="" className="w-full sm:w-[160px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
-                                        setExpiry(e.target.value);
-                                        setSelectedItem(null);
-                                        }
-                                    }>
-                                    <option value="" >Select Expiry</option>
-                                    {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                            <option key={d} value={d}>{d}</option>
-                                        ))}
-                                    
-                                </select>
-
-                                
+                    </select>   
+                    
+                   
+                    {/* Transfer Form Button */}
+                        <button onClick={toggleModal} className={`w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                                    Transfer Form
+                        </button>
+                    
+                    </div>
+                </div>
+                </div>
+                
+                    {/* Navigation Tabs */}
+                    <nav className="top-0 left-0 flex flex-wrap justify-between  space-x-8 w-full p-2">
+                        <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
+                            {Object.keys(stockFlowTableConfigs).map((tab) => (
+                                <span
+                                    key={tab}
+                                    className={`cursor-pointer text-base md:text-md font-semibold transition-colors ${
+                                        activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
+                                    }`}
+                                    onClick={() => setActiveTab(tab)}
+                                >
+                                    {tab}
+                                </span>
+                            ))}
+                        </div>
+                        <div className={`flex gap-2 w-[290px] ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                         
-                    </section>
+                        {/* Transfer Form Button */}
+                        {/* <button onClick={handleAddTransferItem} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
+                                    Transfer Form
+                        </button> */}
+
+                        </div>
+                    </nav>
+                    
+
+                
 
                     <button onClick={toggleModal} className="md:hidden w-full bg-cyan-600 text-white  my-2 px-3 py-1 rounded cursor-pointer">
                                     Transfer Stock
@@ -260,7 +323,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                      
                     {/* Data Table Section */}
                     <main className="flex flex-wrap w-full h-full  rounded-lg">
-                        <div className="stockflow-table w-full h-120 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
+                        <div className="stockflow-table w-full min-h-100 max-h-110 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
                             {loading ? (
                                 <p className="text-center text-gray-600">Loading data...</p>
                             ) //: error ? (
@@ -303,25 +366,20 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                         
                         
                         {/* side section for filters and item details */}
-                        <div className={`flex flex-col  rounded-lg min-h-full w-[230px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <div className={`flex flex-col gap-3 rounded-lg min-h-full w-[300px] ml-4 px-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                             
                                 
 
 
-                            <button
-                                    onClick={toggleModal}
-                                    className="hidden md:block mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
-                                >
-                                    Transfer Stock
-                            </button>
                             
 
                             {/* Selected Items and Item Deatils Label */}
-                            <div className="hidden md:block mt-4">
-                                <h3 className="text-center text-gray-600 mt-2"></h3>
-
+                            <div className="hidden md:block">
+                                
+                                
                                 {/* Selected Items Container */}
-                                <div className="min-h-[300px] border rounded-lg border-gray-300 p-2">
+                                <div className="min-h-90 max-h-auto border rounded-lg border-gray-300 p-4">
+                                <h3 className="text-center text-gray-600 mt-2 mb-4">ITEM DETAILS</h3>
                                 {
                                     selectedItem !== null ? (
                                         <>
@@ -345,6 +403,12 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                 }
                                 </div>  
                             </div>
+                            <button
+                                    onClick={handleAddTransferItem}
+                                    className="hidden md:block  bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
+                                >
+                                    Transfer Item
+                            </button>
                             
                         </div>
                     </main>
@@ -353,15 +417,42 @@ import { ContinuousColorLegend } from "@mui/x-charts";
 
                 </div>          
 
-                {showModal && (
-                <InvTransferStockForm
+                {/* {showCreateTransferForm && (
+                <CreateTransferStockForm
+                    onClose={() => {
+                        // toggleModal();
+                        // setSelectedItem(null);
+                        // refreshInventory();
+                        toggleCreateTransferModal();
+                    }}
+                    // selectedItem={selectedItem}
+                    warehouseList={warehouseList}
+                    successCTD={successCTD}
+                    
+                 />
+            )} */}
+
+
+            {/* Render the "No item selected" modal */}
+            {showNoSelectedItem && (
+            <InvNoSelectedItem
+                onClose={() => {
+                setShowNoSelectedItem(!showNoSelectedItem);
+                }}
+            />
+            )}
+            
+            {showModal && (
+                <TransferStockForm
                     onClose={() => {
                         toggleModal();
                         setSelectedItem(null);
-                        // refreshInventory();
+                        refreshInventory();
+                        // toggleCreateTransferModal();
                     }}
-                    selectedItem={selectedItem}
+                    transferItems={transferItems} // Pass transferItems instead of selectedItem
                     warehouseList={warehouseList}
+                    settransferItems={settransferItems} // Pass settransferItems to allow removal
                     
                  />
             )}
