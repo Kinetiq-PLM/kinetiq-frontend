@@ -236,7 +236,7 @@ const BodyContent = () => {
                         <div className="flex flex-wrap md:max-h-8 space-x-3 space-y-3">
                             <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                                 <option value="">Filter Status</option>
-                                {["Pending", "Approved"].map((s) => (
+                                {["Pending", "Approved", "Rejected"].map((s) => (
                                     <option key={s} value={s}>{s}</option>
                                 ))}
                             </select>
