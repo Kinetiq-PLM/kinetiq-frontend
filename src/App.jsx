@@ -166,7 +166,7 @@ function App() {
     var temp_list = []
     //populate notifs table
     notif_items.map((notif_item, i) => {
-      origin = notif_item.module.split('/')
+      origin = notif_item.module.split(/\/(.*)/s)
       const orig_module = origin[0]
       const orig_submodule = origin.length == 2 ? origin[1] : null
       const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -499,13 +499,15 @@ function App() {
   const filteredModuleFileNames = {};
 
   allowedModules.forEach((permission) => {
-    const [main, sub] = permission.split('/')
-
+    const [main, sub] = permission.split(/\/(.*)/s)
+    console.log('perms main: ' + main)
+    console.log('params sub: ' + sub) 
     if (!filteredModuleFileNames[main]) {
       filteredModuleFileNames[main] = {};
     }
 
     if (!sub) {
+      console.log('including all submodules of ' + main)
       filteredModuleFileNames[main] = {
       ...moduleSubmoduleFileNames[main]
       }
@@ -605,8 +607,8 @@ function App() {
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                    {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (submodule, index) => (
                         <div
                           key={index}
@@ -680,8 +682,8 @@ function App() {
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                  {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (sub, index) => (
                         <div
                           key={index}
