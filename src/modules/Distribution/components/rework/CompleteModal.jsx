@@ -25,7 +25,7 @@ const CompleteModal = ({ rework, onConfirm, onCancel }) => {
           </div>
           
           <p className="warning-text">
-            This action cannot be undone. The rework will be marked as completed and moved to the completed reworks list.
+            This action cannot be undone. The rework will be marked as completed and moved to the Completed Returns list.
           </p>
         </div>
         

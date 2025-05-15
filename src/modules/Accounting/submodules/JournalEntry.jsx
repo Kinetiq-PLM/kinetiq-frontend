@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../styles/JournalEntry.css";
 import "../styles/accounting-styling.css";
-import Button from "../components/Button";
-import Forms from "../components/Forms";
+import Button from "../components/button/Button";
+import Forms from "../components/forms/Forms";
 import NotifModal from "../components/modalNotif/NotifModal";
-import Dropdown from "../components/Dropdown";
-import AddAccountModal from "../components/AddAccountModal";
+import Dropdown from "../components/dropdown/Dropdown";
+import AddAccountModal from "../components/journalEntryModal/AddAccountModal";
 import axios from "axios";
 
 const JournalEntry = () => {

@@ -30,8 +30,8 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const campaignMutation = useMutation({
     mutationFn: async (data) => await POST("crm/campaigns/", data),
-    onSuccess: (data) => {
-      queryClient.refetchQueries(["campaigns"]);
+    onSuccess: async (data) => {
+      await queryClient.refetchQueries(["campaigns"]);
     },
     onError: (error) => {
       showAlert({

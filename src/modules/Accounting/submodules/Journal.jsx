@@ -1,12 +1,12 @@
 import "../styles/accounting-styling.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import Table from "../components/Table";
-import JournalModalInput from "../components/JournalModalInput";
+import Button from "../components/button/Button";
+import Dropdown from "../components/dropdown/Dropdown";
+import Table from "../components/table/Table";
+import JournalModalInput from "../components/journalModal/JournalModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
-import Search from "../components/Search";
+import Search from "../components/search/Search";
 
 const Journal = () => {
 
@@ -35,6 +35,7 @@ const Journal = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [currencies, setCurrencies] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortBy, setSortBy] = useState("Debit");
   const [data, setData] = useState([]);
@@ -69,6 +70,7 @@ const Journal = () => {
   // Fetching data from the API
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.get(JOURNAL_ENTRIES_ENDPOINT, config);
@@ -92,6 +94,7 @@ const Journal = () => {
         const latest = sortedResult[0];
         setLatestJournalId(latest.journal_id || "ACC-JOE-2025-A00000");
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching journal data:", error);
       setValidation({
@@ -100,6 +103,7 @@ const Journal = () => {
         title: "Journal Fetch Failed",
         message: "Failed to load journal entries. Please check your connection or API configuration.",
       });
+      setIsLoading(false);
     }
   };
 
@@ -335,6 +339,15 @@ const Journal = () => {
       .includes(searching.toLowerCase())
   );
 
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading journal data...</p>
+    </div>
+  );
+
   return (
     <div className="Journal">
       <div className="body-content-container">
@@ -376,7 +389,11 @@ const Journal = () => {
 
 
         {/* Table Component */}
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
         <Table data={filteredData} columns={columns} enableCheckbox={false} />
+      )}
       </div>
 
 

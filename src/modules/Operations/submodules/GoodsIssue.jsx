@@ -163,6 +163,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
     tax_rate: isCreateMode ? 0 : selectedData.tax_rate || 0,
     tax_amount: isCreateMode ? 0 : selectedData.tax_amount || 0,
     discount_rate: isCreateMode ? 0 : selectedData.discount_rate || 0,
+    delivery_note: isCreateMode ? "" : selectedData.delivery_note || "",
     discount_amount: isCreateMode ? 0 : selectedData.discount_amount || 0,
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
@@ -1168,6 +1169,15 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                       onChange={(e) => handleDocumentDetailChange(e, "freight")}
                     />
                   </div>
+                  <div className="detail-row">
+  <label>Delivery Note</label>
+  <input
+    type="text"
+    value={documentDetails.delivery_note || ''}
+    onChange={(e) => handleDocumentDetailChange(e, "delivery_note")}
+    maxLength={255}
+  />
+</div>
                 </div>
               )}
             </div>

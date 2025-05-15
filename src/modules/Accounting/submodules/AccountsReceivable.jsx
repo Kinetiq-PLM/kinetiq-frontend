@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Table from "../components/Table";
-import Search from "../components/Search";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
 import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
@@ -43,9 +43,7 @@ const AccountsReceivable = () => {
         response.data
           .filter(
             (entry) =>
-              (entry.account_name === "Accounts Receivable" ||
-               entry.account_name === "Sales Revenue") &&
-              (entry.debit_amount != 0 || entry.credit_amount != 0)
+              (entry.account_name === "Accounts Receivable" || entry.account_name === "Sales Revenue") 
           )
           .map((entry) => entry.journal_id)
       );

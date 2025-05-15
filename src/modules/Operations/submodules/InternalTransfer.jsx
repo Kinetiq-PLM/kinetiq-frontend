@@ -76,6 +76,8 @@ const ApprovalTable = ({employee_id}) => {
  
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
+          console.log("Current filteredData:", filteredData);
+console.log("First item quantity:", filteredData[0]?.quantity);
           console.log(data)
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
@@ -261,14 +263,15 @@ const ApprovalTable = ({employee_id}) => {
             <thead>
               <tr>
                 <th></th> {/* Checkbox column - no checkbox in header */}
-                <th>ID</th> {/* ID column next */}
+                <th>Request ID</th> {/* ID column next */}
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
                     <th>Item Name</th>
+                    <th>Quantity</th>
                     <th>Date</th>
                     <th>Delivery Type</th>
                     <th>Warehouse Location</th>
-                    <th>Module</th>
+                    <th>Receiving Unit</th>
                   </>
                 ) : (
                   <>
@@ -299,6 +302,7 @@ const ApprovalTable = ({employee_id}) => {
                     <>
                       <td>{row.delivery_id}</td>
                       <td>{row.item_name}</td>
+                      <td>{row.quantity || 0}</td> 
                       <td>{row.request_date}</td>
                       <td>{row.delivery_type}</td>
                       <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
@@ -366,7 +370,7 @@ const ApprovalTable = ({employee_id}) => {
                 />
               </div>
               <div className="input-group">
-                <label>Module</label>
+                <label>Receiving Unit</label>
                 <input 
                   type="text" 
                   className="short-input"  
@@ -380,7 +384,7 @@ const ApprovalTable = ({employee_id}) => {
               </div>
               <div className="input-group">
                 <label>Warehouse Location</label>
-                <select value={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
+                <select valueModul={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
                   <option value="">Select Warehouse</option>
                   {loading ? (
                     <option value="">Loading vendors...</option>

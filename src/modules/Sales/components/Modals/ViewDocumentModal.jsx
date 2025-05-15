@@ -6,7 +6,9 @@ import { BASE_API_URL, GET } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 import loading from "../Assets/kinetiq-loading.gif";
 import Button from "../Button";
-import { Table } from "lucide-react";
+import { MessageCircleReplyIcon, Table } from "lucide-react";
+import html2canvas from "html2canvas-pro";
+import { jsPDF } from "jspdf";
 
 const Header = () => {
   return (
@@ -144,13 +146,13 @@ const OrdersTable = ({ data }) => {
           return (
             <tr>
               <td className="border border-black text-black font-light text-start  p-2 text-xs">
-                {item.product.product_id}
+                {item.inventory_item.item.item_id}
               </td>
               <td className="border border-black text-black font-light text-start  p-2 text-xs">
                 <div className="flex flex-col">
-                  <span>{item.product.product_name}</span>
+                  <span>{item.inventory_item.item.item_name}</span>
                   <span className="text-gray-500">
-                    {item.product.description}
+                    {item.inventory_item.item.item_description}
                   </span>
                 </div>
               </td>
@@ -354,6 +356,98 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  const downloadPDF = async () => {
+    const element = document.getElementById("document-content");
+    if (!element) return;
+
+    try {
+      // 1) Render the entire element to one big canvas
+      const canvas = await html2canvas(element, {
+        scale: 1.5,
+        logging: false,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById("document-content");
+          clonedElement
+            .querySelectorAll('[class*="bg-"], [class*="text-"]')
+            .forEach((el) => {
+              const style = window.getComputedStyle(el);
+              el.style.backgroundColor = style.backgroundColor;
+              el.style.color = style.color;
+            });
+        },
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "in",
+        format: "a4",
+      });
+
+      // 2) PDF page size & margins in inches
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 0.5;
+      const usableW = pageW - 2 * margin;
+      const usableH = pageH - 2 * margin;
+
+      // 3) Compute the image’s size in inches (full width keeps aspect)
+      const imgW = usableW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      // 4) Figure out how many “strips” in pixels we need
+      //    pixels-per-inch = canvas.width(px) / imgW(in)
+      const pxPerInch = canvas.width / imgW;
+      const usableHPx = usableH * pxPerInch;
+      const totalPages = Math.ceil(canvas.height / usableHPx);
+
+      // 5) For each page, copy just that slice of the big canvas…
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) pdf.addPage();
+
+        // how tall this slice really is (last page might be shorter)
+        const sliceHeightPx = Math.min(
+          usableHPx,
+          canvas.height - page * usableHPx
+        );
+
+        // create a temporary canvas to hold one slice
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeightPx;
+        const ctx = sliceCanvas.getContext("2d");
+
+        // copy slice from the big canvas
+        ctx.drawImage(
+          canvas,
+          0,
+          page * usableHPx,
+          canvas.width,
+          sliceHeightPx,
+          0,
+          0,
+          canvas.width,
+          sliceHeightPx
+        );
+
+        // convert slice to image and draw at (margin, margin)
+        const sliceData = sliceCanvas.toDataURL("image/jpeg", 1.0);
+        const sliceHIn = sliceHeightPx / pxPerInch;
+        pdf.addImage(sliceData, "JPEG", margin, margin, imgW, sliceHIn);
+      }
+
+      pdf.save(`${documentToView}.pdf`);
+    } catch (error) {
+      console.error(error);
+      showAlert({
+        type: "error",
+        title: "Error generating PDF",
+      });
+    }
+  };
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -439,7 +533,14 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("quotation") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                  style={{
+                    pageBreakAfter: "always",
+                    pageBreakInside: "avoid",
+                  }}
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">QUOTATION</span>
@@ -554,7 +655,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("order") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">SALES ORDER</span>
@@ -675,7 +779,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("delivery") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">DELIVERY NOTE</span>
@@ -753,95 +860,59 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                     </table>
                   </div>
                   <div>
-                    <OrdersTable data={data} />
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <div>Thank you for your business.</div>
-                    <table>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Order No.
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Item & Description
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Qty
+                          </th>
+                        </tr>
+                      </thead>
                       <tbody>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Subtotal</span>
-                            <span>
-                              {Number(data.statement.subtotal).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Sales Tax</span>
-                            <span>
-                              {Number(data.statement.total_tax).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Shipping Fee</span>
-                            <span>
-                              {Number(data.shipping_fee).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Total Discount</span>
-                            <span>
-                              {Number(data.statement.discount).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="bg-[#eff8f9]">
-                          <td className="flex justify-between font-bold p-1">
-                            <span className="font-bold text-[#469fc2]">
-                              Total
-                            </span>
-                            <span className="fold-bold text-[#469fc2]">
-                              {Number(
-                                data.statement.total_amount
-                              ).toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </span>
-                          </td>
-                        </tr>
+                        {data.statement.items.map((item) => {
+                          return (
+                            <tr>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                {item.inventory_item.item.item_id}
+                              </td>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                <div className="flex flex-col">
+                                  <span>
+                                    {item.inventory_item.item.item_name}
+                                  </span>
+                                  <span className="text-gray-500">
+                                    {item.inventory_item.item.item_description}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                {item.quantity}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
-                  <Terms />
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                  </div>
                 </div>
               )}
             {data &&
               data.delivery_note &&
               documentToView &&
               documentToView.includes("invoice") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">SALES INVOICE</span>
@@ -987,7 +1058,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("agreement") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <div className="text-center">
                     <span className="font-light text-lg">
                       BLANKET AGREEMENT
@@ -1043,7 +1117,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           year: "numeric",
                         })}
                       </b>
-                      , unless terminated earlier.
+                      .
                     </span>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -1168,12 +1242,17 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                 </div>
               )}
             <div className="mt-10 justify-center items-center text-center">
-              <a
-                className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
-                href={`${BASE_API_URL}sales/${documentToView}/document`}
+              <button
+                className="py-1 px-6 cursor-pointer font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
+                onClick={downloadPDF}
               >
                 Download
-              </a>
+              </button>
+              {/* <a
+                className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
+                href={`${BASE_API_URL}sales/${documentToView}/document`}
+              > */}
+              {/* </a> */}
             </div>
           </div>
         )}

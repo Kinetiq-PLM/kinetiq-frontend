@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Table from "../components/Table";
-import Search from "../components/Search";
-import Dropdown from "../components/Dropdown";
-import Button from "../components/Button";
-import CreateGLAccountModal from "../components/CreateGLAccountModal";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
+import Dropdown from "../components/dropdown/Dropdown";
+import Button from "../components/button/Button";
+import CreateGLAccountModal from "../components/glAccountsModal/CreateGLAccountModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
