@@ -248,13 +248,13 @@ const BodyContent = () => {
     // Table Configurations per Active Tab
     const stockFlowTableConfigs = {
         "Warehouse": {
-            Columns: ["Item Name", "Type", "Item Management", "Quantity", "Expiry"],
+            Columns: ["Item Name", "Type", "Item No", "Quantity", "Expiry"],
             Data:  filteredData.map((item) => {
                 return {
                     "Inventory Item ID": item?.inventory_item_id || "none",
                     "Item Name": item?.item_name || "Unknown",
                     "Type": item?.item_type || "Unspecified",
-                    "Item Management": item.item_management || "-",
+                    "Item No": item.item_no || "-",
                     "Quantity": item?.current_quantity || "-",
                     "Expiry": item?.expiry.split("T")[0] || "-" 
                 }
