@@ -127,8 +127,7 @@ const BodyContent = () => {
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Payable" ||
-              entry.accountName === "Raw Material Used"
+              entry.accountName === "Accounts Payable"
           )
           .map((entry) => entry.journalId)
       );
@@ -140,8 +139,7 @@ const BodyContent = () => {
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Receivable" ||
-              entry.accountName === "Sales Revenue"
+              entry.accountName === "Accounts Receivable"
           )
           .map((entry) => entry.journalId)
       );

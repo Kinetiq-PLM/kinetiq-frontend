@@ -110,16 +110,14 @@ const AccountingDashboard = () => {
       const accountsPayableNet = netBalances
         .filter(
           (item) =>
-            item.accountName === "Accounts Payable" ||
-            item.accountName === "Raw Material Used"
+            item.accountName === "Accounts Payable"
         )
         .reduce((sum, item) => sum + parseFloat(item.net), 0);
   
       const accountsReceivableNet = netBalances
         .filter(
           (item) =>
-            item.accountName === "Accounts Receivable" ||
-            item.accountName === "Sales Revenue"
+            item.accountName === "Accounts Receivable"
         )
         .reduce((sum, item) => sum + parseFloat(item.net), 0);
   
