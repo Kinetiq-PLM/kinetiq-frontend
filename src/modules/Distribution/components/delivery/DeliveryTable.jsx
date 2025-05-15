@@ -97,7 +97,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
       setApproving(delOrderId);
       
       // Send approval request to backend
-      await axios.post('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/approve-order/', { del_order_id: delOrderId });
+      await axios.post('http://127.0.0.1:8000/api/approve-order/', { del_order_id: delOrderId });
       
       // Update the order status in the local state (optimistic update)
       const updatedDeliveries = filteredDeliveries.map(order => {
