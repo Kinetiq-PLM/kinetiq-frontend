@@ -1,5 +1,5 @@
 const API_BASE_URL = "https://eq7nxor488.execute-api.ap-southeast-1.amazonaws.com/dev";
-//const API_BASE_URL = "http://127.0.0.1:8000/"; // Local development URL
+//const API_BASE_URL = "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/"; // Local development URL
 //const uploadToS3Endpoint = 'https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/'
 
 export const GET = async (endpoint) => {

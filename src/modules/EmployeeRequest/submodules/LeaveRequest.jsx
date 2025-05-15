@@ -40,7 +40,7 @@ const LeaveRequest = () => {
         setFetchingEmployees(true);
         
         // Use the real API endpoint to fetch employees
-        const response = await axios.get("http://127.0.0.1:8000/api/employees");
+        const response = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees");
 
         if (!response || !response.data) {
           throw new Error("Invalid response from employees API");
@@ -76,7 +76,7 @@ const LeaveRequest = () => {
         setFetchingDepartments(true);
         
         // Use the real API endpoint to fetch departments
-        const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
+        const response = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/");
         setDepartments(response.data);
       } catch (err) {
         console.error("Error fetching departments:", err);
@@ -98,7 +98,7 @@ const LeaveRequest = () => {
         setFetchingLeaveBalances(true);
         
         // Fetch the current year's leave balances for this employee
-        const response = await axios.get(`http://127.0.0.1:8000/api/employee_leave_balances/balances/${formData.employee_id}/`);
+        const response = await axios.get(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_balances/balances/${formData.employee_id}/`);
         
         if (response && response.data) {
           setLeaveBalances(response.data);
@@ -388,7 +388,7 @@ const LeaveRequest = () => {
 
       // Use the actual API request
       await axios.post(
-        "http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/",
+        "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/",
         payload
       );
 

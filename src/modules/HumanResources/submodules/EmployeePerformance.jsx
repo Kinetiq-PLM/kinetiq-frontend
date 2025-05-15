@@ -48,7 +48,7 @@ const EmployeePerformance = () => {
   const fetchPerformanceData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
+      const res = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
       setPerformanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch performance data:", err);
@@ -117,7 +117,7 @@ const EmployeePerformance = () => {
       
       // Send the request with the correct data format
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/${selectedPerformance.performance_id}/`,
+        `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/${selectedPerformance.performance_id}/`,
         { rating: ratingValue }
       );
       

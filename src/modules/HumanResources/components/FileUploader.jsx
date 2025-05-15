@@ -26,7 +26,7 @@ const FileUploader = ({ onUploadSuccess }) => {
 
     try {
       // Replace with your actual backend endpoint
-      const response = await axios.post('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload/s3/', formData, {
+      const response = await axios.post('https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload/s3/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

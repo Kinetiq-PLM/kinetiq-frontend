@@ -26,7 +26,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [pnpOrder, setPnpOrder] = useState([]);
     const [prinOrder, setPrincipalOrder] = useState([]);
-    //const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev";
     const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 

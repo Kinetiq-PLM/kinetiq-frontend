@@ -87,7 +87,7 @@ const BodyContent = ({employee_id}) => {
 
     // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
 
-    const API_BASE_URL = "http://127.0.0.1:8000/";
+    const API_BASE_URL = "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/";
 
     const updateConversationTitle = async (conversationId, newTitle) => {
         try {

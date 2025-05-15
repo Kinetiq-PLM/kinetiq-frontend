@@ -1,7 +1,7 @@
 // src/services/employeeService.js
 import axios from 'axios';
 
-const API_URL = 'https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api';
+const API_URL = 'https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api';
 
 // Create axios instance with default config
 const apiClient = axios.create({

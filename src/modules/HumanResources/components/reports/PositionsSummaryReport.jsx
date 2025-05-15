@@ -27,9 +27,9 @@ const PositionsSummaryReport = ({ positions: propsPositions = [], employees: pro
         try {
           console.log("Fetching positions and employees data directly...");
           const [positionsRes, employeesRes, deptsRes] = await Promise.all([
-            axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
-            axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
-            axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
+            axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
+            axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
+            axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
           ]);
           
           console.log("Positions data fetched:", positionsRes.data);

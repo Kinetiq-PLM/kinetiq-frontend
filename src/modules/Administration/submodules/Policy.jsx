@@ -195,7 +195,7 @@ const PolicyManagement = () => {
     setSelectedRecord(record);
     if (record.policy_document) {
       // Prepend the local development server URL if needed
-      const documentUrl = record.policy_document.startsWith('http') ? record.policy_document : `http://127.0.0.1:8000${record.policy_document}`;
+      const documentUrl = record.policy_document.startsWith('http') ? record.policy_document : `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev${record.policy_document}`;
       setViewDocumentUrl(documentUrl);
     } else {
       setViewDocumentUrl(null);

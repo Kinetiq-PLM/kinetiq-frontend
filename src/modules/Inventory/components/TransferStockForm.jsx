@@ -55,7 +55,7 @@ const TransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       };
 
       // post req first sa warehouse movement 
-      const warehouseMovementResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-transfer/", {
+      const warehouseMovementResponse = await fetch("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-transfer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementData),
@@ -77,7 +77,7 @@ const TransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       }
 
       // post req first sa movement items
-      const warehouseMovementItemResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-items/", {
+      const warehouseMovementItemResponse = await fetch("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-items/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementItemData),
