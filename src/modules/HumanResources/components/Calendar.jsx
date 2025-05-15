@@ -37,9 +37,11 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     }
   };
 
-  /* Add a function to get interview emoji */
+  /* Update the getInterviewEmoji function to handle null/undefined values safely */
   const getInterviewEmoji = (interviewType) => {
-    switch (interviewType?.toLowerCase()) {
+    if (!interviewType) return '📋'; // Default emoji for undefined types
+    
+    switch (interviewType.toLowerCase()) {
       case 'technical':
         return '💻';
       case 'hr':
@@ -100,7 +102,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     })();
   }, []);
 
-  // Add new useEffect to fetch interviews and leave requests
+  // Update the fetchInterviewsAndLeaves function inside useEffect
   useEffect(() => {
     const fetchInterviewsAndLeaves = async () => {
       setLoading(true);
@@ -109,7 +111,27 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         const interviewsResponse = await axios.get(
           "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/"
         );
-        setInterviews(interviewsResponse.data);
+        
+        console.log("Interviews API response:", interviewsResponse.data);
+        
+        // Add this after the API call in the fetchInterviewsAndLeaves function
+        console.log("First interview object structure:", 
+          interviewsResponse.data.length > 0 ? interviewsResponse.data[0] : "No interviews");
+        
+        // Process interview data to ensure date format is correct
+        const processedInterviews = interviewsResponse.data.map(interview => {
+          if (interview.interview_date) {
+            // Ensure interview_date is in YYYY-MM-DD format
+            const date = new Date(interview.interview_date);
+            if (!isNaN(date.getTime())) {
+              interview.interview_date = date.toISOString().split('T')[0];
+            }
+          }
+          return interview;
+        });
+        
+        setInterviews(processedInterviews);
+        console.log("Processed interviews:", processedInterviews);
         
         // Fetch leave requests
         const leavesResponse = await axios.get(
@@ -120,7 +142,11 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         setError(null);
       } catch (err) {
         console.error("Error fetching interviews or leave requests:", err);
+        console.log("Error details:", err.response?.data || err.message);
         setError("Failed to load interviews or leave requests");
+        // Set empty arrays to prevent undefined errors
+        setInterviews([]);
+        setLeaves([]);
       } finally {
         setLoading(false);
       }
@@ -173,8 +199,17 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
 
       // Find interviews for this date
       const dayInterviews = interviews.filter((interview) => {
-        const interviewDate = interview.interview_date;
-        return interviewDate === dateStr;
+        if (!interview || !interview.interview_date) return false;
+        
+        try {
+          // Try to normalize the date format for comparison
+          const interviewDateObj = new Date(interview.interview_date);
+          const interviewDateStr = interviewDateObj.toISOString().split('T')[0];
+          return interviewDateStr === dateStr;
+        } catch (err) {
+          console.error("Error processing interview date:", err);
+          return false;
+        }
       });
 
       cells.push({
@@ -223,6 +258,56 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       // Pass the selected date as a query parameter or state
       navigateTo(path, { selectedDate: dateStr });
     }
+  };
+
+  /* Add this improved renderInterviewItem function for better display of interview details */
+  const renderInterviewItem = (interview, index) => {
+    // If we don't have a valid interview object, render a placeholder
+    if (!interview) {
+      return <li key={`unknown-interview-${index}`}>Unknown interview</li>;
+    }
+    
+    // Debug the actual interview object structure in the console
+    console.log("Interview data structure:", interview);
+    
+    // Try different possible field names for candidate name
+    const candidateName = interview.candidate_name || 
+                         interview.candidate?.name || 
+                         interview.applicant_name || 
+                         interview.name || 
+                         'Unnamed Candidate';
+    
+    // Try different possible field names for interview time
+    const time = interview.interview_time || 
+                interview.time || 
+                interview.schedule_time || 
+                (interview.schedule ? interview.schedule.time : null) || 
+                'No time specified';
+    
+    // Try different possible field names for interview type
+    const type = interview.interview_type || 
+                interview.type || 
+                interview.interview_category || 
+                'Unknown';
+    
+    // Safely get ID for key
+    const id = interview.interview_id || 
+              interview.id || 
+              `interview-${index}`;
+    
+    // Safely get CSS class name
+    const typeClass = type && typeof type === 'string' ? type.toLowerCase() : 'unknown';
+    
+    return (
+      <li key={id}>
+        <span className="interview-emoji">{getInterviewEmoji(type)}</span>
+        <strong>{candidateName}</strong> -{" "}
+        <span className={`interview-type ${typeClass}`}>
+          {type} Interview
+        </span>
+        <span className="interview-time"> at {time}</span>
+      </li>
+    );
   };
 
   /* ── derived ────────────────────────────────────────────────────────── */
@@ -412,16 +497,9 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
                     {selectedDay.interviews.length !== 1 ? "s" : ""} Scheduled
                   </h5>
                   <ul>
-                    {selectedDay.interviews.map((interview) => (
-                      <li key={interview.interview_id}>
-                        <span className="interview-emoji">{getInterviewEmoji(interview.interview_type)}</span>
-                        {interview.candidate_name || "Candidate"} -{" "}
-                        <span className={`interview-type ${interview.interview_type.toLowerCase()}`}>
-                          {interview.interview_type} Interview
-                        </span>
-                        <span className="interview-time"> at {interview.interview_time}</span>
-                      </li>
-                    ))}
+                    {selectedDay.interviews.map((interview, index) => 
+                      renderInterviewItem(interview, index)
+                    )}
                   </ul>
                 </div>
               )}
