@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import Button from "./components/button/Button";
 
+
 // Professional color palette
 const COLORS = [
   "#3b82f6",
@@ -29,10 +30,13 @@ const COLORS = [
   "#6366f1",
 ];
 
+
 const AccountingDashboard = () => {
+  // Use States 
   const [chartSeries, setChartSeries] = useState([]);
-  const [pieData, setPieData] = useState([]);
   const [trendData, setTrendData] = useState([]);
+  const [pieData, setPieData] = useState([]);
+  const [data, setData] = useState([]);
   const [summary, setSummary] = useState({
     debit: 0,
     credit: 0,
@@ -40,13 +44,14 @@ const AccountingDashboard = () => {
     receivable: 0,
     balance: 0,
   });
-  const [data, setData] = useState([]);
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
     title: "",
     message: "",
   });
+
+
 
   // API endpoint
   const API_URL =
@@ -55,11 +60,15 @@ const AccountingDashboard = () => {
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
   const CHART_OF_ACCOUNTS_ENDPOINT = `${API_URL}/api/chart-of-accounts/`;
 
+
+  
+  // Computes the Netbalance
   const computeNetBalances = (entries) => {
     const accountSums = {};
   
     entries.forEach(({ accountName, debit, credit }) => {
-      if (!accountSums[accountName]) {
+      if (!accountSums[accountName]) 
+      {
         accountSums[accountName] = { debit: 0, credit: 0 };
       }
   
@@ -67,8 +76,7 @@ const AccountingDashboard = () => {
       accountSums[accountName].credit += parseFloat(credit) || 0;
     });
   
-    return Object.entries(accountSums).map(
-      ([name, { debit, credit }]) => ({
+    return Object.entries(accountSums).map(([name, { debit, credit }]) => ({
         accountName: name,
         debit: debit.toFixed(2),
         credit: credit.toFixed(2),
@@ -77,6 +85,9 @@ const AccountingDashboard = () => {
     );
   };
   
+
+
+  // Fetches data
   const fetchData = async () => {
     try {
       const glResponse = await axios.get(GENERAL_LEDGER_ENDPOINT);
