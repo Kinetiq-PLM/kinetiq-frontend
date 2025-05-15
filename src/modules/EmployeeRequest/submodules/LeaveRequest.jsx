@@ -9,8 +9,6 @@ const LeaveRequest = () => {
     employee_name: "",
     dept_id: "",
     dept_name: "",
-    immediate_superior_id: "",
-    immediate_superior_name: "",
     leave_type: "",
     start_date: "",
     end_date: "",
@@ -26,8 +24,6 @@ const LeaveRequest = () => {
   const [departments, setDepartments] = useState([]);
   const [fetchingEmployees, setFetchingEmployees] = useState(false);
   const [fetchingDepartments, setFetchingDepartments] = useState(false);
-  const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
-  const [fetchingSuperiors, setFetchingSuperiors] = useState(false);
 
   // Properly use the error state
   const [renderError, setRenderError] = useState(false);
@@ -84,32 +80,6 @@ const LeaveRequest = () => {
     fetchDepartments();
   }, []);
 
-  // Fetch department superiors when department changes
-  useEffect(() => {
-    const fetchDepartmentSuperiors = async () => {
-      if (!formData.dept_id) return;
-
-      try {
-        setFetchingSuperiors(true);
-        
-        // Use the real API endpoint to fetch department superiors
-        const response = await axios.get(`http://127.0.0.1:8000/api/department_superiors/department-superiors/`);
-        // Filter superiors by the selected department
-        const filteredSuperiors = response.data.filter(sup => 
-          sup.dept_id === formData.dept_id && !sup.is_archived
-        );
-        setDepartmentSuperiors(filteredSuperiors);
-      } catch (err) {
-        console.error("Error fetching department superiors:", err);
-        showToast("Failed to load department superiors", false);
-      } finally {
-        setFetchingSuperiors(false);
-      }
-    };
-
-    fetchDepartmentSuperiors();
-  }, [formData.dept_id]);
-
   // Toast message helper with improved error handling
   const showToast = (message, success = true) => {
     try {
@@ -126,6 +96,25 @@ const LeaveRequest = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
+    // Special handling for date fields with validation
+    if (name === 'start_date' || name === 'end_date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time for fair comparison
+      
+      // For start date, ensure it's not in the past
+      if (name === 'start_date' && selectedDate < today) {
+        showToast("Start date cannot be in the past", false);
+        return;
+      }
+      
+      // For end date, ensure it's not before start date
+      if (name === 'end_date' && formData.start_date && selectedDate < new Date(formData.start_date)) {
+        showToast("End date cannot be before start date", false);
+        return;
+      }
+    }
+
     // Special handling for employee_id selection
     if (name === "employee_id" && value) {
       const selectedEmployee = employees.find(emp => emp.employee_id === value);
@@ -140,9 +129,6 @@ const LeaveRequest = () => {
           employee_name: `${selectedEmployee.first_name} ${selectedEmployee.last_name}`,
           dept_id: deptId,
           dept_name: deptName,
-          // Reset superior fields when employee changes
-          immediate_superior_id: "",
-          immediate_superior_name: "",
         }));
         return;
       }
@@ -165,9 +151,6 @@ const LeaveRequest = () => {
             employee_name: value,
             dept_id: deptId,
             dept_name: deptName,
-            // Reset superior fields when employee changes
-            immediate_superior_id: "",
-            immediate_superior_name: "",
           }));
         }
         return;
@@ -182,22 +165,6 @@ const LeaveRequest = () => {
           ...prev,
           dept_id: selectedDept.dept_id,
           dept_name: selectedDept.dept_name,
-          // Reset superior fields when department changes
-          immediate_superior_id: "",
-          immediate_superior_name: "",
-        }));
-        return;
-      }
-    }
-
-    // Special handling for superior_id selection
-    if (name === "immediate_superior_id" && value) {
-      const selectedSuperior = departmentSuperiors.find(sup => sup.dept_superior_id === value);
-      if (selectedSuperior && selectedSuperior.employee) {
-        setFormData(prev => ({
-          ...prev,
-          immediate_superior_id: selectedSuperior.dept_superior_id,
-          immediate_superior_name: `${selectedSuperior.employee.first_name} ${selectedSuperior.employee.last_name}`
         }));
         return;
       }
@@ -289,11 +256,6 @@ const LeaveRequest = () => {
         reason: formData.reason
       };
 
-      // Add immediate superior if selected
-      if (formData.immediate_superior_id) {
-        payload.immediate_superior_id = formData.immediate_superior_id;
-      }
-
       // Use the actual API request
       await axios.post(
         "http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/",
@@ -309,8 +271,6 @@ const LeaveRequest = () => {
         employee_name: "",
         dept_id: "",
         dept_name: "",
-        immediate_superior_id: "",
-        immediate_superior_name: "",
         leave_type: "",
         start_date: "",
         end_date: "",
@@ -458,43 +418,9 @@ const LeaveRequest = () => {
                           readOnly
                         />
                       </div>
-
-                      <div className="leave-req-form-group">
-                        <label>Immediate Superior ID</label>
-                        {fetchingSuperiors ? (
-                          <div className="leave-req-loading-dropdown">Loading superiors...</div>
-                        ) : (
-                          <select
-                            name="immediate_superior_id"
-                            value={formData.immediate_superior_id}
-                            onChange={handleInputChange}
-                            disabled={!formData.dept_id}
-                          >
-                            <option value="">-- Select Superior --</option>
-                            {departmentSuperiors.map(sup => (
-                              <option
-                                key={sup.dept_superior_id}
-                                value={sup.dept_superior_id}
-                              >
-                                {sup.dept_superior_id}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
                     </div>
 
                     <div className="leave-req-form-column">
-                      <div className="leave-req-form-group">
-                        <label>Immediate Superior Name</label>
-                        <input
-                          type="text"
-                          name="immediate_superior_name"
-                          value={formData.immediate_superior_name}
-                          readOnly
-                        />
-                      </div>
-
                       <div className="leave-req-form-group">
                         <label>Leave Type *</label>
                         <select
@@ -523,7 +449,14 @@ const LeaveRequest = () => {
                             value={formData.start_date}
                             onChange={handleInputChange}
                             required
+                            min={new Date().toISOString().split('T')[0]} // Set minimum date to today
+                            className="leave-req-date-picker"
+                            onClick={(e) => {
+                              // Ensure click is focused on this input
+                              e.currentTarget.showPicker();
+                            }}
                           />
+                          <small className="leave-req-helper-text">Cannot be in the past</small>
                         </div>
 
                         <div className="leave-req-form-group">
@@ -534,7 +467,17 @@ const LeaveRequest = () => {
                             value={formData.end_date}
                             onChange={handleInputChange}
                             required
+                            min={formData.start_date || new Date().toISOString().split('T')[0]} // Set minimum to start date or today
+                            className="leave-req-date-picker"
+                            disabled={!formData.start_date} // Disable until start date is selected
+                            onClick={(e) => {
+                              // Ensure click is focused on this input
+                              if (!e.currentTarget.disabled) {
+                                e.currentTarget.showPicker();
+                              }
+                            }}
                           />
+                          <small className="leave-req-helper-text">Must be after start date</small>
                         </div>
                       </div>
 
@@ -587,8 +530,6 @@ const LeaveRequest = () => {
                           employee_name: "",
                           dept_id: "",
                           dept_name: "",
-                          immediate_superior_id: "",
-                          immediate_superior_name: "",
                           leave_type: "",
                           start_date: "",
                           end_date: "",

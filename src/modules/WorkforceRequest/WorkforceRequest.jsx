@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiSearch } from "react-icons/fi";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./styles/WorkforceRequest.css";
 
 const WorkforceRequest = () => {
   const [activeTab, setActiveTab] = useState("form");
-  // States for form data
+  // States for form data - simplified with only the necessary fields
   const [formData, setFormData] = useState({
     requesting_dept_id: "",
     current_dept_id: "",
-    hr_approver: "",
-    employee_id: "",
     required_skills: "",
     task_description: "",
     start_date: "",
     end_date: "",
+    // Hidden fields with default values
+    hr_approver: "",
+    employee_id: "",
     status: "Draft",
     approval_status: "Pending",
     rejection_reason: ""
@@ -26,7 +29,6 @@ const WorkforceRequest = () => {
   // States for list view and shared functionality 
   const [requests, setRequests] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,12 +42,7 @@ const WorkforceRequest = () => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
   };
-  // useEffect(() => {
-  //   // This ensures activeTab always stays as "form" since it's the only option
-  //   if (activeTab !== "form") {
-  //     setActiveTab("form");
-  //   }
-  // }, [activeTab]);
+
   // Fetch departments, employees, and requests
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -55,16 +52,6 @@ const WorkforceRequest = () => {
       } catch (err) {
         console.error("Error fetching departments:", err);
         showToast("Failed to load departments", false);
-      }
-    };
-
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/employees/");
-        setEmployees(response.data);
-      } catch (err) {
-        console.error("Error fetching employees:", err);
-        showToast("Failed to load employees", false);
       }
     };
 
@@ -81,7 +68,6 @@ const WorkforceRequest = () => {
     };
 
     fetchDepartments();
-    fetchEmployees();
     fetchRequests();
   }, []);
 
@@ -94,23 +80,50 @@ const WorkforceRequest = () => {
     }));
   };
 
+  // Handle date changes specifically
+  const handleDateChange = (date, name) => {
+    // Format date to YYYY-MM-DD for backend compatibility
+    const formattedDate = date ? date.toISOString().split('T')[0] : "";
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedDate
+    }));
+  };
+
   const validateForm = () => {
     const errors = {};
     
-    // Check date constraint
-    if (formData.start_date && formData.end_date && 
-        new Date(formData.end_date) < new Date(formData.start_date)) {
-      errors.end_date = "End date must be after start date";
+    // Enhanced date validation
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Reset time portion for accurate comparison
+    
+    if (!formData.start_date) {
+      errors.start_date = "Start date is required";
+    } else {
+      const startDate = new Date(formData.start_date);
+      // Check if start date is not in the past
+      if (startDate < currentDate) {
+        errors.start_date = "Start date cannot be in the past";
+      }
     }
     
-    // Check employee constraint when approved
-    if (formData.approval_status === "Approved" && !formData.employee_id) {
-      errors.employee_id = "Employee is required when status is Approved";
-    }
-    
-    // Check rejection reason when rejected
-    if (formData.approval_status === "Rejected" && !formData.rejection_reason) {
-      errors.rejection_reason = "Rejection reason is required when status is Rejected";
+    if (!formData.end_date) {
+      errors.end_date = "End date is required";
+    } else if (formData.start_date) {
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      
+      // Check if end date is after start date
+      if (endDate < startDate) {
+        errors.end_date = "End date must be after start date";
+      }
+      
+      // Check if duration is reasonable (max 1 year)
+      const oneYear = 365 * 24 * 60 * 60 * 1000; // milliseconds in a year
+      if (endDate - startDate > oneYear) {
+        errors.end_date = "Maximum allocation duration is 1 year";
+      }
     }
     
     return errors;
@@ -134,12 +147,13 @@ const WorkforceRequest = () => {
       setFormData({
         requesting_dept_id: "",
         current_dept_id: "",
-        hr_approver: "",
-        employee_id: "",
         required_skills: "",
         task_description: "",
         start_date: "",
         end_date: "",
+        // Keep default values for hidden fields
+        hr_approver: "",
+        employee_id: "",
         status: "Draft",
         approval_status: "Pending",
         rejection_reason: ""
@@ -147,7 +161,7 @@ const WorkforceRequest = () => {
     } catch (err) {
       console.error("Submit error:", err);
       
-      // Improved error handling - similar to WorkforceAllocation
+      // Improved error handling
       if (err.response) {
         if (err.response.data) {
           console.error("Error details:", err.response.data);
@@ -177,12 +191,13 @@ const WorkforceRequest = () => {
     setFormData({
       requesting_dept_id: "",
       current_dept_id: "",
-      hr_approver: "",
-      employee_id: "",
       required_skills: "",
       task_description: "",
       start_date: "",
       end_date: "",
+      // Keep default values for hidden fields
+      hr_approver: "",
+      employee_id: "",
       status: "Draft",
       approval_status: "Pending",
       rejection_reason: ""
@@ -299,12 +314,6 @@ const WorkforceRequest = () => {
               >
                 Workforce Request Form
               </button>
-              {/* <button
-                className={activeTab === "list" ? "active" : ""}
-                onClick={() => setActiveTab("list")}
-              >
-                Workforce Request List
-              </button> */}
             </div>
           </div>
 
@@ -347,83 +356,18 @@ const WorkforceRequest = () => {
                     </select>
                     {formErrors.current_dept_id && <div className="form-error">{formErrors.current_dept_id}</div>}
                   </div>
-                  
-                  <div className="form-group">
-                    <label>HR Approver</label>
-                    <select
-                      name="hr_approver"
-                      value={formData.hr_approver}
-                      onChange={handleChange}
-                    >
-                      <option value="">-- Select HR Approver --</option>
-                      {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
-                        </option>
-                      ))}
-                    </select>
-                    {formErrors.hr_approver && <div className="form-error">{formErrors.hr_approver}</div>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Employee</label>
-                    <select
-                      name="employee_id"
-                      value={formData.employee_id}
-                      onChange={handleChange}
-                    >
-                      <option value="">-- Select Employee --</option>
-                      {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
-                        </option>
-                      ))}
-                    </select>
-                    {formErrors.employee_id && <div className="form-error">{formErrors.employee_id}</div>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Status</label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="Draft">Draft</option>
-                      <option value="Submitted">Submitted</option>
-                      <option value="Active">Active</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Canceled">Canceled</option>
-                    </select>
-                    {formErrors.status && <div className="form-error">{formErrors.status}</div>}
-                  </div>
                 </div>
 
                 <div className="right-column">
                   <div className="form-group">
-                    <label>Approval Status</label>
-                    <select
-                      name="approval_status"
-                      value={formData.approval_status}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                      <option value="Under Review">Under Review</option>
-                    </select>
-                    {formErrors.approval_status && <div className="form-error">{formErrors.approval_status}</div>}
-                  </div>
-                  
-                  <div className="form-group">
                     <label>Start Date</label>
-                    <input
-                      type="date"
-                      name="start_date"
-                      value={formData.start_date}
-                      onChange={handleChange}
+                    <DatePicker
+                      selected={formData.start_date ? new Date(formData.start_date) : null}
+                      onChange={(date) => handleDateChange(date, "start_date")}
+                      dateFormat="yyyy-MM-dd"
+                      minDate={new Date()} // Can't select dates in the past
+                      placeholderText="Select start date"
+                      className="date-picker-input"
                       required
                     />
                     {formErrors.start_date && <div className="form-error">{formErrors.start_date}</div>}
@@ -431,25 +375,16 @@ const WorkforceRequest = () => {
 
                   <div className="form-group">
                     <label>End Date</label>
-                    <input
-                      type="date"
-                      name="end_date"
-                      value={formData.end_date}
-                      onChange={handleChange}
+                    <DatePicker
+                      selected={formData.end_date ? new Date(formData.end_date) : null}
+                      onChange={(date) => handleDateChange(date, "end_date")}
+                      dateFormat="yyyy-MM-dd"
+                      minDate={formData.start_date ? new Date(formData.start_date) : new Date()} // Can't select dates before start date
+                      placeholderText="Select end date"
+                      className="date-picker-input"
                       required
                     />
                     {formErrors.end_date && <div className="form-error">{formErrors.end_date}</div>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Rejection Reason</label>
-                    <textarea
-                      name="rejection_reason"
-                      value={formData.rejection_reason}
-                      onChange={handleChange}
-                      disabled={formData.approval_status !== 'Rejected'}
-                    />
-                    {formErrors.rejection_reason && <div className="form-error">{formErrors.rejection_reason}</div>}
                   </div>
                 </div>
 

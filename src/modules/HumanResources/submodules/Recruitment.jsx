@@ -128,7 +128,7 @@ const Recruitment = () => {
     task_name: "",
     description: "",
     due_date: "",
-    status: "Pending", // Default value
+    status: "Offer Pending", // Default value changed to allowed value
     assigned_to: "",
     priority: "Medium" // Default value
   });
@@ -1584,7 +1584,7 @@ const handleAddClick = () => {
     setNewOnboardingTask({
       candidate_id: "",
       job_id: "",
-      status: "Pending",
+      status: "Offer Pending",
       offer_details: {
         salary: "",
         start_date: "",
@@ -2295,15 +2295,38 @@ const handleEditOnboardingTaskChange = (e) => {
 const handleOnboardingTaskSubmit = async (e) => {
   e.preventDefault();
   try {
+    // Validate status is one of the allowed values
+    const allowedStatuses = [
+      'Offer Pending', 
+      'Offer Accepted', 
+      'Offer Rejected', 
+      'Contract Signed', 
+      'Completed', 
+      'Withdrawn'
+    ];
+    
+    if (!allowedStatuses.includes(newOnboardingTask.status)) {
+      showToast(`Invalid status. Must be one of: ${allowedStatuses.join(', ')}`, false);
+      return;
+    }
+    
     setLoading(true);
+    
+    // Generate a unique onboarding ID
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    // Generate a random hex string for uniqueness
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+    const onboardingId = `ONB-${year}-${randomHex}`;
     
     // Format data for API
     const onboardingData = {
+      onboarding_id: onboardingId,
       candidate: newOnboardingTask.candidate_id,
       job: newOnboardingTask.job_id,
       offer_details: newOnboardingTask.offer_details || {},
       contract_details: newOnboardingTask.contract_details || {},
-      status: newOnboardingTask.status || 'Pending'
+      status: newOnboardingTask.status
     };
     
     // Submit to API
@@ -2333,6 +2356,21 @@ const handleOnboardingTaskSubmit = async (e) => {
 const handleEditOnboardingTaskSubmit = async (e) => {
   e.preventDefault();
   try {
+    // Validate status is one of the allowed values
+    const allowedStatuses = [
+      'Offer Pending', 
+      'Offer Accepted', 
+      'Offer Rejected', 
+      'Contract Signed', 
+      'Completed', 
+      'Withdrawn'
+    ];
+    
+    if (!allowedStatuses.includes(editingOnboardingTask.status)) {
+      showToast(`Invalid status. Must be one of: ${allowedStatuses.join(', ')}`, false);
+      return;
+    }
+    
     setLoading(true);
     
     // Format data for API
@@ -2341,7 +2379,7 @@ const handleEditOnboardingTaskSubmit = async (e) => {
       job: editingOnboardingTask.job,
       offer_details: editingOnboardingTask.offer_details || {},
       contract_details: editingOnboardingTask.contract_details || {},
-      status: editingOnboardingTask.status || 'Pending'
+      status: editingOnboardingTask.status
     };
     
     // Submit to API
@@ -3796,19 +3834,15 @@ const handleEditOnboardingTask = (task) => {
                     <label>Status</label>
                     <select
                       name="status"
-                      value={newOnboardingTask.status || "Pending"}
+                      value={newOnboardingTask.status || "Offer Pending"}
                       onChange={handleOnboardingTaskChange}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
                       <option value="Offer Pending">Offer Pending</option>
-                      <option value="Offer Sent">Offer Sent</option>
                       <option value="Offer Accepted">Offer Accepted</option>
                       <option value="Offer Rejected">Offer Rejected</option>
-                      <option value="Contract Pending">Contract Pending</option>
                       <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
                     </select>
                   </div>
                 </div>
@@ -3947,19 +3981,15 @@ const handleEditOnboardingTask = (task) => {
                     <label>Status</label>
                     <select
                       name="status"
-                      value={editingOnboardingTask.status || "Pending"}
+                      value={editingOnboardingTask.status || "Offer Pending"}
                       onChange={handleEditOnboardingTaskChange}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
                       <option value="Offer Pending">Offer Pending</option>
-                      <option value="Offer Sent">Offer Sent</option>
                       <option value="Offer Accepted">Offer Accepted</option>
                       <option value="Offer Rejected">Offer Rejected</option>
-                      <option value="Contract Pending">Contract Pending</option>
                       <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
                     </select>
                   </div>
                 </div>
@@ -4098,19 +4128,15 @@ const handleEditOnboardingTask = (task) => {
                     <label>Status</label>
                     <select
                       name="status"
-                      value={newOnboardingTask.status || "Pending"}
+                      value={newOnboardingTask.status || "Offer Pending"}
                       onChange={handleOnboardingTaskChange}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
                       <option value="Offer Pending">Offer Pending</option>
-                      <option value="Offer Sent">Offer Sent</option>
                       <option value="Offer Accepted">Offer Accepted</option>
                       <option value="Offer Rejected">Offer Rejected</option>
-                      <option value="Contract Pending">Contract Pending</option>
                       <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
                     </select>
                   </div>
                 </div>

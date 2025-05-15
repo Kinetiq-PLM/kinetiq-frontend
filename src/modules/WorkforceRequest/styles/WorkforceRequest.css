@@ -138,13 +138,59 @@
 
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.date-picker-input {
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.95rem;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* DatePicker styling */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.date-picker-input {
+  width: 100%;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.react-datepicker {
+  font-family: inherit;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.react-datepicker__header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.react-datepicker__current-month {
+  font-weight: 600;
+  color: #374151;
+}
+
+.react-datepicker__day--selected {
+  background-color: #00b0b5;
+  color: white;
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: #009ba0;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: rgba(0, 176, 181, 0.2);
+}
+
+.react-datepicker__day--disabled {
+  color: #d1d5db;
 }
 
 .form-group textarea {
