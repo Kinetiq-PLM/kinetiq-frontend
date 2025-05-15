@@ -6,18 +6,26 @@
 
 .purchreq .purchreq-body-content-container {
   width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+.purchreq {
+    width: 100%;
     height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
 }
+
 
 .purchreq .purchreq-header {
   display: flex;
@@ -128,7 +136,7 @@
 
 .purchreq .purchreq-table-scrollable {
   width: 100%;
-  max-height: 50vh;
+  max-height: 580px;
   overflow-x: auto;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -178,7 +186,8 @@
 }
 
 .purchreq .purchreq-row:hover {
-  background: #f5fcfc;
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
 }
 
 .purchreq .purchreq-checkbox {
@@ -215,4 +224,96 @@
 
 .purchreq .purchreq-new-form:hover {
   background: #008080;
+}
+
+/* Status color styling */
+.purchreq .status-select {
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.85em;
+  font-weight: normal;
+  cursor: pointer;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+  padding-right: 24px;
+}
+
+/* Add a style for status-updating to show visual feedback during updates */
+.purchreq .status-updating {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.purchreq .status-updating::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+}
+
+/* Make all dropdown options white */
+.purchreq .status-select option {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+/* Status colors for the dropdown button itself */
+.purchreq .status-acknowledged {
+  color: #1e40af;
+  background-color: #dbeafe;
+  border: 1px solid #dbeafe;
+}
+
+.purchreq .status-finished {
+  color: #155724;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
+}
+
+.purchreq .status-approved {
+  color: #155724;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
+}
+
+.purchreq .status-pending {
+  color: #856404;
+  background-color: #ffe599;
+  border: 1px solid #ffd966;
+}
+
+.purchreq .status-returned {
+  color: #664d03;
+  background-color: #fff3cd;
+  border: 1px solid #fff3cd;
+}
+
+.purchreq .status-rejected {
+  color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fee2e2;
+}
+
+.purchreq .status-cancelled {
+  color: #6b7280;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.purchreq .status-expired {
+  color: #991b1b;
+  background-color: #fecaca;
+  border: 1px solid #fecaca;
 }

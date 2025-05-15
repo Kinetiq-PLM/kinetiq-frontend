@@ -53,9 +53,9 @@
 }
 
 /* Content Styles */
-.purchase-cred-memo-form .content {
+.purchase-cred-memo-form .purchcred-content {
     width: 100%;
-    max-width: 1200px;
+    max-width: auto;
     margin: 0 auto;
     padding: 0 1rem;
     flex: 1;
