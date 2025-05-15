@@ -28,7 +28,11 @@ const ServiceBilling = ({employee_id}) => {
     try {
       // this filters out billings so that only the service billings assigned to the one currently logged in will show:
       // const data = await GET(`billing/billings/technician/HR-EMP-2025-8d9f9b/`);
-      const data = await GET(`billing/billings/technician/${employee_id}/`);
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07' || employee_id === 'HR-EMP-2025-7ef415' || employee_id === 'HR-EMP-2025-61201b'
+        ? "billing/"
+        : `billing/billings/technician/${employee_id}/`;
+      
+      const data = await GET(endpoint);
 
       // all billings version:
       // const data = await GET("billing/");

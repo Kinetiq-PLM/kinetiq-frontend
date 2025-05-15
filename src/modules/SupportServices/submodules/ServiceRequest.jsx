@@ -54,8 +54,12 @@ const ServiceRequest = ({employee_id}) => {
     try {
       // this filters out requests so that only the service requests assigned to the one currently logged in will show:
       console.log("employee id: ", employee_id)
-      const data = await GET(`request/requests/technician/${employee_id}/`);
-      // const data = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+      
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07' || employee_id === 'HR-EMP-2025-7ef415' || employee_id === 'HR-EMP-2025-61201b'
+        ? "request/"
+        : `request/requests/technician/${employee_id}/`;
+      
+      const data = await GET(endpoint);
 
       // all calls version:
       // const data = await GET("request/");
@@ -723,7 +727,7 @@ const handleUpdateAnalysis = async (analysisData) => {
       service_status: afterAnalysisInfo.serviceStatus,
       service_date: afterAnalysisInfo.serviceDate,
       description: afterAnalysisInfo.description,
-      technician_id: employee_id
+      technician_id: selectedRequest.technician.employee_id
     }
 
     console.log("Creating after analysis sched:", afterAnalysisData)
@@ -1371,6 +1375,7 @@ const handleUpdateAnalysis = async (analysisData) => {
                   <button 
                     className="add-button"
                     onClick={handleAddOrder}
+                    disabled={serviceOrderInfo.serviceOrderId !== ""}
                   >
                     Add
                   </button>
@@ -1707,7 +1712,7 @@ const handleUpdateAnalysis = async (analysisData) => {
           onClose={() => setShowAddModal(false)}
           request={selectedRequest}
           onAdd={handleCreateAnalysis}
-          technician={employee_id}
+          technician={selectedRequest.technician.employee_id}
         />
       )}
 

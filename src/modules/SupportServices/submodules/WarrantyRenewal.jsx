@@ -27,7 +27,11 @@ const WarrantyRenewal = ({employee_id}) => {
    try {
       // this filters out renewals so that only the warranty renewals assigned to the one currently logged in will show:
       // const data = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
-      const data = await GET(`renewal/renewals/technician/${employee_id}/`);
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07' || employee_id === 'HR-EMP-2025-7ef415' || employee_id === 'HR-EMP-2025-61201b'
+        ? "renewal/"
+        : `renewal/renewals/technician/${employee_id}/`;
+      
+      const data = await GET(endpoint);
 
       // all renewals version:
       // const data = await GET("renewal/");

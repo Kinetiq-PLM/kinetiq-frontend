@@ -48,7 +48,7 @@ const ServiceReport = ({employee_id}) => {
 
   const fetchReports = async () => {
     try {
-      const endpoint = employee_id === 'HR-EMP-2025-ed0c07'
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07' || employee_id === 'HR-EMP-2025-7ef415' || employee_id === 'HR-EMP-2025-61201b'
         ? "report/"
         : `report/reports/technician/${employee_id}/`;
   

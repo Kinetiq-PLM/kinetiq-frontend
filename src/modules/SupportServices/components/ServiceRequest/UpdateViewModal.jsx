@@ -228,31 +228,9 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
                   type="text"
                   id="technicianId"
                   value={formData.technicianId}
-                  onChange={(e) => {
-                    handleChange(e); 
-                    setOpenTechDD(true);
-                  }}
-                  onClick={handleToggleDropdownTech}
+                  readOnly
                   placeholder="Select technician ID"
                 />
-                <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                {isTechDropdown && (
-                      <ul className="dropdown-list">
-                        {technicians.length > 0 ? (
-                          technicians
-                            .filter((technician) =>
-                            technician.employee_id.toLowerCase().includes(formData.technicianId.toLowerCase())
-                            )
-                            .map((technician) => (
-                              <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                                {technician.employee_id}
-                              </li>
-                            ))
-                        ) : (
-                          <li>No technicians found</li>
-                        )}
-                      </ul>
-                    )}
               </div>
             </div>
 
@@ -298,16 +276,14 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
                 <input
                   type="text"
                   id="requestDate"
-                  value={formData.requestDate}
+                  value={
+                    formData.requestDate
+                      ? new Date(formData.requestDate).toLocaleDateString("en-GB") // dd/mm/yyyy
+                      : ""
+                  }
                   readOnly
-                  onChange={handleChange}
-                  placeholder="dd/mm/yy"
+                  placeholder="dd/mm/yyyy"
                 />
-                {/* <img
-                  src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
-                  alt="Calendar"
-                  className="calendar-icon"
-                /> */}
               </div>
             </div>
 

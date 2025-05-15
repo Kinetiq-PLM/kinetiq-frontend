@@ -166,7 +166,7 @@ function App() {
     var temp_list = []
     //populate notifs table
     notif_items.map((notif_item, i) => {
-      origin = notif_item.module.split('/')
+      origin = notif_item.module.split(/\/(.*)/s)
       const orig_module = origin[0]
       const orig_submodule = origin.length == 2 ? origin[1] : null
       const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -367,10 +367,7 @@ function App() {
   const moduleSubmoduleFileNames = {
     Management: {
       "Dashboard": "ManagementDashboard",
-      "Project Approval": "ManagementApprovals",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      Settings: "Settings",
+      "Project Approval": "ManagementApprovals"
     },
     Administration: {
       "User": "User",
@@ -388,12 +385,12 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
-      "Tax and Remittances":"TaxAndRemittances",
-      "Payroll Receipts":"PayrollReceipts",
-      "Accounts Payable Receipts":"AccountsPayableReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
@@ -413,8 +410,8 @@ function App() {
       "Goods Tracking": "GoodsTracking",
       "Internal Transfer": "InternalTransfer",
       "Delivery Approval": "DeliveryApproval",
-      "Delivery Receipt": "DeliveryReceipt",
-      "Item Removal": "ItemRemoval",
+      "External Delivery": "External Delivery",
+      "Item Removal Requisition ": "ItemRemovalRequisition",
     },
     Sales: {
       Quotation: "Quotation",
@@ -459,6 +456,7 @@ function App() {
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Project List": "Project List",
@@ -501,13 +499,15 @@ function App() {
   const filteredModuleFileNames = {};
 
   allowedModules.forEach((permission) => {
-    const [main, sub] = permission.split('/')
-
+    const [main, sub] = permission.split(/\/(.*)/s)
+    console.log('perms main: ' + main)
+    console.log('params sub: ' + sub) 
     if (!filteredModuleFileNames[main]) {
       filteredModuleFileNames[main] = {};
     }
 
     if (!sub) {
+      console.log('including all submodules of ' + main)
       filteredModuleFileNames[main] = {
       ...moduleSubmoduleFileNames[main]
       }
@@ -607,8 +607,8 @@ function App() {
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                    {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (submodule, index) => (
                         <div
                           key={index}
@@ -682,8 +682,8 @@ function App() {
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                  {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (sub, index) => (
                         <div
                           key={index}

@@ -41,8 +41,11 @@ const ServiceTicket = ({ user_id, employee_id }) => {
     try {
       // this filters out tickets so that only the tickets assigned to the one currently logged in will show:
       // const data = await GET(`ticket/tickets/salesrep/HR-EMP-2025-de92df/`);
-      const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07' || employee_id === 'HR-EMP-2025-7ef415' || employee_id === 'HR-EMP-2025-61201b'
+        ? "ticket/"
+        : `ticket/tickets/salesrep/${employee_id}/`;
       
+      const data = await GET(endpoint);
       // all tix version:
       // const data = await GET("ticket/");
       setTickets(data);

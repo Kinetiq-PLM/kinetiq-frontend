@@ -31,7 +31,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) =>
     billingId: "",
     description: "",
     reportStatus: "",
-    technicianId: technician,
+    technicianId: "",
   })
 
   // Update form when report changes
@@ -48,7 +48,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) =>
         billingId: report.service_billing?.service_billing_id || "",
         description: report.description || "",
         reportStatus: report.report_status  || "",
-        technicianId: technician
+        technicianId: report.technician?.employee_id || ""
       })
     }
   }, [report])
