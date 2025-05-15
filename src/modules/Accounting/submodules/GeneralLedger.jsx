@@ -328,24 +328,18 @@ const BodyContent = () => {
 
               {activeTab === "Accounts Payable" && (
                 <>
-                  <div className="font-bold col-span-2">
-                    Accounts Payable Total
-                  </div>
-                  <div className="font-light col-span-2">
-                    {formatNumber(accountsPayableNet)}
-                  </div>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
                   <div className="col-span-1" />
                 </>
               )}
 
               {activeTab === "Accounts Receivable" && (
                 <>
-                  <div className="font-bold col-span-2">
-                    Accounts Receivable Total
-                  </div>
-                  <div className="font-light col-span-2">
-                    {formatNumber(accountsReceivableNet)}
-                  </div>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
                   <div className="col-span-1" />
                 </>
               )}
