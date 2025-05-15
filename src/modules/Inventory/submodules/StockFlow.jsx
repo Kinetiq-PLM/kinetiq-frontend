@@ -353,7 +353,7 @@ const BodyContent = () => {
 
 
                             {/* Search Bar */}
-                            <div className="flex flex-1 h-8.5 md:flex-row-reverse sm:order-2">
+                            <div className={`flex flex-1 h-8.5 md:flex-row-reverse sm:order-2 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                                 <ControlledSearchBar
                                 placeholder="Search..."
                                 value={searchTerm}
