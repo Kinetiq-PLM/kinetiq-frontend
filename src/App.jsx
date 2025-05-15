@@ -450,7 +450,7 @@ function App() {
       "Picking": "Picking",
       "Packing": "Packing",
       Shipment: "Shipment",
-      "Rework": "Rework",
+      "Returns": "Returns",
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
