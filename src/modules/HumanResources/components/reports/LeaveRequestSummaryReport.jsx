@@ -40,7 +40,7 @@ const LeaveRequestSummaryReport = ({ leaveRequests: propsLeaveRequests = [] }) =
       }
       
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/');
+        const response = await axios.get('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/');
         setLeaveRequests(response.data);
       } catch (err) {
         console.error("Error fetching leave requests:", err);

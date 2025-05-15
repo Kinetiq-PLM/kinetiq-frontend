@@ -20,7 +20,7 @@ const ResignationsSummaryReport = () => {
       try {
         // Fetch resignations data
         const resignationsResponse = await axios.get(
-          "http://127.0.0.1:8000/api/resignation/resignations/"
+          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/"
         );
         setResignations(resignationsResponse.data);
         

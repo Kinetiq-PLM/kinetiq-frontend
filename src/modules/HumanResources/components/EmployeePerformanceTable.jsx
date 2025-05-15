@@ -19,7 +19,7 @@ const EmployeePerformanceTable = ({ onViewAll }) => {
     const fetchPerformanceData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/api/employee_performance/employee_performance/");
+        const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
         
         if (response.data && Array.isArray(response.data)) {
           // Sort by review date (newest first) and take top 5
