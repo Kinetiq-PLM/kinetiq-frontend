@@ -37,8 +37,8 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     subject: subject,
     description: description,
     type: "",
-    status: "",
-    priority: "",
+    status: "Open",
+    priority: "Low",
     salesrep: employee_id,
     created_at: new Date().toISOString().split("T")[0],
   });
@@ -68,6 +68,7 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           ticketInfo={ticketInfo}
           setTicketInfo={setTicketInfo}
           setTicketID={setTicketID}
+          employee_id={employee_id}
         />
       ),
     },
@@ -81,6 +82,7 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           ticketInfo={ticketInfo}
           setTicketInfo={setTicketInfo}
           setTicketID={setTicketID}
+          employee_id={employee_id}
         />
       ),
     },

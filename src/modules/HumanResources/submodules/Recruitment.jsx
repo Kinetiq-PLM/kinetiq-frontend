@@ -5,16 +5,27 @@ import "../styles/Recruitment.css";
 
 const S3_BASE_DIRECTORY = "Human_Resource_Management/Candidates/";
 
+// Add this constant near the top of the file, after the imports
+const ALLOWED_HR_INTERVIEWERS = [
+  'HR-EMP-2025-25162d',
+  'HR-EMP-2025-e6d9e0',
+  'HR-EMP-2025-98742b',
+  'HR-EMP-2025-664dd0',
+  'HR-EMP-2025-cd68b8',
+  'HR-EMP-2025-265236',
+  'HR-EMP-2025-b7e57c',
+  'HR-EMP-2025-c874fa',
+  'HR-EMP-2025-ca929d',
+  'HR-EMP-2025-2c6c54'
+];
+
 const Recruitment = () => {
   // Data states for each section
   const [candidates, setCandidates] = useState([]);
   const [archivedCandidates, setArchivedCandidates] = useState([]);
   const [jobPostings, setJobPostings] = useState([]);
   const [archivedJobPostings, setArchivedJobPostings] = useState([]);
-  const [resignations, setResignations] = useState([]);
   const [showAddJobModal, setShowAddJobModal] = useState(false);
-  const [showAddResignationModal, setShowAddResignationModal] = useState(false); // New state for resignation modal
-  const [showEditResignationModal, setShowEditResignationModal] = useState(false); // New state for editing resignation
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const [showInterviewDetailsModal, setShowInterviewDetailsModal] = useState(false);
   const [showOfferDetailsModal, setShowOfferDetailsModal] = useState(false);
@@ -23,6 +34,8 @@ const Recruitment = () => {
   const [showEditCandidateModal, setShowEditCandidateModal] = useState(false);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
   const [showEditJobModal, setShowEditJobModal] = useState(false);
+  const [showAddInterviewModal, setShowAddInterviewModal] = useState(false);
+  const [showAddOnboardingModal, setShowAddOnboardingModal] = useState(false);
   
   // Reference data
   const [departments, setDepartments] = useState([]);
@@ -40,16 +53,6 @@ const Recruitment = () => {
     duration_days: "",
     posting_status: "Draft" // Default status
   });
-
-  const [newResignation, setNewResignation] = useState({
-    employee_id: "",
-    notice_period_days: "",
-    hr_approver_id: "",
-    approval_status: "Pending", // Default value
-    clearance_status: "Not Started" // Default value
-  });
-
-  const [editingResignation, setEditingResignation] = useState(null);
 
   const [newCandidate, setNewCandidate] = useState({
     job_id: "",
@@ -71,7 +74,7 @@ const Recruitment = () => {
   const [editingJobPosting, setEditingJobPosting] = useState(null);
 
   // UI States
-  const [activeTab, setActiveTab] = useState("Candidates");
+  const [activeTab, setActiveTab] = useState("Job Postings");
   const [showArchived, setShowArchived] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,86 +96,164 @@ const Recruitment = () => {
   // Add these state variables after the other state declarations
   const [selectedArchivedCandidates, setSelectedArchivedCandidates] = useState([]);
   const [selectedArchivedJobPostings, setSelectedArchivedJobPostings] = useState([]);
+  const [selectedArchivedInterviews, setSelectedArchivedInterviews] = useState([]);
+  const [selectedArchivedOnboardingTasks, setSelectedArchivedOnboardingTasks] = useState([]);
+
+
+  // Add these after other state variables
+  const [interviews, setInterviews] = useState([]);
+  const [archivedInterviews, setArchivedInterviews] = useState([]);
+  const [onboardingTasks, setOnboardingTasks] = useState([]);
+  const [archivedOnboardingTasks, setArchivedOnboardingTasks] = useState([]);
+
+  // For modals
+  const [showEditInterviewModal, setShowEditInterviewModal] = useState(false);
+  const [editingInterview, setEditingInterview] = useState(null);
+  const [newInterview, setNewInterview] = useState({
+    candidate_id: "",
+    interview_date: "",
+    interview_time: "",
+    interview_type: "Technical", // Default value
+    interviewer_id: "",
+    status: "Scheduled", // Default value
+    notes: "",
+    feedback: "",
+    rating: null
+  });
+
+  const [showEditOnboardingModal, setShowEditOnboardingModal] = useState(false);
+  const [editingOnboardingTask, setEditingOnboardingTask] = useState(null);
+  const [newOnboardingTask, setNewOnboardingTask] = useState({
+    employee_id: "",
+    task_name: "",
+    description: "",
+    due_date: "",
+    status: "Offer Pending", // Default value changed to allowed value
+    assigned_to: "",
+    priority: "Medium" // Default value
+  });
+  
+// Add this near the beginning of your component after the useState declarations
+useEffect(() => {
+  // Debug log whenever data changes
+  console.log("Data state:", {
+    candidates: candidates.length,
+    archivedCandidates: archivedCandidates.length,
+    jobPostings: jobPostings.length,
+    archivedJobPostings: archivedJobPostings.length,
+    interviews: interviews.length,
+    archivedInterviews: archivedInterviews.length,
+    onboardingTasks: onboardingTasks.length,
+    archivedOnboardingTasks: archivedOnboardingTasks.length
+  });
+}, [candidates, archivedCandidates, jobPostings, archivedJobPostings, 
+    interviews, archivedInterviews, onboardingTasks, archivedOnboardingTasks]);
 
   // Fetch data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch candidates
       try {
-        // Existing fetch calls
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
         ]);
+        setCandidates(ensureArray(candidatesRes.data));
+        setArchivedCandidates(ensureArray(archivedCandidatesRes.data));
+        console.log("Candidates data loaded:", ensureArray(candidatesRes.data).length);
+      } catch (err) {
+        console.error("Error fetching candidates:", err);
+        setCandidates([]);
+        setArchivedCandidates([]);
+      }
 
-        console.log('Candidates data:', candidatesRes.data);
-        if (candidatesRes.data && candidatesRes.data.length > 0) {
-          console.log('Sample candidate:', candidatesRes.data[0]);
-        }
-
-        // Add this debugging code
-        console.log('CANDIDATE DATA STRUCTURE:');
-        if (candidatesRes.data && candidatesRes.data.length > 0) {
-          const sampleCandidate = candidatesRes.data[0];
-          console.log('Sample candidate object keys:', Object.keys(sampleCandidate));
-          console.log('Full sample candidate:', sampleCandidate);
-        }
-
+      // Fetch job postings
+      try {
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
         ]);
+        setJobPostings(ensureArray(jobPostingsRes.data));
+        setArchivedJobPostings(ensureArray(archivedJobPostingsRes.data));
+        console.log("Job postings data loaded:", ensureArray(jobPostingsRes.data).length);
+      } catch (err) {
+        console.error("Error fetching job postings:", err);
+        setJobPostings([]);
+        setArchivedJobPostings([]);
+      }
 
-        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      // Fetch interviews
+      try {
+        const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+        ]);
+        setInterviews(ensureArray(activeInterviewsRes.data));
+        setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
+        console.log("Interviews data loaded:", ensureArray(activeInterviewsRes.data).length, "archived:", ensureArray(archivedInterviewsRes.data).length);
+      } catch (err) {
+        console.error("Error fetching interviews:", err);
+        setInterviews([]);
+        setArchivedInterviews([]);
+      }
+      try {
+        const [onboardingRes, archivedOnboardingRes] = await Promise.all([
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true")
+        ]);
+        setOnboardingTasks(ensureArray(onboardingRes.data));
+        setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+        console.log("Onboarding data loaded:", ensureArray(onboardingRes.data).length, "archived:", ensureArray(archivedOnboardingRes.data).length);
+      } catch (err) {
+        console.error("Error fetching onboarding tasks:", err);
+        setOnboardingTasks([]);
+        setArchivedOnboardingTasks([]);
+      }
 
-        // New fetch calls for departments, positions, and employees - THIS WAS MISSING
+      // Fetch reference data
+      try {
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/")
         ]);
-
-        // Add this debugging to see what's coming back
-        console.log('Departments data:', deptsRes.data);
-        console.log('Positions data:', positionsRes.data);
-        console.log('Employees data:', employeesRes.data);
-
-        // Ensure we're working with arrays
-        const departmentsData = ensureArray(deptsRes.data);
-        const positionsData = ensureArray(positionsRes.data);
-        const employeesData = ensureArray(employeesRes.data);
-        
-        // Set all the state values with the fetched data
-        setCandidates(candidatesRes.data);
-        setArchivedCandidates(archivedCandidatesRes.data);
-        setJobPostings(jobPostingsRes.data);
-        setArchivedJobPostings(archivedJobPostingsRes.data);
-        setResignations(resignationsRes.data);
-        setDepartments(departmentsData);
-        setPositions(positionsData);
-        setEmployees(employeesData); // Add this line to save employees
+        setDepartments(ensureArray(deptsRes.data));
+        setPositions(ensureArray(positionsRes.data));
+        setEmployees(ensureArray(employeesRes.data));
+        console.log("Reference data loaded");
       } catch (err) {
-        console.error("Error fetching data:", err);
-        showToast("Failed to fetch data", false);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching reference data:", err);
+        setDepartments([]);
+        setPositions([]);
+        setEmployees([]);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
   
   // Add this helper function near the top of your component
   const ensureArray = (data) => {
-    if (Array.isArray(data)) {
-      return data;
-    } else if (data && typeof data === 'object') {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
       // If it's an object, it might be a response with results property
       if (data.results && Array.isArray(data.results)) {
         return data.results;
       }
       // Or it might be an object where values are what we want
-      return data.values;
+      if (data.values && Array.isArray(data.values)) {
+        return data.values;
+      }
+      // Last resort: if it has no results but is an object, check if it might be an array-like object
+      if (Object.keys(data).length > 0 && typeof Object.keys(data)[0] === 'number') {
+        return Object.values(data);
+      }
     }
     // Default to empty array
     return [];
@@ -363,45 +444,6 @@ const Recruitment = () => {
     }
   };
 
-  const handleEditResignation = (resignation) => {
-    // Create a copy of the resignation to edit
-    setEditingResignation({
-      ...resignation
-    });
-    setShowEditResignationModal(true);
-    setDotsMenuOpen(null);
-  };
-
-  const handleViewResignationDetails = (resignation) => {
-    // View resignation details logic
-    console.log("Viewing resignation details:", resignation);
-    setDotsMenuOpen(null);
-  };
-
-  const handleEditResignationSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Update resignation logic here
-      await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${editingResignation.resignation_id}/`, 
-        editingResignation
-      );
-      
-      showToast("Resignation updated successfully", true);
-      setShowEditResignationModal(false);
-      
-      // Refresh resignations
-      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-      setResignations(resignationsRes.data);
-    } catch (err) {
-      console.error("Error updating resignation:", err.response?.data || err);
-      const errorMessage = err.response?.data?.detail || 
-                         Object.values(err.response?.data || {}).flat().join(", ") || 
-                         "Failed to update resignation";
-      showToast(errorMessage, false);
-    }
-  };
-
   const handleEditCandidateSubmit = async (e) => {
     e.preventDefault();
     
@@ -418,6 +460,14 @@ const Recruitment = () => {
     // Add resume file if present
     if (editingCandidate.resume_file) {
       formData.append('resume', editingCandidate.resume_file);
+      // If a new file is being uploaded, set resume_path
+      formData.append('resume_path', 'pending_upload');
+    } else if (!editingCandidate.resume_path) {
+      // If no file and no existing path, set empty string
+      formData.append('resume_path', '');
+    } else {
+      // Keep existing resume path
+      formData.append('resume_path', editingCandidate.resume_path);
     }
     
     try {
@@ -467,6 +517,22 @@ const Recruitment = () => {
       setSelectedArchivedJobPostings(prev => prev.filter(item => item !== id));
     } else {
       setSelectedArchivedJobPostings(prev => [...prev, id]);
+    }
+  };
+
+  const toggleSelectArchivedInterview = (id) => {
+    if (selectedArchivedInterviews.includes(id)) {
+      setSelectedArchivedInterviews(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedInterviews(prev => [...prev, id]);
+    }
+  };
+
+  const toggleSelectArchivedOnboardingTask = (id) => {
+    if (selectedArchivedOnboardingTasks.includes(id)) {
+      setSelectedArchivedOnboardingTasks(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedOnboardingTasks(prev => [...prev, id]);
     }
   };
 
@@ -564,158 +630,367 @@ const Recruitment = () => {
       setLoading(false);
     }
   };
+  // Add these functions for interview management
+const handleArchiveInterview = async (interview) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${interview.interview_id}/archive/`);
+    showToast("Interview archived successfully", true);
+    
+    // Refresh interview lists
+    const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+    ]);
+    
+    setInterviews(ensureArray(activeInterviewsRes.data));
+    setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
+  } catch (err) {
+    console.error("Error archiving interview:", err);
+    showToast("Failed to archive interview", false);
+  }
+};
+
+const handleRestoreInterview = async (interview) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${interview.interview_id}/unarchive/`);
+    showToast("Interview restored successfully", true);
+    
+    // Refresh interview lists
+    const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+    ]);
+    
+    setInterviews(ensureArray(activeInterviewsRes.data));
+    setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
+  } catch (err) {
+    console.error("Error restoring interview:", err);
+    showToast("Failed to restore interview", false);
+  }
+};
+
+const handleEditInterview = (interview) => {
+  // Extract time from the interview_date
+  let date = "";
+  let time = "";
+  
+  if (interview.interview_date) {
+    const parts = interview.interview_date.split('T');
+    date = parts[0];
+    time = parts.length > 1 ? parts[1].substring(0, 5) : ""; // Extract HH:MM
+  }
+
+  setEditingInterview({
+    interview_id: interview.interview_id,
+    candidate: interview.candidate_id,
+    job: interview.job_id,
+    interview_date: date,
+    interview_time: time,
+    interviewer: interview.interviewer_id,
+    status: interview.status || 'Scheduled',
+    feedback: interview.feedback || '',
+    rating: interview.rating || null,
+    // Store name values for display purposes
+    candidate_name: interview.candidate_name,
+    job_title: interview.job_title,
+    interviewer_name: interview.interviewer_name
+  });
+  
+  setShowEditInterviewModal(true);
+  setDotsMenuOpen(null);
+};
+
+const handleEditInterviewSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Validate the interviewer is in the allowed list
+  if (!ALLOWED_HR_INTERVIEWERS.includes(editingInterview.interviewer)) {
+    showToast("Only authorized HR employees can conduct interviews. Please select a valid interviewer.", false);
+    return;
+  }
+  
+  // Validate rating if provided (must be between 1 and 5)
+  if (editingInterview.rating !== null && editingInterview.rating !== undefined && 
+      (editingInterview.rating < 1 || editingInterview.rating > 5)) {
+    showToast("Rating must be between 1 and 5", false);
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    
+    // Combine date and time for interview_date
+    const combinedData = {
+      ...editingInterview,
+      interview_date: editingInterview.interview_date && editingInterview.interview_time ?
+        `${editingInterview.interview_date}T${editingInterview.interview_time}:00` :
+        editingInterview.interview_date
+    };
+    
+    // Convert field names to match backend model
+    const apiData = {
+      ...combinedData,
+      candidate_id: combinedData.candidate,
+      job_id: combinedData.job,
+      interviewer_id: combinedData.interviewer
+    };
+    
+    // Only include rating if status is Completed or rating already exists
+    if (apiData.status !== 'Completed' && !editingInterview.rating) {
+      apiData.rating = null;
+    } else if (apiData.rating === null || apiData.rating === undefined || apiData.rating === '') {
+      // If status is Completed but no rating, set default to 1
+      apiData.rating = 1;
+    }
+    
+    // Remove old field names
+    delete apiData.candidate;
+    delete apiData.job;
+    delete apiData.interviewer;
+    delete apiData.interview_time; // This is combined into interview_date
+    
+    // Submit to API
+    const response = await axios.patch(
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${editingInterview.interview_id}/`,
+      apiData
+    );
+    
+    showToast("Interview updated successfully", true);
+    setShowEditInterviewModal(false);
+    
+    // Refresh interviews list
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+    ]);
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
+    
+  } catch (err) {
+    console.error("Error updating interview:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to update interview";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Add this function to handle bulk unarchiving of interviews
+const bulkUnarchiveInterviews = async () => {
+  try {
+    setLoading(true);
+    
+    // Create an array of promises for each selected interview
+    const promises = selectedArchivedInterviews.map(id => 
+      axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${id}/unarchive/`)
+    );
+    
+    // Execute all promises
+    await Promise.all(promises);
+    
+    // Show success message
+    showToast("Selected interviews restored successfully", true);
+    
+    // Reset selection
+    setSelectedArchivedInterviews([]);
+    
+    // Refresh interview lists
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+    ]);
+    
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
+  } catch (err) {
+    console.error("Error restoring interviews:", err);
+    showToast("Failed to restore interviews", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+// Also add the selected archived interviews state if you haven't already
 
   // Utility functions
   const filterAndPaginate = (data) => {
+    // Safety check for empty/null data
+    if (!data || !Array.isArray(data)) {
+      return { paginated: [], totalPages: 0 };
+    }
+
     // Filter based on search term
     let filtered = data;
     if (searchTerm) {
       filtered = data.filter(item => {
-        // Adjust these properties based on your data structure
-        return (
-          (item.resignation_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.employee_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.approval_status?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.clearance_status?.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
+        if (!item) return false;
+        // Check all properties that might be strings for a match
+        return Object.entries(item).some(([key, value]) => {
+          if (typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())) {
+            return true;
+          }
+          if (typeof value === 'number' && value.toString().includes(searchTerm)) {
+            return true;
+          }
+          return false;
+        });
       });
     }
-  
+
     // Sort if needed
     if (sortField !== 'all') {
       filtered = [...filtered].sort((a, b) => {
+        if (!a || !b) return 0;
+        
         if (sortField === 'id') {
-          return a.resignation_id?.localeCompare(b.resignation_id);
+          const aId = a.job_id || a.candidate_id || a.interview_id || a.task_id || '';
+          const bId = b.job_id || b.candidate_id || b.interview_id || b.task_id || '';
+          return aId.toString().localeCompare(bId.toString());
         } else if (sortField === 'status') {
-          return a.approval_status?.localeCompare(b.approval_status);
+          const aStatus = a.posting_status || a.application_status || a.status || '';
+          const bStatus = b.posting_status || b.application_status || b.status || '';
+          return aStatus.toString().localeCompare(bStatus.toString());
         }
         return 0;
       });
     }
-  
+
     // Paginate
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-  
+
     return { paginated, totalPages };
   };
-
   // Render functions for each table
-  const renderJobPostingsTable = (data, isArchived = false) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    
-    if (loading) return <div className="recruitment-no-results">Loading job postings...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No job postings found.</div>;
+const renderJobPostingsTable = (data, isArchived = false) => {
+  if (loading) return <div className="recruitment-no-results">Loading job postings...</div>;
+  
+  // Safety check for data
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div className="recruitment-no-results">
+      {isArchived ? "No archived job postings found." : "No job postings found."}
+    </div>;
+  }
+  
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (!paginated || paginated.length === 0) {
+    return <div className="recruitment-no-results">No matching job postings found with the current filters.</div>;
+  }
 
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  {isArchived && <th>Select</th>}
-                  <th>Job ID</th>
-                  <th>Department</th>
-                  <th>Position</th>
-                  <th>Description</th>
-                  <th>Requirements</th>
-                  <th>Employment Type</th>
-                  <th>Base Salary</th>
-                  <th>Daily Rate</th>
-                  <th>Duration (Days)</th>
-                  <th>Finance Approval</th>
-                  <th>Posting Status</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((posting, index) => (
-                  <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                    {isArchived && (
-                      <td>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedArchivedJobPostings.includes(posting.job_id)}
-                          onChange={() => toggleSelectArchivedJobPosting(posting.job_id)}
-                        />
-                      </td>
-                    )}
-                    <td>{posting.job_id}</td>
-                    <td>{posting.dept_id}</td>
-                    <td>{posting.position_title}</td>
-                    <td>{posting.description}</td>
-                    <td>{posting.requirements}</td>
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Job ID</th>
+                <th>Department ID</th>
+                <th>Position ID</th>
+                <th>Position Title</th>
+                <th>Description</th>
+                <th>Requirements</th>
+                <th>Employment Type</th>
+                <th>Base Salary</th>
+                <th>Daily Rate</th>
+                <th>Duration (Days)</th>
+                <th>Finance Approval Status</th>
+                <th>Posting Status</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((posting, index) => (
+                <tr key={posting.job_id || index} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
                     <td>
-                      <span className={`recruitment-tag ${posting.employment_type?.toLowerCase() || 'unknown'}`}>
-                        {posting.employment_type || 'Unknown'}
-                      </span>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedJobPostings.includes(posting.job_id)}
+                        onChange={() => toggleSelectArchivedJobPosting(posting.job_id)}
+                      />
                     </td>
-                    <td>{posting.base_salary}</td>
-                    <td>{posting.daily_rate}</td>
-                    <td>{posting.duration_days}</td>
-                    <td>
-                      <span className={`recruitment-tag ${posting.finance_approval_status ? 
-                        `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
-                        {posting.finance_approval_status || 'Pending'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`recruitment-tag ${posting.posting_status ? 
-                        posting.posting_status.toLowerCase() : 'unknown'}`}>
-                        {posting.posting_status || 'Unknown'}
-                      </span>
-                    </td>
-                    <td>{posting.created_at}</td>
-                    <td>{posting.updated_at}</td>
-                    <td className="recruitment-actions">
-                      <div
-                        className="recruitment-dots"
-                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                      >
-                        ⋮
-
-                        {dotsMenuOpen === index && (
-                          <div className="recruitment-dropdown">
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => handleEditJobPosting(posting)}
-                            >
-                              Edit
-                            </div>
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
-                            >
-                              {isArchived ? "Restore" : "Archive"}
-                            </div>
+                  )}
+                  <td>{posting.job_id || '-'}</td>
+                  <td>{posting.dept_id || '-'}</td>
+                  <td>{posting.position_id || '-'}</td>
+                  <td>{posting.position_title || '-'}</td>
+                  <td>{posting.description || '-'}</td>
+                  <td>{posting.requirements || '-'}</td>
+                  <td>
+                    <span className={`recruitment-tag ${(posting.employment_type?.toLowerCase() || 'unknown')}`}>
+                      {posting.employment_type || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{posting.base_salary || '-'}</td>
+                  <td>{posting.daily_rate || '-'}</td>
+                  <td>{posting.duration_days || '-'}</td>
+                  <td>
+                    <span className={`recruitment-tag ${posting.finance_approval_status ? 
+                      `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
+                      {posting.finance_approval_status || 'Pending'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`recruitment-tag ${posting.posting_status ? 
+                      posting.posting_status.toLowerCase() : 'unknown'}`}>
+                      {posting.posting_status || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{formatDate(posting.created_at)}</td>
+                  <td>{formatDate(posting.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div
+                      className="recruitment-dots"
+                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                    >
+                      ⋮
+                      {dotsMenuOpen === index && (
+                        <div className="recruitment-dropdown">
+                          <div 
+                            className="recruitment-dropdown-item"
+                            onClick={() => handleEditJobPosting(posting)}
+                          >
+                            Edit
                           </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          <div 
+                            className="recruitment-dropdown-item"
+                            onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
+                          >
+                            {isArchived ? "Restore" : "Archive"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {isArchived && selectedArchivedJobPostings.length > 0 && (
-          <div className="recruitment-bulk-actions">
-            <button 
-              className="recruitment-bulk-action-btn" 
-              onClick={bulkUnarchiveJobPostings}
-            >
-              Restore Selected Job Postings
-            </button>
-          </div>
-        )}
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
+      </div>
+      {isArchived && selectedArchivedJobPostings.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveJobPostings}
+          >
+            Restore Selected Job Postings
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
 
   const renderCandidatesTable = (data, isArchived = false) => {
     const { paginated, totalPages } = filterAndPaginate(data);
@@ -740,9 +1015,6 @@ const Recruitment = () => {
                   <th>Resume Path</th>
                   <th>Application Status</th>
                   <th>Documents</th>
-                  <th>Interview Details</th>
-                  <th>Offer Details</th>
-                  <th>Contract Details</th>
                   <th>Created At</th>
                   <th>Updated At</th>
                   <th></th>
@@ -808,42 +1080,6 @@ const Recruitment = () => {
                           </button>
                         )}
                       </div>
-                    </td>
-                    <td>
-                      {candidate.interview_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewInterviewDetails(candidate.interview_details)}
-                        >
-                          View Details
-                        </button>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                    <td>
-                      {candidate.offer_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewOfferDetails(candidate.offer_details)}
-                        >
-                          View Offer
-                        </button>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                    <td>
-                      {candidate.contract_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewContractDetails(candidate.contract_details)}
-                        >
-                          View Contract
-                        </button>
-                      ) : (
-                        '-'
-                      )}
                     </td>
                     <td>{formatDate(candidate.created_at)}</td>
                     <td>{formatDate(candidate.updated_at)}</td>
@@ -913,80 +1149,263 @@ const Recruitment = () => {
     );
   };
 
-  const renderResignationsTable = (data) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    if (loading) return <div className="recruitment-loading">Loading...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No resignations found</div>;
-    
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  <th>Resignation ID</th>
-                  <th>Employee ID</th>
-                  <th>Submission Date</th>
-                  <th>Notice Period (Days)</th>
-                  <th>HR Approver</th>
-                  <th>Approval Status</th>
-                  <th>Clearance Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((resignation, index) => (
-                  <tr key={resignation.resignation_id}>
-                    <td>{resignation.resignation_id}</td>
-                    <td>{resignation.employee_id}</td>
-                    <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
-                    <td>{resignation.notice_period_days || 'N/A'}</td>
-                    <td>{resignation.hr_approver_id || 'Pending'}</td>
+// Function to render interviews table
+const renderInterviewsTable = (data, isArchived = false) => {
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (loading) return <div className="recruitment-no-results">Loading interviews...</div>;
+  if (!paginated.length) return <div className="recruitment-no-results">No interviews found.</div>;
+  
+  // Log the data to help debug
+  console.log("Interview data in rendering function:", paginated);
+  
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Interview ID</th>
+                <th>Candidate</th>
+                <th>Candidate ID</th>
+                <th>Job ID</th>
+                <th>Interview Date</th>
+                <th>Status</th>
+                <th>Interviewer</th>
+                <th>Interviewer ID</th>
+                <th>Feedback</th>
+                <th>Rating</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((interview, index) => {
+                // Extract date and time from interview_date if it exists
+                const interviewDate = interview.interview_date ? 
+                  new Date(interview.interview_date) : null;
+                const formattedDate = interviewDate ? 
+                  interviewDate.toLocaleDateString() : '-';
+                const formattedTime = interviewDate ? 
+                  interviewDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-';
+                
+                // Get candidate name from candidates list if not already available
+                let candidateName = interview.candidate_name;
+                if (!candidateName && interview.candidate_id) {
+                  const candidate = candidates.find(c => c.candidate_id === interview.candidate_id);
+                  if (candidate) {
+                    candidateName = `${candidate.first_name} ${candidate.last_name}`;
+                  }
+                }
+                
+                return (
+                <tr key={interview.interview_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
                     <td>
-                      <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
-                        {resignation.approval_status || 'Unknown'}
-                      </span>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedInterviews.includes(interview.interview_id)}
+                        onChange={() => toggleSelectArchivedInterview(interview.interview_id)}
+                      />
                     </td>
-                    <td>
-                      <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
-                        {resignation.clearance_status || 'Unknown'}
-                      </span>
-                    </td>
-                    <td className="recruitment-actions">
+                  )}
+                  <td>{interview.interview_id}</td>
+                  <td>{candidateName || 'Unknown'}</td>
+                  <td>{interview.candidate_id}</td>
+                  <td>{interview.job_id}</td>
+                  <td>{formattedDate} {formattedTime}</td>
+                  <td>
+                    <span className={`recruitment-tag ${(interview.status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                      {interview.status || 'Not Set'}
+                    </span>
+                  </td>
+                  <td>{interview.interviewer_name || 'Unknown'}</td>
+                  <td>{interview.interviewer_id}</td>
+                  <td>{interview.feedback || '-'}</td>
+                  <td>{interview.rating ? `${interview.rating}/5` : '-'}</td>
+                  <td>{formatDate(interview.created_at)}</td>
+                  <td>{formatDate(interview.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div className="recruitment-action-buttons">
                       <div
                         className="recruitment-dots"
-                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                        }}
                       >
                         ⋮
                         {dotsMenuOpen === index && (
                           <div className="recruitment-dropdown">
                             <div 
                               className="recruitment-dropdown-item"
-                              onClick={() => handleEditResignation(resignation)}
+                              onClick={() => handleEditInterview(interview)}
                             >
                               Edit
                             </div>
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => handleViewResignationDetails(resignation)}
-                            >
-                              View Details
-                            </div>
+                            {!isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleArchiveInterview(interview)}
+                              >
+                                Archive
+                              </div>
+                            )}
+                            {isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleRestoreInterview(interview)}
+                              >
+                                Restore
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                </tr>
+              )})}
+            </tbody>
+          </table>
         </div>
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
+      </div>
+      {isArchived && selectedArchivedInterviews.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveInterviews}
+          >
+            Restore Selected Interviews
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
+
+  // Function to render onboarding tasks table
+const renderOnboardingTable = (data, isArchived = false) => {
+  const { paginated, totalPages } = filterAndPaginate(data);
+  
+  if (loading) return <div className="recruitment-no-results">Loading onboarding tasks...</div>;
+  if (!paginated.length) return <div className="recruitment-no-results">No onboarding tasks found.</div>;
+  
+  // Log the data to help debug
+  console.log("Onboarding data in rendering function:", paginated);
+  
+  return (
+    <>
+      <div className="recruitment-table-wrapper">
+        <div className="recruitment-table-scrollable">
+          <table className="recruitment-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Onboarding ID</th>
+                <th>Candidate</th>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Offer Details</th>
+                <th>Contract Details</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((task, index) => (
+                <tr key={task.onboarding_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                  {isArchived && (
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedArchivedOnboardingTasks.includes(task.onboarding_id)}
+                        onChange={() => toggleSelectArchivedOnboardingTask(task.onboarding_id)}
+                      />
+                    </td>
+                  )}
+                  <td>{task.onboarding_id}</td>
+                  <td>{task.candidate}</td>
+                  <td>{task.job}</td>
+                  <td>
+                    <span className={`recruitment-tag ${task.status ? task.status.toLowerCase().replace(/\s+/g, '-') : 'unknown'}`}>
+                      {task.status || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>{task.offer_details ? 
+                      <button onClick={() => handleViewOfferDetails(task.offer_details)} className="recruitment-view-btn">View Details</button> : 
+                      '-'}
+                  </td>
+                  <td>{task.contract_details ? 
+                      <button onClick={() => handleViewContractDetails(task.contract_details)} className="recruitment-view-btn">View Details</button> : 
+                      '-'}
+                  </td>
+                  <td>{formatDate(task.created_at)}</td>
+                  <td>{formatDate(task.updated_at)}</td>
+                  <td className="recruitment-actions">
+                    <div className="recruitment-action-buttons">
+                      <div
+                        className="recruitment-dots"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                        }}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => handleEditOnboardingTask(task)}
+                            >
+                              Edit
+                            </div>
+                            {!isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleArchiveOnboardingTask(task)}
+                              >
+                                Archive
+                              </div>
+                            )}
+                            {isArchived && (
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleRestoreOnboardingTask(task)}
+                              >
+                                Restore
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {isArchived && selectedArchivedOnboardingTasks.length > 0 && (
+        <div className="recruitment-bulk-actions">
+          <button 
+            className="recruitment-bulk-action-btn" 
+            onClick={bulkUnarchiveOnboardingTasks}
+          >
+            Restore Selected Tasks
+          </button>
+        </div>
+      )}
+      {renderPagination(totalPages)}
+    </>
+  );
+};
 
   const renderPagination = (totalPages) => {
     return (
@@ -1133,29 +1552,51 @@ const Recruitment = () => {
 const handleAddClick = () => {
   if (activeTab === "Job Postings") {
     setNewJobPosting({
-      dept_id: null,
-      position_id: null,
+      dept_id: "",
+      position_id: "",
       position_title: "",
       description: "",
       requirements: "",
-      employment_type: null,
-      base_salary: null,
-      daily_rate: null,
-      duration_days: null,
-      posting_status: null
+      employment_type: "",
+      base_salary: "",
+      daily_rate: "",
+      duration_days: "",
+      posting_status: "Draft"
     });
     setShowAddJobModal(true);
-  } else if (activeTab === "Resignations") {
-    setNewResignation({
-      employee_id: "",
-      notice_period_days: "",
-      hr_approver_id: "",
-      approval_status: "Pending",
-      clearance_status: "Not Started"
-    });
-    setShowAddResignationModal(true);
   } else if (activeTab === "Candidates") {
     handleAddCandidate();
+  } else if (activeTab === "Interviews") {
+    // Reset the new interview form values
+    setNewInterview({
+      candidate_id: "",
+      interview_date: "",
+      interview_time: "",
+      interview_type: "Technical",
+      interviewer_id: "",
+      status: "Scheduled",
+      notes: "",
+      feedback: "",
+      rating: null
+    });
+    setShowAddInterviewModal(true);
+  } else if (activeTab === "Onboarding") {
+    setNewOnboardingTask({
+      candidate_id: "",
+      job_id: "",
+      status: "Offer Pending",
+      offer_details: {
+        salary: "",
+        start_date: "",
+        benefits: ""
+      },
+      contract_details: {
+        type: "",
+        duration: "",
+        terms: ""
+      }
+    });
+    setShowAddOnboardingModal(true);
   }
 };
 
@@ -1222,14 +1663,6 @@ const handleJobPostingChange = (e) => {
       [name]: value
     }));
   }
-};
-
-const handleResignationChange = (e) => {
-  const { name, value } = e.target;
-  setNewResignation(prev => ({
-    ...prev,
-    [name]: value
-  }));
 };
 
 const handleCandidateChange = (e) => {
@@ -1492,37 +1925,6 @@ const handleJobPostingSubmit = async (e) => {
   }
 };
 
-const handleResignationSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    // Validate required fields
-    if (!newResignation.employee_id || !newResignation.notice_period_days) {
-      showToast("Please fill all required fields", false);
-      return;
-    }
-    
-    // Send resignation data to the API
-    const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
-      newResignation
-    );
-    
-    showToast("Resignation created successfully", true);
-    setShowAddResignationModal(false);
-    
-    // Refresh resignations
-    const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-    setResignations(resignationsRes.data);
-  } catch (err) {
-    console.error("Error creating resignation:", err.response?.data || err);
-    const errorMessage = err.response?.data?.detail || 
-                       Object.values(err.response?.data || {}).flat().join(", ") || 
-                       "Failed to create resignation";
-    showToast(errorMessage, false);
-  }
-};
-
 const handleArchiveJobPosting = async (jobPosting) => {
   try {
     console.log("Job posting to archive:", jobPosting);
@@ -1623,7 +2025,7 @@ const submitCandidateForm = async (e) => {
   
   // Add all text fields
   Object.keys(newCandidate).forEach(key => {
-    if (key !== 'resume_file' && newCandidate[key] !== null) {
+    if (key !== 'resume_file' && key !== 'resume_path' && newCandidate[key] !== null) {
       formData.append(key, newCandidate[key]);
     }
   });
@@ -1631,6 +2033,11 @@ const submitCandidateForm = async (e) => {
   // Add resume file if present
   if (newCandidate.resume_file) {
     formData.append('resume', newCandidate.resume_file);
+    // Set a default resume_path as it's required by the backend
+    formData.append('resume_path', 'pending_upload');
+  } else {
+    // Resume path is required in the backend model
+    formData.append('resume_path', '');
   }
   
   try {
@@ -1656,7 +2063,10 @@ const submitCandidateForm = async (e) => {
     
   } catch (err) {
     console.error("Error adding candidate:", err);
-    showToast("Failed to add candidate: " + (err.response?.data?.message || err.message), false);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to add candidate: " + (err.message || "Unknown error");
+    showToast(errorMessage, false);
   } finally {
     setLoading(false);
   }
@@ -1766,6 +2176,332 @@ const submitCandidateForm = async (e) => {
     }
   };
 
+// Interview handlers
+const handleInterviewChange = (e) => {
+  const { name, value } = e.target;
+  
+  // Add validation for interviewer_id
+  if (name === 'interviewer_id' && value && !ALLOWED_HR_INTERVIEWERS.includes(value)) {
+    showToast("Selected interviewer is not authorized to conduct interviews. Please select an HR employee.", false);
+    return;
+  }
+  
+  setNewInterview(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
+const handleInterviewSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Validate the interviewer is in the allowed list
+  if (!ALLOWED_HR_INTERVIEWERS.includes(newInterview.interviewer_id)) {
+    showToast("Only authorized HR employees can conduct interviews. Please select a valid interviewer.", false);
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    
+    // Create a formatted interview object
+    const interviewData = {
+      candidate_id: newInterview.candidate_id,
+      job_id: candidates.find(c => c.candidate_id === newInterview.candidate_id)?.job_id,
+      interview_date: `${newInterview.interview_date}T${newInterview.interview_time || '00:00'}:00`,
+      interviewer_id: newInterview.interviewer_id,
+      status: newInterview.status || 'Scheduled',
+      feedback: newInterview.notes || ""
+    };
+    
+    // Only add rating if interview is completed, otherwise leave it null
+    // Rating must be between 1 and 5 per database constraint
+    if (interviewData.status === 'Completed') {
+      interviewData.rating = newInterview.rating || 1; // Default to minimum rating of 1
+    }
+    
+    console.log("Creating interview with data:", interviewData);
+    
+    // Submit to API
+    const response = await axios.post(
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/",
+      interviewData
+    );
+    
+    showToast("Interview scheduled successfully", true);
+    setShowAddInterviewModal(false);
+    
+    // Refresh interviews list
+    const [activeInterviews, archivedInterviews] = await Promise.all([
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
+      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+    ]);
+    
+    setInterviews(ensureArray(activeInterviews.data));
+    setArchivedInterviews(ensureArray(archivedInterviews.data));
+    
+  } catch (err) {
+    console.error("Error scheduling interview:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to schedule interview";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Onboarding task handlers
+const handleOnboardingTaskChange = (e) => {
+  const { name, value } = e.target;
+  
+  if (name.startsWith('offer_details.') || name.startsWith('contract_details.')) {
+    const [objName, field] = name.split('.');
+    setNewOnboardingTask(prev => ({
+      ...prev,
+      [objName]: {
+        ...(prev[objName] || {}),
+        [field]: value
+      }
+    }));
+  } else {
+    setNewOnboardingTask(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleEditOnboardingTaskChange = (e) => {
+  const { name, value } = e.target;
+  
+  if (name.startsWith('offer_details.') || name.startsWith('contract_details.')) {
+    const [objName, field] = name.split('.');
+    setEditingOnboardingTask(prev => ({
+      ...prev,
+      [objName]: {
+        ...(prev[objName] || {}),
+        [field]: value
+      }
+    }));
+  } else {
+    setEditingOnboardingTask(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleOnboardingTaskSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    // Validate status is one of the allowed values
+    const allowedStatuses = [
+      'Offer Pending', 
+      'Offer Accepted', 
+      'Offer Rejected', 
+      'Contract Signed', 
+      'Completed', 
+      'Withdrawn'
+    ];
+    
+    if (!allowedStatuses.includes(newOnboardingTask.status)) {
+      showToast(`Invalid status. Must be one of: ${allowedStatuses.join(', ')}`, false);
+      return;
+    }
+    
+    setLoading(true);
+    
+    // Generate a unique onboarding ID
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    // Generate a random hex string for uniqueness
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+    const onboardingId = `ONB-${year}-${randomHex}`;
+    
+    // Format data for API
+    const onboardingData = {
+      onboarding_id: onboardingId,
+      candidate: newOnboardingTask.candidate_id,
+      job: newOnboardingTask.job_id,
+      offer_details: newOnboardingTask.offer_details || {},
+      contract_details: newOnboardingTask.contract_details || {},
+      status: newOnboardingTask.status
+    };
+    
+    // Submit to API
+    const response = await axios.post(
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/",
+      onboardingData
+    );
+    
+    showToast("Onboarding task created successfully", true);
+    setShowAddOnboardingModal(false);
+    
+    // Refresh onboarding tasks list
+    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+  } catch (err) {
+    console.error("Error creating onboarding task:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to create onboarding task";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleEditOnboardingTaskSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    // Validate status is one of the allowed values
+    const allowedStatuses = [
+      'Offer Pending', 
+      'Offer Accepted', 
+      'Offer Rejected', 
+      'Contract Signed', 
+      'Completed', 
+      'Withdrawn'
+    ];
+    
+    if (!allowedStatuses.includes(editingOnboardingTask.status)) {
+      showToast(`Invalid status. Must be one of: ${allowedStatuses.join(', ')}`, false);
+      return;
+    }
+    
+    setLoading(true);
+    
+    // Format data for API
+    const onboardingData = {
+      candidate: editingOnboardingTask.candidate,
+      job: editingOnboardingTask.job,
+      offer_details: editingOnboardingTask.offer_details || {},
+      contract_details: editingOnboardingTask.contract_details || {},
+      status: editingOnboardingTask.status
+    };
+    
+    // Submit to API
+    const response = await axios.patch(
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${editingOnboardingTask.onboarding_id}/`,
+      onboardingData
+    );
+    
+    showToast("Onboarding task updated successfully", true);
+    setShowEditOnboardingModal(false);
+    
+    // Refresh onboarding tasks list
+    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+  } catch (err) {
+    console.error("Error updating onboarding task:", err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to update onboarding task";
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleArchiveOnboardingTask = async (task) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${task.onboarding_id}/archive/`);
+    showToast("Onboarding task archived successfully", true);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error archiving onboarding task:", err);
+    showToast("Failed to archive onboarding task", false);
+  }
+};
+
+const handleRestoreOnboardingTask = async (task) => {
+  try {
+    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${task.onboarding_id}/unarchive/`);
+    showToast("Onboarding task restored successfully", true);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error restoring onboarding task:", err);
+    showToast("Failed to restore onboarding task", false);
+  }
+};
+
+const bulkUnarchiveOnboardingTasks = async () => {
+  try {
+    setLoading(true);
+    
+    // Create an array of promises for each selected onboarding task
+    const promises = selectedArchivedOnboardingTasks.map(id => 
+      axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${id}/unarchive/`)
+    );
+    
+    // Execute all promises
+    await Promise.all(promises);
+    
+    // Show success message
+    showToast("Selected onboarding tasks restored successfully", true);
+    
+    // Reset selection
+    setSelectedArchivedOnboardingTasks([]);
+    
+    // Refresh onboarding task lists
+    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    setOnboardingTasks(ensureArray(onboardingRes.data));
+    
+    // Also fetch archived tasks if available
+    try {
+      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
+    } catch (err) {
+      console.error("Error fetching archived onboarding tasks:", err);
+    }
+  } catch (err) {
+    console.error("Error restoring onboarding tasks:", err);
+    showToast("Failed to restore onboarding tasks", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleEditOnboardingTask = (task) => {
+  setEditingOnboardingTask({
+    onboarding_id: task.onboarding_id,
+    candidate: task.candidate_id,
+    job: task.job_id,
+    candidate_name: task.candidate,
+    job_title: task.job,
+    offer_details: task.offer_details || {},
+    contract_details: task.contract_details || {},
+    status: task.status || 'Pending',
+  });
+  setShowEditOnboardingModal(true);
+  setDotsMenuOpen(null);
+};
+
   return (
     <div className="recruitment">
       <div className="recruitment-body-content-container">
@@ -1802,14 +2538,18 @@ const submitCandidateForm = async (e) => {
                   <FiPlus className="icon" /> Add Job Posting
                 </button>
               )}
-
-              {activeTab === "Resignations" && (
+              
+              {activeTab === "Interviews" && (
                 <button className="recruitment-add-btn" onClick={handleAddClick}>
-                  <FiPlus className="icon" /> Add Resignation
+                  <FiPlus className="icon" /> Add Interview
                 </button>
               )}
-              
-              {activeTab !== "Resignations" && (
+              {activeTab === "Onboarding" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Onboarding
+                </button>
+              )}
+              {activeTab !== "Job Postings" && (
                 <button
                   className="recruitment-add-btn"
                   onClick={() => setShowArchived(!showArchived)}
@@ -1841,16 +2581,6 @@ const submitCandidateForm = async (e) => {
           <div className="recruitment-header">
             <div className="recruitment-tabs">
               <button
-                className={activeTab === "Candidates" ? "active" : ""}
-                onClick={() => {
-                  setActiveTab("Candidates");
-                  setShowArchived(false);
-                  setCurrentPage(1);
-                }}
-              >
-                Candidates <span className="recruitment-count">{candidates.length}</span>
-              </button>
-              <button
                 className={activeTab === "Job Postings" ? "active" : ""}
                 onClick={() => {
                   setActiveTab("Job Postings");
@@ -1861,14 +2591,34 @@ const submitCandidateForm = async (e) => {
                 Job Postings <span className="recruitment-count">{jobPostings.length}</span>
               </button>
               <button
-                className={activeTab === "Resignations" ? "active" : ""}
+                className={activeTab === "Candidates" ? "active" : ""}
                 onClick={() => {
-                  setActiveTab("Resignations");
+                  setActiveTab("Candidates");
                   setShowArchived(false);
                   setCurrentPage(1);
                 }}
               >
-                Resignations <span className="recruitment-count">{resignations.length}</span>
+                Candidates <span className="recruitment-count">{candidates.length}</span>
+              </button>
+              <button
+                className={activeTab === "Interviews" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Interviews");
+                  setShowArchived(false);
+                  setCurrentPage(1);
+                }}
+              >
+                Interviews <span className="recruitment-count">{interviews.length}</span>
+              </button>
+              <button
+                className={activeTab === "Onboarding" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Onboarding");
+                  setShowArchived(false);
+                  setCurrentPage(1);
+                }}
+              >
+                Onboarding <span className="recruitment-count">{onboardingTasks.length}</span>
               </button>
             </div>
           </div>
@@ -1876,7 +2626,12 @@ const submitCandidateForm = async (e) => {
           <div className="recruitment-table-container">
             {activeTab === "Candidates" && renderCandidatesTable(showArchived ? archivedCandidates : candidates, showArchived)}
             {activeTab === "Job Postings" && renderJobPostingsTable(showArchived ? archivedJobPostings : jobPostings, showArchived)}
-            {activeTab === "Resignations" && renderResignationsTable(resignations)}
+            {activeTab === "Interviews" && (
+              <>
+                {renderInterviewsTable(showArchived ? archivedInterviews : interviews, showArchived)}
+              </>
+            )}
+            {activeTab === "Onboarding" && renderOnboardingTable(showArchived ? archivedOnboardingTasks : onboardingTasks, showArchived)}
           </div>
         </div>
       </div>
@@ -2065,189 +2820,6 @@ const submitCandidateForm = async (e) => {
         </div>
       )}
 
-      {showAddResignationModal && (
-        <div className="recruitment-modal-overlay">
-          <div className="recruitment-modal">
-            <h3>Add New Resignation</h3>
-            <form onSubmit={handleResignationSubmit} className="recruitment-form">
-              <div className="recruitment-form-two-columns">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Employee *</label>
-                    <select 
-                      name="employee_id" 
-                      value={newResignation.employee_id} 
-                      onChange={handleResignationChange}
-                      required
-                    >
-                      <option value="">-- Select Employee --</option>
-                      {Array.isArray(employees) ? employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
-                        </option>
-                      )) : <option value="">No employees available</option>}
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Notice Period (Days) *</label>
-                    <input 
-                      type="number" 
-                      name="notice_period_days" 
-                      value={newResignation.notice_period_days} 
-                      onChange={handleResignationChange}
-                      min="1"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>HR Approver</label>
-                    <select 
-                      name="hr_approver_id" 
-                      value={newResignation.hr_approver_id} 
-                      onChange={handleResignationChange}
-                    >
-                      <option value="">-- Select HR Approver --</option>
-                      {Array.isArray(employees) ? employees
-                        .filter(employee => 
-                          employee.dept_name === "Human Resources" || 
-                          employee.dept_id === "HR-DEPT-2025-e9fa93" ||
-                          employee.dept?.dept_name === "Human Resources" || 
-                          employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
-                        )
-                        .map(employee => (
-                          <option key={employee.employee_id} value={employee.employee_id}>
-                            {employee.first_name} {employee.last_name}
-                          </option>
-                      )) : <option value="">No HR employees available</option>}
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Approval Status</label>
-                    <select
-                      name="approval_status"
-                      value={newResignation.approval_status || "Pending"}
-                      onChange={handleResignationChange}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Clearance Status</label>
-                    <select
-                      name="clearance_status"
-                      value={newResignation.clearance_status || "Not Started"}
-                      onChange={handleResignationChange}
-                    >
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Submit</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn" 
-                  onClick={() => setShowAddResignationModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showEditResignationModal && editingResignation && (
-        <div className="recruitment-modal-overlay">
-          <div className="recruitment-modal">
-            <h3>Edit Resignation</h3>
-            <form onSubmit={handleEditResignationSubmit} className="recruitment-form">
-              <div className="recruitment-form-two-columns">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Employee ID</label>
-                    <input 
-                      type="text"
-                      value={editingResignation.employee_id || ""}
-                      disabled
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Notice Period (Days)</label>
-                    <input 
-                      type="number"
-                      value={editingResignation.notice_period_days || ""}
-                      disabled
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Approval Status *</label>
-                    <select
-                      name="approval_status"
-                      value={editingResignation.approval_status || "Pending"}
-                      onChange={(e) => setEditingResignation({
-                        ...editingResignation,
-                        approval_status: e.target.value
-                      })}
-                      required
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Clearance Status *</label>
-                    <select
-                      name="clearance_status"
-                      value={editingResignation.clearance_status || "Not Started"}
-                      onChange={(e) => setEditingResignation({
-                        ...editingResignation,
-                        clearance_status: e.target.value
-                      })}
-                      required
-                    >
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Save Changes</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn" 
-                  onClick={() => setShowEditResignationModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Documents Modal */}
       {showDocumentsModal && viewingDocuments && (
         <div className="recruitment-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
           <div className="recruitment-modal" onClick={e => e.stopPropagation()}>
@@ -2368,14 +2940,8 @@ const submitCandidateForm = async (e) => {
                   {uploadingDocumentCategory === "required" && (
                     <>
                       <option value="resume">Resume</option>
-                      <option value="psa_birth_cert">PSA Birth Certificate</option>
-                      <option value="nbi_clearance">NBI Clearance</option>
                       <option value="diploma">College Diploma</option>
                       <option value="tor">Transcript of Records</option>
-                      <option value="sss_id">SSS ID</option>
-                      <option value="pagibig_id">Pag-IBIG ID</option>
-                      <option value="philhealth_id">PhilHealth ID</option>
-                      <option value="tin_id">TIN ID</option>
                     </>
                   )}
                   {uploadingDocumentCategory === "optional" && (
@@ -2927,6 +3493,733 @@ const submitCandidateForm = async (e) => {
                   type="button" 
                   className="cancel-btn" 
                   onClick={() => setShowEditJobModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Interview Add Modal */}
+      {showAddInterviewModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Schedule New Interview</h3>
+            <form onSubmit={handleInterviewSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate_id" 
+                      value={newInterview.candidate_id} 
+                      onChange={handleInterviewChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Interview Date *</label>
+                    <input 
+                      type="date" 
+                      name="interview_date" 
+                      value={newInterview.interview_date} 
+                      onChange={handleInterviewChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Interview Time *</label>
+                    <input 
+                      type="time" 
+                      name="interview_time" 
+                      value={newInterview.interview_time} 
+                      onChange={handleInterviewChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Interviewer *</label>
+                    <select
+                      name="interviewer_id"
+                      value={newInterview.interviewer_id}
+                      onChange={handleInterviewChange}
+                      required
+                    >
+                      <option value="">-- Select Interviewer --</option>
+                      {employees
+                        .filter(emp => ALLOWED_HR_INTERVIEWERS.includes(emp.employee_id))
+                        .map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name} (HR)
+                          </option>
+                        ))}
+                    </select>
+                    <span className="input-help-text">Only HR employees are authorized to conduct interviews</span>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newInterview.status}
+                      onChange={handleInterviewChange}
+                    >
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Rescheduled">Rescheduled</option>
+                    </select>
+                  </div>
+                  
+                  {newInterview.status === 'Completed' && (
+                    <div className="form-group">
+                      <label>Rating (1-5) *</label>
+                      <input 
+                        type="number" 
+                        name="rating" 
+                        value={newInterview.rating || "1"} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (val < 1 || val > 5) {
+                            showToast("Rating must be between 1 and 5", false);
+                            return;
+                          }
+                          setNewInterview({...newInterview, rating: val});
+                        }}
+                        min="1"
+                        max="5"
+                        required
+                      />
+                      <span className="input-help-text">Rating is required for completed interviews and must be between 1-5</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="form-group full-width">
+                  <label>Notes</label>
+                  <textarea
+                    name="notes"
+                    value={newInterview.notes || ""}
+                    onChange={handleInterviewChange}
+                    placeholder="Additional notes about the interview..."
+                  />
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Scheduling..." : "Schedule Interview"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddInterviewModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+{/* Edit Interview Modal */}
+{showEditInterviewModal && editingInterview && (
+  <div className="recruitment-modal-overlay">
+    <div className="recruitment-modal">
+      <h3>Edit Interview</h3>
+      <form onSubmit={handleEditInterviewSubmit} className="recruitment-form">
+        <div className="recruitment-form-two-columns">
+          <div className="form-column">
+            <div className="form-group">
+              <label>Candidate *</label>
+              <select 
+                name="candidate" 
+                value={editingInterview.candidate || ""} 
+                onChange={(e) => setEditingInterview({...editingInterview, candidate: e.target.value})}
+                required
+              >
+                <option value="">-- Select Candidate --</option>
+                {candidates.map(candidate => (
+                  <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                    {candidate.first_name} {candidate.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Interview Date *</label>
+              <input 
+                type="date" 
+                name="interview_date" 
+                value={editingInterview.interview_date ? editingInterview.interview_date.split('T')[0] : ""} 
+                onChange={(e) => setEditingInterview({...editingInterview, interview_date: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Interview Time *</label>
+              <input 
+                type="time" 
+                name="interview_time" 
+                value={editingInterview.interview_time || (editingInterview.interview_date && editingInterview.interview_date.includes('T') ? 
+                  editingInterview.interview_date.split('T')[1].substring(0, 5) : "")} 
+                onChange={(e) => setEditingInterview({...editingInterview, interview_time: e.target.value})}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="form-column">
+            <div className="form-group">
+              <label>Interviewer *</label>
+              <select
+                name="interviewer"
+                value={editingInterview.interviewer || ""}
+                onChange={(e) => {
+                  if (!ALLOWED_HR_INTERVIEWERS.includes(e.target.value)) {
+                    showToast("Selected interviewer is not authorized to conduct interviews. Please select an HR employee.", false);
+                    return;
+                  }
+                  setEditingInterview({...editingInterview, interviewer: e.target.value});
+                }}
+                required
+              >
+                <option value="">-- Select Interviewer --</option>
+                {employees
+                  .filter(emp => ALLOWED_HR_INTERVIEWERS.includes(emp.employee_id))
+                  .map(emp => (
+                    <option key={emp.employee_id} value={emp.employee_id}>
+                      {emp.first_name} {emp.last_name} (HR)
+                    </option>
+                  ))}
+              </select>
+              <span className="input-help-text">Only HR employees are authorized to conduct interviews</span>
+            </div>
+            
+            <div className="form-group">
+              <label>Status</label>
+              <select
+                name="status"
+                value={editingInterview.status}
+                onChange={(e) => setEditingInterview({...editingInterview, status: e.target.value})}
+              >
+                <option value="Scheduled">Scheduled</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Rescheduled">Rescheduled</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="form-group full-width">
+            <label>Feedback</label>
+            <textarea
+              name="feedback"
+              value={editingInterview.feedback || ""}
+              onChange={(e) => setEditingInterview({...editingInterview, feedback: e.target.value})}
+              placeholder="Detailed feedback on the interview..."
+            />
+          </div>
+          
+          {editingInterview.status === 'Completed' ? (
+            <div className="form-group">
+              <label>Rating (1-5) *</label>
+              <input 
+                type="number" 
+                name="rating" 
+                value={editingInterview.rating || "1"} 
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val < 1 || val > 5) {
+                    showToast("Rating must be between 1 and 5", false);
+                    return;
+                  }
+                  setEditingInterview({...editingInterview, rating: val});
+                }}
+                min="1"
+                max="5"
+                required
+              />
+              <span className="input-help-text">Rating is required for completed interviews and must be between 1-5</span>
+            </div>
+          ) : (
+            <div className="form-group">
+              <label>Rating</label>
+              <input 
+                type="number" 
+                disabled
+                value="-"
+                readOnly
+              />
+              <span className="input-help-text">Rating can only be set for completed interviews</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="recruitment-modal-buttons">
+          <button type="submit" className="submit-btn">Save Changes</button>
+          <button 
+            type="button" 
+            className="cancel-btn" 
+            onClick={() => setShowEditInterviewModal(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+      {/* Onboarding Add Modal */}
+      {showAddOnboardingModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Create Onboarding Task</h3>
+            <form onSubmit={handleOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate_id" 
+                      value={newOnboardingTask.candidate_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Job *</label>
+                    <select 
+                      name="job_id" 
+                      value={newOnboardingTask.job_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newOnboardingTask.status || "Offer Pending"}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={newOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={newOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={newOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={newOnboardingTask.contract_details?.type || ""}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={newOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={newOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Creating..." : "Create Onboarding Task"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddOnboardingModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Onboarding Modal */}
+      {showEditOnboardingModal && editingOnboardingTask && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Edit Onboarding Task</h3>
+            <form onSubmit={handleEditOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate" 
+                      value={editingOnboardingTask.candidate || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Job *</label>
+                    <select 
+                      name="job" 
+                      value={editingOnboardingTask.job || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={editingOnboardingTask.status || "Offer Pending"}
+                      onChange={handleEditOnboardingTaskChange}
+                    >
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={editingOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={editingOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={editingOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={editingOnboardingTask.contract_details?.type || ""}
+                      onChange={handleEditOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={editingOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={editingOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleEditOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Saving..." : "Save Changes"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowEditOnboardingModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Create Onboarding Modal */}
+      {showAddOnboardingModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Create Onboarding Task</h3>
+            <form onSubmit={handleOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate_id" 
+                      value={newOnboardingTask.candidate_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Job *</label>
+                    <select 
+                      name="job_id" 
+                      value={newOnboardingTask.job_id || ""} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newOnboardingTask.status || "Offer Pending"}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Signed">Contract Signed</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Withdrawn">Withdrawn</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={newOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={newOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={newOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={newOnboardingTask.contract_details?.type || ""}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={newOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={newOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Creating..." : "Create Onboarding Task"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddOnboardingModal(false)}
                 >
                   Cancel
                 </button>

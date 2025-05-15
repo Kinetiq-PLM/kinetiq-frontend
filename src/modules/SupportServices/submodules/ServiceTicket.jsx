@@ -24,7 +24,7 @@ const ServiceTicket = ({ user_id, employee_id }) => {
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [tickets, setTickets] = useState([])
-  const [filterBy, setFilterBy] = useState("")
+  const [filterBy, setFilterBy] = useState("open")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -191,6 +191,8 @@ const ServiceTicket = ({ user_id, employee_id }) => {
 
       inProgTix(ticketId);
       setShowQueueModal(false);
+      setSuccessModalMessage(`Email sent to customer ${data.customer.name}!`); 
+      setShowSuccessModal(true);  
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -211,6 +213,9 @@ const ServiceTicket = ({ user_id, employee_id }) => {
         setShowErrorModal(true);          
     }
   }
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successModalMessage, setSuccessModalMessage] = useState("")
 
   const handleFilterChange = (value) => {
     setFilterBy(value)
@@ -355,7 +360,16 @@ const ServiceTicket = ({ user_id, employee_id }) => {
             <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
           </div>
         </div>
-      )}                  
+      )}          
+
+      {showSuccessModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <p>{successModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowSuccessModal(false)}>OK</button>
+          </div>
+        </div>
+      )}         
     </div>
   )
 }

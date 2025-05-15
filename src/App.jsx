@@ -166,7 +166,7 @@ function App() {
     var temp_list = []
     //populate notifs table
     notif_items.map((notif_item, i) => {
-      origin = notif_item.module.split('/')
+      origin = notif_item.module.split(/\/(.*)/s)
       const orig_module = origin[0]
       const orig_submodule = origin.length == 2 ? origin[1] : null
       const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -368,9 +368,7 @@ function App() {
     Management: {
       "Dashboard": "ManagementDashboard",
       "Project Approval": "ManagementApprovals",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      Settings: "Settings",
+      "Approvals": "ManagementApprovals",
     },
     Administration: {
       "User": "User",
@@ -413,8 +411,8 @@ function App() {
       "Goods Tracking": "GoodsTracking",
       "Internal Transfer": "InternalTransfer",
       "Delivery Approval": "DeliveryApproval",
-      "Delivery Receipt": "DeliveryReceipt",
-      "Item Removal": "ItemRemoval",
+      "External Delivery": "External Delivery",
+      "Item Removal Requisition ": "ItemRemovalRequisition",
     },
     Sales: {
       Quotation: "Quotation",
@@ -432,9 +430,8 @@ function App() {
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
       "Service Call": "ServiceCall",
-      "Service Request": "ServiceRequest",
       "Warranty Renewal": "WarrantyRenewal",
-      "Service Analysis": "ServiceAnalysis",
+      "Service Request": "ServiceRequest",
       "Service Billing": "ServiceBilling",
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
@@ -453,9 +450,10 @@ function App() {
       "Rework": "Rework",
     },
     "Production": {
-      "Equipment and Labor": "Equipment&Labor",
-      //"Quality Control": "QualityControl",
-      "Cost of Production": "CostOfProduction"
+      "Equipment": "Equipment",
+      "Labor": "Labor",
+      "Cost of Production": "CostOfProduction",
+      "Rework Cost": "ReworkCost",
     },
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
@@ -465,11 +463,9 @@ function App() {
     "Project Management": {
       "Project List": "Project List",
       "Project Planning": "ProjectPlanning",
-      "Project Request": "Projectrequest",
+      "Project Cost": "Projectcost",
       "Tasks": "TaskMonitoring",
-      "Report Monitoring": "Reports",
-      "Warranty Monitoring": "Warranties",
-      "Project Cost":"ProjectCost",
+      "Warranty Monitoring":"Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -503,13 +499,15 @@ function App() {
   const filteredModuleFileNames = {};
 
   allowedModules.forEach((permission) => {
-    const [main, sub] = permission.split('/')
-
+    const [main, sub] = permission.split(/\/(.*)/s)
+    console.log('perms main: ' + main)
+    console.log('params sub: ' + sub) 
     if (!filteredModuleFileNames[main]) {
       filteredModuleFileNames[main] = {};
     }
 
     if (!sub) {
+      console.log('including all submodules of ' + main)
       filteredModuleFileNames[main] = {
       ...moduleSubmoduleFileNames[main]
       }
@@ -609,8 +607,8 @@ function App() {
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                    {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (submodule, index) => (
                         <div
                           key={index}
@@ -684,8 +682,8 @@ function App() {
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
-                  {moduleSubmoduleFileNames[module.id] &&
-                    Object.keys(moduleSubmoduleFileNames[module.id]).map(
+                  {filteredModuleFileNames[module.id] &&
+                    Object.keys(filteredModuleFileNames[module.id]).map(
                       (sub, index) => (
                         <div
                           key={index}

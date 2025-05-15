@@ -1,3 +1,24 @@
+.vendorappform {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.vendorappform .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
 .org-type-dropdown {
     position: relative;
     width: 100%;
@@ -42,7 +63,7 @@
 
 .vendorappform-scrollable-wrapper {
     width: 100%;
-    max-height: 80vh;
+    max-height: auto;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
@@ -55,27 +76,6 @@
     justify-content: flex-start !important;
     min-width: 0 !important;
     min-height: 0 !important;
-}
-
-.vendorappform {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-.vendorappform .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
 }
 
 .vendorappform-header {
@@ -413,4 +413,96 @@
 
 .vendorappform .submit-btn:hover {
     background-color: #00A8A8;
+}
+
+.vendorappform .vaf-table-container {
+    flex: 1;
+    background: white;
+    border: 1px solid #D2D2D2;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.vendorappform .vaf-table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+    text-align: center;
+    color: #666;
+}
+
+.vendorappform .vaf-table-header > div {
+    text-align: center;
+}
+
+.vendorappform .vaf-table-scrollable {
+    width: 100%;
+    max-height: 580px;
+    overflow-x: auto;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.vendorappform .vaf-table {
+    flex: 1;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.vendorappform .vaf-table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+    text-align: center;
+    color: #666;
+}
+
+.vendorappform .vaf-table-header > div {
+text-align: center;
+}
+
+.vendorappform .vaf-table-rows {
+display: flex;
+flex-direction: column;
+}
+  
+.vendorappform .vaf-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+  
+.vendorappform .vaf-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+  
+.vendorappform .vaf-no-results {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px;
+    grid-column: 1 / -1;
 }

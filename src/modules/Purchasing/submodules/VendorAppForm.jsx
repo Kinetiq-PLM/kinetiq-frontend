@@ -1,30 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/VendorAppForm.css";
 
 const VendorAppForm = () => {
     const [formData, setFormData] = useState({
+        vendor_code: "",
+        status: null,
         company_name: "",
-        vendor_name: "",
         tax_number: "",
         vendor_address: "",
         tax_exempt: false,
         contact_person: "",
-        fax: "",
-        title: "",
         vendor_email: "",
         phone: "",
         vendor_website: "",
         account_no: "",
         routing_no: "",
-        separate_checks: false,
         purchasing_card: false,
         requestor: "",
         date_requested: "",
-        organization_type: "Corporation", // Default to "Corporation"
+        payment_terms: "Corporation",
     });
+    const handleCancel = () => {
+        // Reset the form to its initial state
+        setFormData({
+            vendor_code: "",
+            status: null,
+            company_name: "",
+            tax_number: "",
+            vendor_address: "",
+            tax_exempt: false,
+            contact_person: "",
+            vendor_email: "",
+            phone: "",
+            vendor_website: "",
+            account_no: "",
+            routing_no: "",
+            purchasing_card: false,
+            requestor: "",
+            date_requested: "",
+            payment_terms: "Corporation",
+        });
+    };
 
+    const [vendorList, setVendorList] = useState([]); // State to store vendor list
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+
+    useEffect(() => {
+        // Fetch vendor list from the API
+        const fetchVendors = async () => {
+            try {
+                const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/VendorApp/list/");
+                setVendorList(response.data);
+            } catch (error) {
+                console.error("Error fetching vendor list:", error);
+            }
+        };
+
+        fetchVendors();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -34,23 +68,29 @@ const VendorAppForm = () => {
         }));
     };
 
-    const handleOrgTypeChange = (type) => {
-        setFormData((prev) => ({
-            ...prev,
-            organization_type: type,
-        }));
-    };
-
-    const formatWebsite = (url) => {
-        if (!url) return "";
-        if (!/^https?:\/\//i.test(url)) {
-            return "https://" + url;
-        }
-        return url;
+    const handleRowClick = (vendor) => {
+        // Populate the form with the selected vendor's data
+        setFormData({
+            vendor_code: vendor.vendor_code || "",
+            status: vendor.status || null,
+            company_name: vendor.company_name || "",
+            tax_number: vendor.tax_number || "",
+            vendor_address: vendor.vendor_address || "",
+            tax_exempt: vendor.tax_exempt || false,
+            contact_person: vendor.contact_person || "",
+            vendor_email: vendor.vendor_email || "",
+            phone: vendor.phone || "",
+            vendor_website: vendor.vendor_website || "",
+            account_no: vendor.account_no || "",
+            routing_no: vendor.routing_no || "",
+            purchasing_card: vendor.purchasing_card || false,
+            requestor: vendor.requestor || "",
+            date_requested: vendor.date_requested || "",
+            payment_terms: vendor.payment_terms || "Corporation",
+        });
     };
 
     const handleSubmit = async () => {
-        // Validation: Ensure 'requestor' and other fields are properly populated
         if (!formData.requestor.trim()) {
             alert("Please enter the name of the requestor.");
             return;
@@ -58,25 +98,21 @@ const VendorAppForm = () => {
 
         try {
             const payload = {
-                application_reference: `APP-${Date.now()}`,  // Automatically generated
-                status: null,  // 'status' is set to null by default
-                company_name: formData.company_name,
-                tax_number: formData.tax_number,
-                contact_person: formData.contact_person,
-                title: formData.title,
-                vendor_address: formData.vendor_address,
-                phone: formData.phone,
-                fax: formData.fax,
-                vendor_email: formData.vendor_email,
+                vendor_code: formData.vendor_code || "",
+                company_name: formData.company_name || "",
+                tax_number: formData.tax_number || "",
+                contact_person: formData.contact_person || "",
+                vendor_address: formData.vendor_address || "",
+                phone: formData.phone || "",
+                vendor_email: formData.vendor_email || "",
                 tax_exempt: formData.tax_exempt,
-                vendor_website: formatWebsite(formData.vendor_website),
-                organization_type: formData.organization_type,
-                separate_checks: formData.separate_checks,
-                purchasing_card: formData.purchasing_card,
-                account_no: formData.account_no,
-                routing_no: formData.routing_no,
-                requestor: formData.requestor,
-                date_requested: formData.date_requested ? formData.date_requested : null,
+                purchasing_card: formData.purchasing_card ? "Yes" : "No",
+                account_no: formData.account_no || "",
+                routing_no: formData.routing_no || "",
+                requestor: formData.requestor || "",
+                date_requested: formData.date_requested || null,
+                payment_terms: formData.payment_terms || null,
+                status: formData.status || null,
             };
 
             console.log("📤 Submitting Vendor Application Payload:", payload);
@@ -94,90 +130,103 @@ const VendorAppForm = () => {
         }
     };
 
-    const handleCancel = () => {
-        setFormData({
-            company_name: "",
-            vendor_name: "",
-            tax_number: "",
-            vendor_address: "",
-            tax_exempt: false,
-            contact_person: "",
-            fax: "",
-            title: "",
-            vendor_email: "",
-            phone: "",
-            vendor_website: "",
-            account_no: "",
-            routing_no: "",
-            separate_checks: false,
-            purchasing_card: false,
-            requestor: "",
-            date_requested: "",
-            organization_type: "Corporation",
-        });
-        alert("Form reset.");
-    };
-
     return (
         <div className="vendorappform">
             <div className="vendorappform-scrollable-wrapper">
                 <div className="body-content-container">
                     <div className="vendorappform-header">
                         <button className="vendorappform-back">Back</button>
-                        <h2 className="vendorappform-title">Vendor Application Form</h2>
+                        <h2 className="vendorappform-title">Vendor Management</h2>
                     </div>
 
-                    <div className="vendorappform-content">
-
-                        {/* Vendor Info */}
-                        <div className="vendorappform-vendor-info">
-                            <h3 className="vendorappform-section-title">VENDOR INFORMATION</h3>
-                            <div className="vendorappform-grid">
-                                {[ 
-                                    { label: "Company Name", name: "company_name" },
-                                    { label: "Tax No.", name: "tax_number" },
-                                    { label: "Vendor Address", name: "vendor_address" },
-                                    { label: "Contact Person", name: "contact_person" },
-                                    { label: "Fax", name: "fax" },
-                                    { label: "Title", name: "title" },
-                                    { label: "Vendor Email", name: "vendor_email", type: "email" },
-                                    { label: "Phone", name: "phone", type: "tel" },
-                                    { label: "Vendor Website", name: "vendor_website", type: "url" },
-                                ].map(({ label, name, type = "text" }) => (
-                                    <div className="form-group" key={name}>
-                                        <label>{label}</label>
-                                        <input
-                                            type={type}
-                                            name={name}
-                                            value={formData[name] || ""}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                ))}
+                    {/* Vendor List Table */}
+                    <div className="vaf-table-container">
+                        <div className="vaf-table-header">
+                            <div>Vendor Name</div>
+                            <div>Contact Person</div>
+                            <div>Status</div>
+                            <div>Date Requested</div>
+                            <div>Requestor</div>
+                        </div>
+                        <div className="vaf-table-scrollable">
+                            <div className="vaf-table-rows">
+                                {vendorList.length > 0 ? (
+                                    vendorList.map((vendor) => (
+                                        <div
+                                            key={vendor.vendor_code}
+                                            className="vaf-row"
+                                            onClick={() => handleRowClick(vendor)}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <div>{vendor.company_name}</div>
+                                            <div>{vendor.contact_person}</div>
+                                            <div>
+                                                <select
+                                                    value={vendor.status || "Pending"}
+                                                    disabled
+                                                >
+                                                    <option value="Approved">Approved</option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Rejected">Rejected</option>
+                                                </select>
+                                            </div>
+                                            <div>{vendor.date_requested}</div>
+                                            <div>{vendor.requestor}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="vaf-no-results">No results found</div>
+                                )}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Vendor Application Form */}
+                    <div className="vendorappform-content">
+                        <h3 className="vendorappform-section-title">VENDOR INFORMATION</h3>
+                        <div className="vendorappform-grid">
+                            {[
+                                { label: "Company Name", name: "company_name" },
+                                { label: "Tax No.", name: "tax_number" },
+                                { label: "Vendor Address", name: "vendor_address" },
+                                { label: "Contact Person", name: "contact_person" },
+                                { label: "Vendor Email", name: "vendor_email", type: "email" },
+                                { label: "Phone", name: "phone", type: "tel" },
+                                { label: "Vendor Website", name: "vendor_website", type: "url" },
+                            ].map(({ label, name, type = "text" }) => (
+                                <div className="form-group" key={name}>
+                                    <label>{label}</label>
+                                    <input
+                                        type={type}
+                                        name={name}
+                                        value={formData[name] || ""}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                            ))}
                         </div>
 
                         {/* Org Type */}
                         <div className="vendorappform-org-type">
-                            <h3 className="vendorappform-section-title">ORGANIZATION TYPE</h3>
+                            <h3 className="vendorappform-section-title">PAYMENT TERMS</h3>
                             <div className="org-type-dropdown">
                                 <button
                                     type="button"
                                     className="org-type-toggle"
                                     onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
                                 >
-                                    {formData.organization_type
-                                        ? formData.organization_type.charAt(0).toUpperCase() +
-                                          formData.organization_type.slice(1).replace("_", " ")
+                                    {formData.payment_terms
+                                        ? formData.payment_terms.charAt(0).toUpperCase() +
+                                          formData.payment_terms.slice(1).replace("_", " ")
                                         : "Select organization type"}
                                     <span className="dropdown-arrow">{orgDropdownOpen ? "▲" : "▼"}</span>
                                 </button>
                                 {orgDropdownOpen && (
                                     <div className="org-type-options">
-                                        {["Corporation", "LLC", "Partnership", "Nonprofit"].map((type) => (
+                                        {["80", "70", "50", "25"].map((type) => (
                                             <div
                                                 key={type}
-                                                className={`org-type-option ${formData.organization_type === type ? "selected" : ""}`}
+                                                className={`org-type-option ${formData.payment_terms === type ? "selected" : ""}`}
                                                 onClick={() => {
                                                     handleOrgTypeChange(type);
                                                     setOrgDropdownOpen(false);
@@ -347,7 +396,7 @@ const VendorAppForm = () => {
                                 Submit
                             </button>
                         </div>
-                    </div>
+                    </div>              
                 </div>
             </div>
         </div>

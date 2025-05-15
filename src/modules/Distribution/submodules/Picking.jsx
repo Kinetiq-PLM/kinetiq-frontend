@@ -8,6 +8,8 @@ import CompletionModal from "../components/picking/CompletionModal";
 import EditPickingModal from "../components/picking/EditPickingModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// Import icons
+import { FaSearch } from 'react-icons/fa';
 
 const Picking = () => {
   // State for data management
@@ -93,7 +95,7 @@ const Picking = () => {
     fetchPickingLists();
     fetchEmployees();
     
-    // Then fetch warehouses separately (and don't derive from picking lists)
+    // Still fetch warehouses for display purposes
     fetchWarehouses();
   }, [refreshTrigger]);
   
@@ -165,6 +167,12 @@ const Picking = () => {
         throw new Error(errorData.error || 'Failed to update picking list');
       }
       
+      // Update the selectedList with the new values
+      setSelectedList(prev => ({
+        ...prev,
+        ...updates
+      }));
+      
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);
@@ -175,104 +183,152 @@ const Picking = () => {
     }
   };
   
-  // Handle status update
-  const handleStatusUpdate = async (list, newStatus, employeeId, warehouseId) => {
-    try {
-      // Build the update object
-      const updateData = {
-        picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
-      };
+  // Modify your handleStatusUpdate function
+
+const handleStatusUpdate = async (list, newStatus, employeeId) => {
+  try {
+    // Check if all items are picked when trying to complete
+    if (newStatus === 'Completed') {
+      // Fetch picking items
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/items/`);
+      const items = await response.json();
       
-      // Add employee and warehouse if they changed
-      if (employeeId && employeeId !== list.picked_by) {
-        updateData.picked_by = employeeId;
+      if (!items.length) {
+        toast.error("No items found for this picking list");
+        return;
       }
       
-      // Always update warehouse if this is an external delivery and the warehouse changed
-      if (list.is_external && warehouseId && warehouseId !== list.warehouse_id) {
-        updateData.warehouse_id = warehouseId;
-      }
-  
-      // Always make the API call when status changes (or when completing)
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
+      // For partial deliveries, group items by delivery note
+      const itemsByDeliveryNote = {};
+      items.forEach(item => {
+        const noteId = item.delivery_note_id || 'no_note';
+        if (!itemsByDeliveryNote[noteId]) {
+          itemsByDeliveryNote[noteId] = [];
+        }
+        itemsByDeliveryNote[noteId].push(item);
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update picking list status');
-      }
-  
-      // Find the warehouse name for the updated warehouse ID
-      const warehouseName = warehouses.find(w => w.id === (warehouseId || list.warehouse_id))?.name || list.warehouse_name;
-  
-      // Update the selectedList with the new values so completion modal has the latest data
-      setSelectedList(prev => ({
-        ...prev,
-        picked_by: employeeId || prev.picked_by,
-        warehouse_id: warehouseId || prev.warehouse_id,
-        warehouse_name: warehouseName,
-        picked_status: updateData.picked_status
-      }));
+      // Check if all items in each delivery note are picked
+      let allPicked = true;
+      let unpickedNotes = [];
       
-      // Refresh the list after successful update (only if not going to completion)
-      if (newStatus !== 'Completed') {
-        setRefreshTrigger(prev => prev + 1);
-        setShowEditModal(false);
-        toast.info(`Status updated to ${newStatus}`);
+      for (const [noteId, noteItems] of Object.entries(itemsByDeliveryNote)) {
+        const isNotePicked = noteItems.every(item => item.is_picked);
+        if (!isNotePicked) {
+          allPicked = false;
+          unpickedNotes.push(noteId === 'no_note' ? 'Main Order' : noteId);
+        }
       }
       
-      // If trying to mark as Completed, show the completion modal
-      if (newStatus === 'Completed') {
-        setShowEditModal(false);
-        setShowCompletionModal(true);
+      if (!allPicked) {
+        if (unpickedNotes.length === 1) {
+          toast.error(`Cannot complete picking: Not all items in delivery note ${unpickedNotes[0]} have been picked`);
+        } else {
+          toast.error(`Cannot complete picking: Items remaining in multiple delivery notes`);
+        }
+        return;
       }
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
     }
-  };
-  
-  // Handle completion confirmation
-  const handleConfirmCompletion = async () => {
-    if (!selectedList || !showCompletionModal) return;
+    if (newStatus === 'In Progress') {
+      setTimeout(() => {
+        fetchPickingItems();
+      }, 500); // Add slight delay to ensure backend processing completes
+    }
+    // Build the update object
+    const updateData = {
+      picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
+    };
     
-    try {
-      // Get the current employee and warehouse selections from the modal
-      // Since the modal is closed at this point, we'll use the selectedList data
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          picked_status: 'Completed'
-          // We don't include employee/warehouse here because the completion modal
-          // is shown after the edit modal is closed, so any changes were already saved
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to complete picking list');
-      }
-      
-      // Close modal and refresh the list
-      setShowCompletionModal(false);
+    // Add employee if it changed
+    if (employeeId && employeeId !== list.picked_by) {
+      updateData.picked_by = employeeId;
+    }
+    
+    // Make the API call
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update picking list status');
+    }
+
+    // Find the warehouse name for display purposes
+    const warehouseName = warehouses.find(w => w.id === list.warehouse_id)?.name || list.warehouse_name;
+
+    // Update the selectedList with the new values
+    setSelectedList(prev => ({
+      ...prev,
+      picked_by: employeeId || prev.picked_by,
+      warehouse_name: warehouseName,
+      picked_status: updateData.picked_status
+    }));
+    
+    // Refresh the list after successful update (only if not going to completion)
+    if (newStatus !== 'Completed') {
       setRefreshTrigger(prev => prev + 1);
-      
-      // Show success notification
-      toast.success('Picking list completed successfully! A new Packing List has been created.', {
+      setShowEditModal(false);
+      toast.info(`Status updated to ${newStatus}`);
+    }
+    
+    // If trying to mark as Completed, show the completion modal
+    if (newStatus === 'Completed') {
+      setShowEditModal(false);
+      setShowCompletionModal(true);
+    }
+  } catch (err) {
+    toast.error(`Error: ${err.message}`);
+  }
+};
+  
+// In the handleConfirmCompletion function, update the success message to better explain next steps
+const handleConfirmCompletion = async () => {
+  if (!selectedList || !showCompletionModal) return;
+  
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        picked_status: 'Completed'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to complete picking list');
+    }
+    
+    // Close modal and refresh the list
+    setShowCompletionModal(false);
+    setRefreshTrigger(prev => prev + 1);
+    
+    // Different success message based on whether this is a partial delivery
+    const isPartialDelivery = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
+    const currentBatch = isPartialDelivery ? selectedList.delivery_notes_info.current_delivery : null;
+    const totalBatches = isPartialDelivery ? selectedList.delivery_notes_info.total_deliveries : null;
+    
+    // Show success notification with batch-specific message if applicable
+    if (isPartialDelivery) {
+      toast.success(`Batch ${currentBatch} of ${totalBatches} picked successfully! After this batch is shipped, the next batch will automatically be available for picking.`, {
         autoClose: 5000 // Keep this message visible a bit longer
       });
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
+    } else {
+      toast.success('Picking list completed successfully! A new packing list has been created.', {
+        autoClose: 3000
+      });
     }
-  };
+  } catch (err) {
+    toast.error(`Error: ${err.message}`);
+  }
+};
   
   return (
     <div className="picking">
@@ -286,7 +342,7 @@ const Picking = () => {
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               className="search-input"

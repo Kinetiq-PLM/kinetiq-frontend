@@ -1,208 +1,184 @@
 .accounting-table .table-container {
   width: 100%;
   max-height: 60vh;
-  overflow-y: auto;
   overflow-x: auto;
-  position: relative;
-  border-radius: 10px;
-  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .accounting-table table {
+  min-width: max-content; /* add this */
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
+  table-layout: auto; /* change from fixed if you want natural column width growth */
+  font-family: 'Inter', sans-serif;
 }
+
 
 .accounting-table thead {
   position: sticky;
   top: 0;
-  background-color: #5a9ecf;
-  z-index: 2;
+  background-color: #00a8a8;
+  color: white;
+  z-index: auto;
 }
 
 .accounting-table th,
-td {
+.accounting-table td {
+  /* Removed white-space: nowrap */
+  padding: 0.75rem 1rem;
+  font-size: clamp(12px, 1.2vw, 14px);
   text-align: left;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e2e8f0;
+
+  /* NEW: Allow text to wrap and break */
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 500px; /* Optional: limit cell width */
 }
 
-tr:hover {
-  background-color: #e8e8e8;
-}
 
 .accounting-table th {
-  padding: .8rem;
-  background-color: #00a8a8; 
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-.accounting-table td {
-  padding: .3rem .8rem;
-  font-size: 13px;
-  font-weight: 400;
-  text-wrap: wrap;
-}
-
-.accounting-table th,
-td {
-  white-space: nowrap;
-  word-wrap: break-word;
-  overflow: hidden;
-}
-
-.accounting-table .table-container::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.accounting-table .table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 5px;
-}
-
-.accounting-table .table-container::-webkit-scrollbar-thumb {
-  background: #5a9ecf;
-  border-radius: 5px;
-}
-
-.accounting-table .table-container::-webkit-scrollbar-thumb:hover {
-  background: #4a8bb3;
-}
-
-.accounting-table .table-container {
-  scrollbar-width: thin;
-  scrollbar-color: #5a9ecf #f1f1f1;
-}
-
-.accounting-table .table-container.checkbox-enabled th:first-child,
-.accounting-table .table-container.checkbox-enabled td:first-child {
-  width: 40px;
-
-  text-align: center;
-}
-
-.accounting-table input[type="checkbox"] {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid #a4a4a4;
-  background-color: white;
-  border-radius: 3px;
+.accounting-table tbody th:hover {
+  background-color: #e2e8f0;
   cursor: pointer;
 }
 
-.accounting-table input[type="checkbox"]:checked {
-  background-color: #a4a4a4;
-}
-
-.accounting-table .status-active {
-  background-color: #a0fbcc;
-  color: #065f46;
-  font-weight: bold;
-  border-radius: 30px;
-  width: fit-content;
-  padding: 0.5vh 2vh;
-}
-
-.accounting-table .status-active:hover {
-  background-color: #9aedc2;
-}
-
-.accounting-table .status-inactive {
-  background-color: #ffd0d0;
-  color: #b91c1c;
-  font-weight: bold;
-  border-radius: 30px;
-  width: fit-content;
-  padding: 0.5vh 2vh;
-}
-
-.accounting-table .status-inactive:hover {
-  background-color: #fca5a5;
+.accounting-table td {
+  font-weight: 400;
 }
 
 .accounting-table .selected-row {
-  background-color: #d2f0ff !important;
+  background-color: #e0f7ff !important;
+}
+
+.accounting-table .status-cell {
+  cursor: pointer;
+}
+
+.status-active,
+.status-inactive,
+.status-draft,
+.status-processing,
+.status-completed {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-draft {
+  background-color: #fef9c3;
+  color: #92400e;
+}
+
+.status-processing {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-active:hover {
+  background-color: #bbf7d0;
+}
+
+.status-inactive:hover {
+  background-color: #fecaca;
+}
+
+.status-draft:hover {
+  background-color: #fef08a;
+}
+
+.status-processing:hover {
+  background-color: #bae6fd;
+}
+
+.status-completed:hover {
+  background-color: #bbf7d0;
 }
 
 
-
-@media (min-width: 1025px) and (max-width: 1280px) {
-
-  .accounting-table th {
-    font-size: 12px;
-  }
-
-  .accounting-table td {
-    font-size: 10px;
-    font-weight: 300;
-    text-wrap: wrap;
-  }
+/* Checkbox */
+.accounting-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #94a3b8;
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none;
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-
-  .accounting-table th,
-  td {
-    padding: .5rem;
-  }
-
-  .accounting-table th {
-    font-size: 12px;
-  }
-
-  .accounting-table td {
-    font-size: 10px;
-    font-weight: 300;
-    text-wrap: wrap;
-  }
+.accounting-table input[type="checkbox"]:checked {
+  background-color: #0ea5e9;
+  border-color: #0ea5e9;
 }
+
+.accounting-table .checkbox-enabled th:first-child,
+.accounting-table .checkbox-enabled td:first-child {
+  width: 48px;
+  text-align: center;
+}
+
+/* Scrollbar */
+.accounting-table .table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.accounting-table .table-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.accounting-table .table-container::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+
+.accounting-table .actions-cell {
+  min-width: 80px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.accounting-table .icon-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+
 
 @media (max-width: 768px) {
-
   .accounting-table table {
-    width: 120%;
-    table-layout: auto;
+    width: max-content;
   }
 
   .accounting-table th,
-  td {
-    padding: .3rem;
-  }
-
-  .accounting-table th {
-    font-size: 10px;
-  }
-
   .accounting-table td {
-    font-size: 8px;
-    font-weight: 300;
-    text-wrap: wrap;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .accounting-table table {
-    width: 50rem;
-    table-layout: auto;
-  }
-
-  .accounting-table th,
-  td {
-    padding: .2rem;
-  }
-
-  .accounting-table th {
-    font-size: 8px;
-  }
-
-  .accounting-table td {
-    font-size: 8px;
-    font-weight: 300;
-    text-wrap: wrap;
+    font-size: 12px;
+    padding: 0.5rem;
   }
 }

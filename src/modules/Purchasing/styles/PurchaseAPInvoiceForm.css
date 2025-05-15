@@ -1,6 +1,6 @@
 .purchase-ap-invoice-form .purchase-ap-invoice-scrollable-wrapper {
     width: 100%;
-    max-height: 80vh;
+    max-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;

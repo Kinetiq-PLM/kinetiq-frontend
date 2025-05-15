@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState} from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
+import BillingDetails from "./BillingDetails"
 
 import { GET } from "../../api/api"
 
@@ -19,9 +20,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
   const [billings, setBillings] = useState([]); 
   const [isBillingDropdown, setOpenBillingDD] = useState(false);
   const [isOpenStatusDD, setOpenStatusDD] = useState(false);
-  const [technicians, setTechnicians] = useState([]);
-  const [isTechDropdown, setOpenTechDD] = useState(false);
-  
   const [formData, setFormData] = useState({
     ticketId: "",
     callId: "",
@@ -32,7 +30,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
     description: "",
     reportStatus: "",
     technicianId: technician,
-    // technicianId: 'HR-EMP-2025-8d9f9b'
   })
 
   const fetchTickets = async () => {
@@ -173,30 +170,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
     setOpenStatusDD(false); 
   };
 
-  const fetchTechnicians = async () => {
-    try {
-      const response = await GET("call/calls/technicians/");
-      setTechnicians(response);
-    } catch (error) {
-      console.error("Error fetching technicians:", error);
-    }
-  }
-
-  const handleToggleDropdownTech = () => {
-    if (!isTechDropdown) {
-      fetchTechnicians(); 
-    }
-    setOpenTechDD(!isTechDropdown);
-  };
-
-  const handleSelectTechnician = (technician) => {
-    setFormData((prev) => ({
-      ...prev,
-      technicianId: technician.employee_id || "",
-    }));
-    setOpenTechDD(false);
-  };
-
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -261,6 +234,14 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
     };
   }, []);
   
+  const [selectedBillingId, setSelectedBillingId] = useState("")
+  const [showViewModal, setShowViewModal] = useState(false)
+
+  const handleViewBilling = (billingId) => {
+    setSelectedBillingId(billingId)
+    setShowViewModal(true)
+  }
+
   if (!isOpen) return null
 
   return (
@@ -465,7 +446,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
               </div>
 
               <div className="form-column">
-                <div className="form-group description-group">
+                <div className="form-group description-group-submit">
                   <label htmlFor="description">Description</label>
                   <div className="textarea-container">
                     <textarea
@@ -499,7 +480,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
                     <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
                     {isOpenStatusDD && (
                     <ul className="status-dropdown-list dropdown-list">
-                      {["Draft", "Submitted", "Reviewed"].map((status) => (
+                      {["Draft", "Submitted"].map((status) => (
                         <li key={status} onClick={() => handleSelectStatus(status)}>
                           {status}
                         </li>
@@ -509,41 +490,30 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
                   </div>
                 </div>
                 <div className="form-group">
-                <label htmlFor="technicianId">
-                  Technician ID <span className="required">*</span>
-                </label>
-                <div className="select-wrapper" ref={techRef}>
-                  <input
-                    type="text"
-                    id="technicianId"
-                    readOnly
-                    value={formData.technicianId}
-                    // onChange={(e) => {
-                    //   handleChange(e); 
-                    //   setOpenTechDD(true);
-                    // }}
-                    // onClick={handleToggleDropdownTech}
-                    placeholder="Select technician ID"
-                  />
-                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                  {isTechDropdown && (
-                      <ul className="technician-dropdown-list dropdown-list">
-                        {technicians.length > 0 ? (
-                          technicians
-                            .filter((technician) =>
-                            technician.employee_id.toLowerCase().includes(formData.technicianId.toLowerCase())
-                            )
-                            .map((technician) => (
-                              <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                                {technician.employee_id}
-                              </li>
-                            ))
-                        ) : (
-                          <li>No technicians found</li>
-                        )}
-                      </ul>
-                    )} */}
-                </div>
+                  <label htmlFor="technicianId">
+                    Technician ID <span className="required">*</span>
+                  </label>
+                  <div className="select-wrapper" ref={techRef}>
+                    <input
+                      type="text"
+                      id="technicianId"
+                      readOnly
+                      value={formData.technicianId}
+                      placeholder="Select technician ID"
+                    />
+                  </div>
+              </div>
+              <div className="form-group">
+                  <label htmlFor="billingDetails">
+                    Billing Details
+                  </label>
+                  <button 
+                    className={`update-button ${formData.billingId !== "" ? "clickable" : "disabled"}`}
+                    onClick={() => handleViewBilling(formData.billingId)}
+                    disabled={formData.billingId === ""}  
+                  >
+                    View
+                  </button>
               </div>
               </div>
             </div>
@@ -568,9 +538,15 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
           </button>
         </div>
       </div>
+        {showViewModal && (
+        <BillingDetails
+          isOpen={showViewModal}
+          onClose={() => setShowViewModal(false)}
+          billingId={selectedBillingId}
+        />
+      )}
     </div>
   )
 }
 
 export default SubmitReportModal
-

@@ -24,6 +24,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedOrderNo, setSelectedOrderNo] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
     const [projPro, setProjMats] = useState([]);
+    const [laborCostId, setLaborCostId] = useState([]);
     const [principalItems, setPrincipalItems] = useState([]);
     const [npProducts, setNPProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null);
@@ -82,7 +83,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
         
                 const formattedData = data.map((item) => ({
-                    serviceOrderItemId: item.service_order_item_id,
+                    serviceOrderItemId: item.service_order_id,
                     type: item.type,
                     description: item.description,
                     date: item.date.trim(),
@@ -129,7 +130,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
 
                 const formattedData = data.map((item) => ({
-                    sr_orderID: item.service_order_item_id,
+                    sr_orderID: item.service_order_id,
                     sr_status: item.status,
                 }));
 
@@ -200,6 +201,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 number: index + 1,
+                np_statement_item_id: item.statement_item_id,
                 np_product_id: item.product_id,
                 np_product_name: item.product_name,
                 np_product_description: item.description,
@@ -244,6 +246,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
         const data = await response.json();
         const formattedData = data.map((item) => ({
+            proj_production_order_detail_id: item.production_order_detail_id,
             productioncost: parseFloat(item.cost_of_production),
         }));
 
@@ -265,9 +268,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
         const data = await response.json();
         const formattedData = data.map((item) => ({
+            proj_labor_cost_id: item.labor_cost_id,
             days_worked: item.days_worked,
             daily_rate: parseFloat(item.daily_rate)
         }));
+
+        setLaborCostId(formattedData);
 
         const totalCost = formattedData.reduce(
             (sum, item) => sum + item.days_worked * item.daily_rate,
@@ -291,10 +297,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
-                prin_material_id: item.material_id,
+                prin_service_order_item_id: item.service_order_item_id,
+                prin_material_id: item.item_id,
                 prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
                 prin_quantity: item.item_quantity,
                 prin_itemcost: parseFloat(item.item_price),
                 prin_totalitemcost: parseFloat(item.total_item_price)
@@ -350,18 +356,27 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         const sendProjectData = async () => {
             try {
 
-                const payload = projPro.map(item => ({
+                const payload = projPro.map((item, index) => ({
                     project_id: projectId[0]?.projectID || null,
                     product_mats_id: item.proj_product_mats_id,
                     overall_quantity_of_material: parseInt(item.proj_quantity_required) || 1,
                     cost_per_raw_material: parseFloat(item.proj_cost_per_raw_material) || 1.00,
                     total_cost_of_raw_materials: parseFloat(item.proj_total_cost_of_raw_materials) || 1.00,
-                    production_order_detail_id: null,
-                    labor_cost_id: null,
+                    production_order_detail_id: costOfProduction[index % costOfProduction.length]?.proj_production_order_detail_id || null,
+                    labor_cost_id: laborCostId[index % laborCostId.length]?.proj_labor_cost_id || null,
                     total_cost: parseFloat(totalOrderCost) || 1.00
                 }));
         
                 console.log("Payload:", payload);
+
+                // const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                // const url = URL.createObjectURL(blob);
+                // const link = document.createElement('a');
+                // link.href = url;
+                // link.download = 'proj_payload.json';
+                // document.body.appendChild(link);
+                // link.click();
+                // document.body.removeChild(link);
         
                 const response = await fetch(`${baseurl}/insertbom/`, {
                     method: 'POST',
@@ -393,10 +408,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const sendNonProjectData = async () => {
         try {
 
-            const payload = {
-                order_id: selectedRowData.number,
-                final_price: totalOrderCost
-            };
+            const payload = npProducts.map(item => ({
+                final_price: item.np_totalCost,
+                statement_item_id: item.np_statement_item_id,
+            }));
+
             console.log('Payload:', payload);
             const response = await fetch(`${baseurl}/insert_nonproject/`, {
                 method: 'POST',
@@ -430,11 +446,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const sendPrincipalData = async () => {
         try {
 
-            const payload = {
-                service_order_item_id: selectedRowData.number,
-                item_id: principalItems.prin_item_id,
-                mark_up_price: totalOrderCost
-            };
+            const payload = principalItems.map(item => ({
+                service_order_item_id: item.prin_service_order_item_id,
+                item_id: item.prin_material_id,
+                mark_up_price: item.prin_totalitemcost
+            }));
+
             console.log('Payload:', payload);
             const response = await fetch(`${baseurl}/insert_principal/`, {
                 method: 'POST',
@@ -447,13 +464,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (!response.ok) throw new Error('Failed to submit Principal Item Data');
             const data = await response.json();
             console.log('Success:', data);
-
+            
             const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ service_order_item_id: selectedRowData.number })
+                body: JSON.stringify({ service_order_id: selectedRowData.number })
             });
     
             if (!updateResponse.ok) throw new Error('Failed to update tracking status');
@@ -473,7 +490,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         } else if (isProjectType === "Non Project") {
             total = parseFloat(npOverallProductCost || 0);
         } else if (isProjectType === "Principal Item") {
-            total = parseFloat(prinOverallCost * 1.2);
+            total = parseFloat(prinOverallCost || 0);
         }
 
         total += totalCostOfProduction + totalLaborCost;
@@ -613,7 +630,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
                     <div className="table-header" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8'}}>
-                        {['Order No.', 'Type', 'Details', 'Date'].map((label) => (
+                        {['Order No.', 'Type', 'Details'].map((label) => (
                             <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
@@ -622,7 +639,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details || '—'}</div>
-                            <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
+                            {/* <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div> */}
                         </div>
                     ))}
                 </div>
@@ -641,7 +658,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         { label: 'Order No.', value: selectedRowData.number },
                         { label: 'Type', value: selectedRowData.type },
                         { label: 'Details', value: selectedRowData.details },
-                        { label: 'Date', value: selectedRowData.date },
+                        // { label: 'Date', value: selectedRowData.date },
                     ].map((item) => (
                         <div key={item.label} style={{ flex: '1 1 45%', minWidth: 200}}>
                         <div style={{fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: '500', color: '#585757', marginBottom: 5,}}>
@@ -661,7 +678,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </button>
 
                         <button
-                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
+                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); setSelectedRowData(item);}}
                             style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                             <span>Next</span>
                             <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
@@ -704,7 +721,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div className="table-cell" data-label="Product Description" style={rowCellStyle}><span>{item.product_description}</span></div>
                                     <div className="table-cell" data-label="Quantity" style={rowCellStyle}>{item.qtyProduct} pcs</div>
                                     <div className="table-cell" data-label="Raw Materials" onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
-                                    <div className="table-cell" data-label="Cost" style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    <div className="table-cell" data-label="Cost" style={rowCellStyle}>₱{parseFloat(item.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+
                                     </div>
                                 ))}
                                 </div>
@@ -715,7 +733,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(overallTotalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -773,7 +791,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={rowCellStyle}>{item.np_product_name}</div>
                                     <div style={rowCellStyle}>{item.np_product_description}</div>
                                     <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
-                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString()}</div>
+                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                     </div>
                                 ))}
                                 </div>
@@ -784,7 +802,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(npOverallProductCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -842,8 +860,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={rowCellStyle}>{item.prin_uom}</div>
                                     <div style={rowCellStyle}>{item.prin_item_name}</div>
                                     <div style={rowCellStyle}>{item.prin_quantity}</div>
-                                    <div style={rowCellStyle}>₱{item.prin_itemcost} </div>
-                                    <div style={rowCellStyle}>₱{item.prin_totalitemcost} </div>
+                                    <div style={rowCellStyle}>₱{item.prin_itemcost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </div>
+                                    <div style={rowCellStyle}>₱{item.prin_totalitemcost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </div>
                                     </div>
                                 ))}
                                 </div>
@@ -854,7 +872,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{prinOverallCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(prinOverallCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -901,8 +919,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div className="table-cell" style={rowCellStyle} data-label="Material ID">{item.materialId}</div>
                                 <div className="table-cell" style={rowCellStyle} data-label="Quantity">{item.rmquantity}</div>
                                 <div className="table-cell" style={rowCellStyle} data-label="Units">{item.rmunits}</div>
-                                <div className="table-cell" style={rowCellStyle} data-label="Unit Cost">₱{parseFloat(item.rmunitCost).toFixed(2)}</div>
-                                <div className="table-cell" style={rowCellStyle} data-label="Total Cost">₱{parseFloat(item.rmtotalCost).toFixed(2)}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Unit Cost">₱{parseFloat(item.rmunitCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Total Cost">₱{parseFloat(item.rmtotalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                             </div>
                             ))}
                         </div>
@@ -913,7 +931,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost Of Raw Material:</b></span>
-                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalCostofRawMaterial}</span>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalCostofRawMaterial.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
 
                                     </div>
                                 </div>
@@ -956,7 +974,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{isProjectType === "Project" ? overallTotalCost : isProjectType === "Non Project" ? npOverallProductCost : prinOverallCost}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(isProjectType === "Project" ? overallTotalCost : isProjectType === "Non Project" ? npOverallProductCost : prinOverallCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
                                 </div>
                             </div>
@@ -969,7 +987,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalCostOfProduction}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(totalCostOfProduction).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
                                 </div>
                             </div>
@@ -982,7 +1000,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                     <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalLaborCost}</div>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(totalLaborCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                     </div>
                                 </div>
                             </div>
@@ -992,7 +1010,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Whole Order: </b></span>
-                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{totalOrderCost}</span>
+                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{parseFloat(totalOrderCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>

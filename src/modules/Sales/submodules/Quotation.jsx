@@ -396,7 +396,11 @@ const Quotation = ({
               >
                 Add Item
               </Button>
-              <Button type="outline" onClick={() => handleDelete()}>
+              <Button
+                type="outline"
+                onClick={() => handleDelete()}
+                disabled={!isSalesRep}
+              >
                 Delete Item
               </Button>
             </div>
@@ -428,7 +432,7 @@ const Quotation = ({
                 type="primary"
                 className=""
                 onClick={handleSubmit}
-                disabled={!isSalesRep}
+                disabled={!isSalesRep || products.length === 0}
               >
                 Submit Quotation
               </Button>

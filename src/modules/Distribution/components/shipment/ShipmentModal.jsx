@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, Marker, DirectionsService, DirectionsRenderer, useLoadScript, Polyline } from '@react-google-maps/api';
 import PropTypes from 'prop-types';
+import { 
+  FaBox, 
+  FaBoxes, 
+  FaBoxOpen, 
+  FaWarehouse, 
+  FaMapMarkerAlt, 
+  FaFlag, 
+  FaTruck, 
+  FaFileInvoiceDollar, 
+  FaInfoCircle, 
+  FaExclamationTriangle, 
+  FaRoad, 
+  FaClock, 
+  FaLightbulb, 
+  FaMapMarkedAlt, 
+  FaSave, 
+  FaMoneyBillWave, 
+  FaReceipt, 
+  FaClipboardCheck, 
+  FaExclamationCircle, 
+  FaFileAlt
+} from "react-icons/fa";
 
 const ShipmentModal = ({ 
   shipment, 
@@ -13,63 +35,58 @@ const ShipmentModal = ({
   onShowDeliveryReceipt,
   onReportFailure
 }) => {
-  // Create state for editable fields with proper default values
   const [formData, setFormData] = useState({
     carrier_id: shipment.carrier_id || '',
     weight_kg: shipment.shipping_cost_info?.weight_kg || 0,
     distance_km: shipment.shipping_cost_info?.distance_km || 0,
     cost_per_kg: shipment.shipping_cost_info?.cost_per_kg || 150,
-    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20,
-    additional_cost: shipment.operational_cost_info?.additional_cost || 0,
+    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20
   });
 
-  // Form validation state
   const [formErrors, setFormErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   
-  // Tabs for better organization
   const [activeTab, setActiveTab] = useState('details');
   
   const mapsInitializedRef = useRef(false);
 
-  // Use the useLoadScript hook for Google Maps
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyAby5p9XBIsWC1aoy1_RyHxrnlzHhjIoOU",
     preventGoogleFontsLoading: true
   });
 
-  // Map state
   const [sourceCoordinates, setSourceCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(null);
 
-  // Add state for directions
   const [directions, setDirections] = useState(null);
   const [routeError, setRouteError] = useState(null);
   const [travelMode, setTravelMode] = useState('DRIVING');
   
-  // Add state for route metrics
   const [routeMetrics, setRouteMetrics] = useState({
     distance: 0,
     duration: 0
   });
 
-  // Map styles and settings
+  const [warehouseCoordinates, setWarehouseCoordinates] = useState([]);
+  const [multipleRoutes, setMultipleRoutes] = useState([]);
+
+  // Add this new state to track if distance was auto-calculated
+  const [isDistanceAutoSet, setIsDistanceAutoSet] = useState(false);
+
   const mapContainerStyle = {
     width: '100%',
     height: '300px',
     borderRadius: '4px'
   };
 
-  // Philippines center (default)
   const defaultCenter = {
     lat: 14.5995,
     lng: 120.9842
   };
 
-  // Geocode both source and destination addresses
   useEffect(() => {
     if (!isLoaded || mapsInitializedRef.current) return;
     
@@ -91,7 +108,9 @@ const ShipmentModal = ({
                 lat: location.lat(),
                 lng: location.lng()
               };
-              setCoordinates(coordinates);
+              if (setCoordinates) {
+                setCoordinates(coordinates);
+              }
               resolve(coordinates);
             } else {
               console.error(`Geocoding failed for ${locationString}: ${status}`);
@@ -109,14 +128,7 @@ const ShipmentModal = ({
       try {
         let sourceCoords = null;
         let destCoords = null;
-        
-        if (shipment.source_location) {
-          try {
-            sourceCoords = await geocodeLocation(shipment.source_location, setSourceCoordinates);
-          } catch (error) {
-            console.error("Source location geocoding failed:", error);
-          }
-        }
+        const warehouseCoords = [];
         
         if (shipment.destination_location) {
           try {
@@ -126,9 +138,129 @@ const ShipmentModal = ({
           }
         }
         
-        // Get directions if both coordinates are available - use DRIVING as default mode
-        if (sourceCoords && destCoords) {
-          fetchDirections(sourceCoords, destCoords, 'DRIVING');
+        if (shipment.source_warehouses && shipment.source_warehouses.length > 0) {
+          const warehouses = [];
+          
+          for (const warehouse of shipment.source_warehouses) {
+            try {
+              const coords = await geocodeLocation(warehouse.location, null);
+              if (coords) {
+                warehouses.push({
+                  id: warehouse.id,
+                  location: warehouse.location,
+                  name: warehouse.name,
+                  coordinates: coords
+                });
+                warehouseCoords.push(coords);
+              }
+            } catch (error) {
+              console.error(`Geocoding failed for warehouse ${warehouse.location}:`, error);
+            }
+          }
+          
+          setWarehouseCoordinates(warehouses);
+          
+          if (warehouses.length > 0) {
+            sourceCoords = warehouses[0].coordinates;
+            setSourceCoordinates(sourceCoords);
+          }
+        } 
+        else if (shipment.items_details && shipment.items_details.length > 0) {
+          const uniqueWarehouses = {};
+          
+          for (const item of shipment.items_details) {
+            if (item.warehouse_name && !uniqueWarehouses[item.warehouse_id]) {
+              uniqueWarehouses[item.warehouse_id] = {
+                id: item.warehouse_id,
+                name: item.warehouse_name,
+                location: item.warehouse_name
+              };
+            }
+          }
+          
+          const warehouses = [];
+          
+          for (const warehouseId in uniqueWarehouses) {
+            const warehouse = uniqueWarehouses[warehouseId];
+            try {
+              const coords = await geocodeLocation(warehouse.location, null);
+              if (coords) {
+                warehouses.push({
+                  ...warehouse,
+                  coordinates: coords
+                });
+                warehouseCoords.push(coords);
+              }
+            } catch (error) {
+              console.error(`Geocoding failed for warehouse ${warehouse.location}:`, error);
+            }
+          }
+          
+          setWarehouseCoordinates(warehouses);
+          
+          if (warehouses.length > 0) {
+            sourceCoords = warehouses[0].coordinates;
+            setSourceCoordinates(sourceCoords);
+          }
+        } 
+        else if (shipment.source_location) {
+          try {
+            sourceCoords = await geocodeLocation(shipment.source_location, setSourceCoordinates);
+            if (sourceCoords) {
+              warehouseCoords.push(sourceCoords);
+              setWarehouseCoordinates([{
+                location: shipment.source_location,
+                coordinates: sourceCoords
+              }]);
+            }
+          } catch (error) {
+            console.error("Source location geocoding failed:", error);
+          }
+        }
+        
+        if (destCoords && warehouseCoords.length > 0) {
+          if (warehouseCoords.length > 1) {
+            const routePromises = warehouseCoords.map(wCoords => 
+              fetchDirectionsPromise(wCoords, destCoords, 'DRIVING')
+            );
+            
+            Promise.allSettled(routePromises).then(results => {
+              const validRoutes = results
+                .filter(r => r.status === 'fulfilled')
+                .map(r => r.value);
+              
+              let totalDistance = 0;
+              let maxDuration = 0;
+              
+              validRoutes.forEach(route => {
+                if (route.routes && route.routes[0] && route.routes[0].legs && route.routes[0].legs[0]) {
+                  const leg = route.routes[0].legs[0];
+                  totalDistance += leg.distance.value / 1000;
+                  const routeDuration = leg.duration.value / 3600;
+                  maxDuration = Math.max(maxDuration, routeDuration);
+                }
+              });
+              
+              setRouteMetrics({
+                distance: totalDistance.toFixed(2),
+                duration: maxDuration.toFixed(1)
+              });
+              
+              // Update to set isDistanceAutoSet flag
+              if (parseFloat(formData.distance_km) === 0) {
+                setFormData(prev => ({
+                  ...prev,
+                  distance_km: totalDistance.toFixed(2)
+                }));
+                setIsDistanceAutoSet(true);
+              }
+              
+              setMultipleRoutes(validRoutes);
+              setMapLoading(false);
+            });
+          } else {
+            fetchDirections(sourceCoords, destCoords, 'DRIVING');
+          }
         } else {
           setMapLoading(false);
         }
@@ -141,9 +273,8 @@ const ShipmentModal = ({
     };
     
     initializeLocations();
-  }, [shipment.source_location, shipment.destination_location, isLoaded]);
+  }, [shipment, isLoaded]);
 
-  // Add function to fetch directions
   const fetchDirections = useCallback((origin, destination, mode) => {
     if (!window.google || !origin || !destination) return;
     
@@ -155,25 +286,20 @@ const ShipmentModal = ({
         origin: new window.google.maps.LatLng(origin.lat, origin.lng),
         destination: new window.google.maps.LatLng(destination.lat, destination.lng),
         travelMode: window.google.maps.TravelMode[mode],
-        // Optimize for shipping - avoid tolls, optimize waypoints, etc.
-        avoidFerries: false, // Allow ferries for shipping
-        avoidHighways: false, // Allow highways for shipping
-        avoidTolls: false, // Allow toll roads for shipping
-        optimizeWaypoints: true // Optimize the route
+        avoidFerries: false,
+        avoidHighways: false,
+        avoidTolls: false,
+        optimizeWaypoints: true
       },
       (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           setDirections(result);
           
-          // Update route metrics
           const route = result.routes[0];
           if (route && route.legs && route.legs[0]) {
             const leg = route.legs[0];
             
-            // Get distance in kilometers
             const distanceInKm = leg.distance.value / 1000;
-            
-            // Get duration in hours
             const durationInHours = leg.duration.value / 3600;
             
             setRouteMetrics({
@@ -181,12 +307,13 @@ const ShipmentModal = ({
               duration: durationInHours.toFixed(1)
             });
             
-            // Update the distance in formData (only if it was 0)
+            // Update to set isDistanceAutoSet flag
             if (parseFloat(formData.distance_km) === 0) {
               setFormData(prev => ({
                 ...prev,
                 distance_km: distanceInKm.toFixed(2)
               }));
+              setIsDistanceAutoSet(true);
             }
           }
           
@@ -195,34 +322,33 @@ const ShipmentModal = ({
         } else {
           console.warn(`Directions request failed: ${status}`);
           
-          // Calculate straight-line distance as fallback
           const straightLineDistance = calculateHaversineDistance(origin, destination);
           
           setRouteMetrics({
             distance: straightLineDistance.toFixed(2),
-            duration: (straightLineDistance / 50).toFixed(1) // Rough estimate
+            duration: (straightLineDistance / 50).toFixed(1)
           });
           
-          // Update the distance in formData if it was 0
+          // Update to set isDistanceAutoSet flag for straight line distance too
           if (parseFloat(formData.distance_km) === 0) {
             setFormData(prev => ({
               ...prev,
               distance_km: straightLineDistance.toFixed(2)
             }));
+            setIsDistanceAutoSet(true);
           }
           
           setRouteError(`Unable to calculate route: ${status}. Using straight-line distance instead.`);
-          setDirections(null); // Clear directions to fall back to Polyline
+          setDirections(null);
           setMapLoading(false);
         }
       }
     );
   }, [formData.distance_km]);
   
-  // Add a helper function to calculate straight-line distance using the Haversine formula
   const calculateHaversineDistance = (point1, point2) => {
     const toRad = value => value * Math.PI / 180;
-    const R = 6371; // Earth's radius in km
+    const R = 6371;
     
     const dLat = toRad(point2.lat - point1.lat);
     const dLng = toRad(point2.lng - point1.lng);
@@ -236,21 +362,48 @@ const ShipmentModal = ({
     return R * c;
   };
 
-  // if need travel mode
-  // // Add handler for travel mode change
-  // const handleTravelModeChange = (mode) => {
-  //   setTravelMode(mode);
-  //   if (sourceCoordinates && destinationCoordinates) {
-  //     setMapLoading(true);
-  //     fetchDirections(sourceCoordinates, destinationCoordinates, mode);
-  //   }
-  // };
+  const fetchDirectionsPromise = (origin, destination, mode) => {
+    return new Promise((resolve, reject) => {
+      if (!window.google || !origin || !destination) {
+        reject("Google Maps not loaded or invalid coordinates");
+        return;
+      }
+      
+      const directionsService = new window.google.maps.DirectionsService();
+      
+      directionsService.route(
+        {
+          origin: new window.google.maps.LatLng(origin.lat, origin.lng),
+          destination: new window.google.maps.LatLng(destination.lat, destination.lng),
+          travelMode: window.google.maps.TravelMode[mode],
+          avoidFerries: false,
+          avoidHighways: false,
+          avoidTolls: false,
+          optimizeWaypoints: true
+        },
+        (result, status) => {
+          if (status === window.google.maps.DirectionsStatus.OK) {
+            resolve(result);
+          } else {
+            reject(status);
+          }
+        }
+      );
+    });
+  };
 
-  // Handle map load
+  const getRouteColor = (index) => {
+    const colors = ["#0aaceb","#00a8a8", "#ff7043", "#5c6bc0", "#66bb6a", "#ffa726"];
+    return colors[index % colors.length];
+  };
+
   const onMapLoad = useCallback((map) => {
-    // Set appropriate center and zoom based on available coordinates
-    if (destinationCoordinates && sourceCoordinates) {
-      // Create bounds that include both points
+    if (warehouseCoordinates.length > 0 && destinationCoordinates) {
+      const bounds = new window.google.maps.LatLngBounds();
+      warehouseCoordinates.forEach(warehouse => bounds.extend(warehouse.coordinates));
+      bounds.extend(destinationCoordinates);
+      map.fitBounds(bounds);
+    } else if (destinationCoordinates && sourceCoordinates) {
       const bounds = new window.google.maps.LatLngBounds();
       bounds.extend(sourceCoordinates);
       bounds.extend(destinationCoordinates);
@@ -262,9 +415,8 @@ const ShipmentModal = ({
     }
     
     setMapLoading(false);
-  }, [sourceCoordinates, destinationCoordinates]);
+  }, [sourceCoordinates, destinationCoordinates, warehouseCoordinates]);
 
-  // Calculate shipping cost
   const calculateShippingCost = () => {
     const weight = parseFloat(formData.weight_kg) || 0;
     const distance = parseFloat(formData.distance_km) || 0;
@@ -274,16 +426,10 @@ const ShipmentModal = ({
     return (weight * costPerKg) + (distance * costPerKm);
   };
   
-  // Calculate total operational cost
   const calculateOperationalCost = () => {
-    const additionalCost = parseFloat(formData.additional_cost) || 0;
-    const shippingCost = calculateShippingCost();
-    const packingCost = shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0;
-    
-    return additionalCost + shippingCost + packingCost;
+    return calculateShippingCost();
   };
   
-  // Format currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PH', {
       style: 'currency',
@@ -292,7 +438,6 @@ const ShipmentModal = ({
     }).format(amount);
   };
   
-  // Validate form fields
   const validateField = (name, value) => {
     switch (name) {
       case 'weight_kg':
@@ -312,7 +457,6 @@ const ShipmentModal = ({
   };
   
   const ErrorSummary = () => {
-    // Only show if we have errors and user has attempted to submit
     if (Object.keys(formErrors).length === 0 || !hasAttemptedSubmit) return null;
     
     return (
@@ -325,7 +469,7 @@ const ShipmentModal = ({
         color: '#dc3545'
       }}>
         <div style={{ fontWeight: '500', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
-          <span style={{ marginRight: '0.5rem' }}>⚠️</span>
+          <FaExclamationTriangle style={{ marginRight: '0.5rem' }} />
           Please fix the following issues:
         </div>
         <ul style={{ margin: '0', paddingLeft: '1.5rem' }}>
@@ -338,11 +482,9 @@ const ShipmentModal = ({
     );
   };  
 
-  // Handle input changes with validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Apply limits for weight and distance
     let finalValue = value;
     if (name === 'weight_kg' && parseFloat(value) > 2000) {
       finalValue = '2000';
@@ -359,7 +501,6 @@ const ShipmentModal = ({
     
     setIsDirty(true);
     
-    // Validate the field
     const error = validateField(name, finalValue);
     setFormErrors(prev => ({
       ...prev,
@@ -367,11 +508,9 @@ const ShipmentModal = ({
     }));
   };
   
-  // Validate entire form before submission
   const validateForm = () => {
     const errors = {};
     
-    // Check required fields
     if (!formData.carrier_id) {
       errors.carrier_id = 'Please select a carrier';
     }
@@ -389,30 +528,23 @@ const ShipmentModal = ({
     return Object.keys(errors).length === 0;
   };
   
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Prevent saving if shipment is not editable
     if (!isShipmentEditable) {
       return;
     }
     
-    // Validate form
     if (!validateForm()) {
-      // Show error toast or notification
       return;
     }
     
-    // Prepare updates object
     const updates = {};
     
-    // Only include fields that have changed
     if (formData.carrier_id !== shipment.carrier_id) {
       updates.carrier_id = formData.carrier_id;
     }
     
-    // Check if shipping cost fields have changed
     const shippingCostChanged = 
       formData.weight_kg != shipment.shipping_cost_info?.weight_kg ||
       formData.distance_km != shipment.shipping_cost_info?.distance_km ||
@@ -420,38 +552,33 @@ const ShipmentModal = ({
       formData.cost_per_km != shipment.shipping_cost_info?.cost_per_km;
     
     if (shippingCostChanged) {
+      const shippingCost = calculateShippingCost();
+      
       updates.shipping_cost = {
-        weight_kg: parseFloat(formData.weight_kg),
-        distance_km: parseFloat(formData.distance_km),
-        cost_per_kg: parseFloat(formData.cost_per_kg),
-        cost_per_km: parseFloat(formData.cost_per_km),
-        total_shipping_cost: calculateShippingCost()
+        weight_kg: parseFloat(formData.weight_kg) || 0,
+        distance_km: parseFloat(formData.distance_km) || 0,
+        cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
+        cost_per_km: parseFloat(formData.cost_per_km) || 0,
+        total_shipping_cost: shippingCost
+      };
+      
+      updates.operational_cost = {
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       };
     }
     
-    // Check if additional cost has changed
-    if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
-      updates.additional_cost = parseFloat(formData.additional_cost);
-    }
-    
-    // Save changes
     onSave(shipment, updates);
     
-    // Reset dirty flag
     setIsDirty(false);
   };
   
-  // Handle mark as shipped
   const handleShip = () => {
-    // Mark that user attempted to submit
     setHasAttemptedSubmit(true);
     
-    // Validate form first
     if (!validateForm()) {
-      // Show error message and scroll to the error summary
       toast.error('Please fix the validation errors before shipping');
       
-      // Switch to the appropriate tab based on errors
       if (formErrors.carrier_id) {
         setActiveTab('details');
       } else if (formErrors.weight_kg || formErrors.distance_km) {
@@ -461,6 +588,8 @@ const ShipmentModal = ({
       return;
     }
     
+    const shippingCost = calculateShippingCost();
+    
     onShip(shipment, {
       carrier_id: formData.carrier_id,
       shipping_cost_info: {
@@ -468,19 +597,17 @@ const ShipmentModal = ({
         distance_km: parseFloat(formData.distance_km) || 0,
         cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
         cost_per_km: parseFloat(formData.cost_per_km) || 0,
-        total_shipping_cost: calculateShippingCost()
+        total_shipping_cost: shippingCost
       },
       operational_cost_info: {
-        additional_cost: parseFloat(formData.additional_cost) || 0,
-        total_operational_cost: calculateOperationalCost()
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       }
     });
   };
   
-  // Handle modal close with unsaved changes warning
   const handleClose = () => {
     if (isDirty) {
-      // Show a more detailed confirmation dialog
       const message = Object.keys(formErrors).length > 0
         ? 'You have unsaved changes with validation errors. If you close now, your changes will be lost.'
         : 'You have unsaved changes. Would you like to save before closing?';
@@ -493,7 +620,6 @@ const ShipmentModal = ({
     }
   };
   
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'Not Set';
     
@@ -509,82 +635,61 @@ const ShipmentModal = ({
     });
   };
   
-  // Get carrier name by ID
   const getCarrierName = (carrierId) => {
     const carrier = carriers.find(c => c.carrier_id === carrierId);
     return carrier ? carrier.carrier_name : 'Not Assigned';
   };
 
-  // Determine if shipment can be marked as shipped
   const canBeShipped = shipment.shipment_status === 'Pending';
-  
-  // Determine if delivery receipt can be accessed
   const hasDeliveryReceipt = shipment.shipment_status === 'Shipped' || shipment.shipment_status === 'Delivered';
-  
-  // Determine if shipment can be marked as failed
   const canBeFailed = shipment.shipment_status === 'Pending' || shipment.shipment_status === 'Shipped';
-  
-  // Determine if shipment is editable (only Pending shipments can be edited)
   const isShipmentEditable = shipment.shipment_status === 'Pending';
-  
-  // Check if shipping details are valid
-  const hasValidShippingDetails = 
-    parseFloat(formData.weight_kg) > 0 && 
-    parseFloat(formData.distance_km) > 0;
-  
-  // Combined validation for action buttons
+  const hasValidShippingDetails = parseFloat(formData.weight_kg) > 0 && parseFloat(formData.distance_km) > 0;
   const isActionDisabled = !formData.carrier_id || !hasValidShippingDetails;
-  
-  // Determine if we should show the map section
   const shouldShowMap = shipment.destination_location || shipment.source_location;
+  const polylinePath = sourceCoordinates && destinationCoordinates ? [sourceCoordinates, destinationCoordinates] : [];
   
-  // Create polyline path (straight line between source and destination)
-  const polylinePath = sourceCoordinates && destinationCoordinates ? 
-    [sourceCoordinates, destinationCoordinates] : [];
-  
-  // Polyline options for the route line
   const polylineOptions = {
-    strokeColor: "#4285F4", // Google Maps blue
+    strokeColor: "#4285F4",
     strokeOpacity: 0.8,
     strokeWeight: 5,
-    geodesic: true, // Follow the curvature of the earth
+    geodesic: true,
   };
   
-  // Get status indicator class and icon
   const getStatusInfo = (status) => {
     switch (status) {
       case 'Pending':
         return { 
           class: 'status-pending', 
-          icon: '⦿', 
+          icon: <FaExclamationCircle />, 
           color: '#6c757d',
           bgColor: 'rgba(108, 117, 125, 0.1)'
         };
       case 'Shipped':
         return { 
           class: 'status-shipped', 
-          icon: '⦿', 
+          icon: <FaTruck />, 
           color: '#007bff',
           bgColor: 'rgba(0, 123, 255, 0.1)'
         };
       case 'Delivered':
         return { 
           class: 'status-delivered', 
-          icon: '⦿', 
+          icon: <FaClipboardCheck />, 
           color: '#28a745',
           bgColor: 'rgba(40, 167, 69, 0.1)'
         };
       case 'Failed':
         return { 
           class: 'status-failed', 
-          icon: '⦿', 
+          icon: <FaExclamationTriangle />, 
           color: '#dc3545',
           bgColor: 'rgba(220, 53, 69, 0.1)'
         };
       default:
         return { 
           class: '', 
-          icon: '⦿', 
+          icon: <FaInfoCircle />, 
           color: '#6c757d',
           bgColor: 'rgba(108, 117, 125, 0.1)'
         };
@@ -593,6 +698,92 @@ const ShipmentModal = ({
   
   const statusInfo = getStatusInfo(shipment.shipment_status);
   
+  const renderItemsByWarehouses = () => {
+    const warehouseGroups = [];
+    const warehouseMap = {};
+    let totalQuantity = 0;
+    
+    if (shipment?.items_details?.length) {
+      shipment.items_details.forEach(item => {
+        const warehouseId = item.warehouse_id || 'unknown';
+        totalQuantity += parseInt(item.quantity) || 0;
+        
+        if (!warehouseMap[warehouseId]) {
+          const group = {
+            warehouseId,
+            warehouseName: item.warehouse_name || 'Unknown Warehouse',
+            items: [],
+            totalQuantity: 0
+          };
+          warehouseMap[warehouseId] = group;
+          warehouseGroups.push(group);
+        }
+        warehouseMap[warehouseId].items.push(item);
+        warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
+      });
+    }
+  
+    const hasMultipleWarehouses = warehouseGroups.length > 1;
+  
+    return (
+      <>
+        <h4 className="section-title">
+          <FaBoxOpen className="section-icon" style={{marginRight: '8px'}} />
+          Shipment Items ({shipment?.items_details?.length || 0} items, {totalQuantity} units)
+        </h4>
+  
+        {warehouseGroups.length > 0 ? (
+          warehouseGroups.map((group, groupIndex) => (
+            <div key={group.warehouseId} className="warehouse-group">
+              <h5 className="warehouse-name">
+                <FaWarehouse className="warehouse-icon" style={{marginRight: '8px'}} /> {group.warehouseName}
+                <span className="warehouse-items-count">
+                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, {group.totalQuantity} units
+                </span>
+              </h5>
+              
+              <div className="items-table-container">
+                <table className="items-table">
+                  <thead>
+                    <tr>
+                      <th>Item Name</th>
+                      <th>Item Number</th>
+                      <th>Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.items.map((item, itemIndex) => (
+                      <tr key={itemIndex}>
+                        <td>{item.item_name}</td>
+                        <td>{item.item_no || '-'}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+            </div>
+          ))
+        ) : (
+          <div className="items-table-container empty-state">
+            <div className="no-items-message">
+              <FaBoxOpen className="empty-icon" style={{fontSize: '2rem', marginBottom: '1rem', color: '#dee2e6'}} />
+              <p>No item details available for this shipment</p>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // Add a function to manually override the auto-set distance
+  const handleOverrideDistance = () => {
+    if (window.confirm("Are you sure you want to override the calculated distance? The automatically calculated distance is based on optimal routing.")) {
+      setIsDistanceAutoSet(false);
+    }
+  };
+
   return (
     <div className="shipment modal-overlay">
       <div className="shipment-modal">
@@ -615,7 +806,7 @@ const ShipmentModal = ({
             <span 
               className={`status-badge ${statusInfo.class}`}
               style={{
-                display: 'inline-block',
+                // display: 'inline-block',
                 padding: '0.25rem 0.5rem',
                 borderRadius: '4px',
                 fontSize: '0.8rem',
@@ -632,7 +823,6 @@ const ShipmentModal = ({
           <button className="close-button" onClick={handleClose}>&times;</button>
         </div>
         
-        {/* Tab Navigation */}
         <div className="tab-navigation">
           <button 
             className={`tab ${activeTab === 'details' ? 'active' : ''}`}
@@ -641,29 +831,38 @@ const ShipmentModal = ({
             Shipment Details
           </button>
           <button 
+            className={`tab ${activeTab === 'items' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('items')}
+          >
+            {/* <FaBoxOpen style={{marginRight: '6px', fontSize: '0.9rem'}} /> */}
+            Items ({shipment?.items_details?.length || 0})
+          </button>
+          <button 
             className={`tab ${activeTab === 'route' ? 'active' : ''}`}
             onClick={() => setActiveTab('route')}
             disabled={!shouldShowMap}
           >
+            {/* <FaMapMarkedAlt style={{marginRight: '6px', fontSize: '0.9rem'}} /> */}
             Route Map
           </button>
           <button 
             className={`tab ${activeTab === 'costs' ? 'active' : ''}`}
             onClick={() => setActiveTab('costs')}
           >
+            {/* <FaMoneyBillWave style={{marginRight: '6px', fontSize: '0.9rem'}} /> */}
             Shipping Costs
           </button>
           <button 
             className={`tab ${activeTab === 'related' ? 'active' : ''}`}
             onClick={() => setActiveTab('related')}
           >
+            {/* <FaFileAlt style={{marginRight: '6px', fontSize: '0.9rem'}} /> */}
             Related Info
           </button>
         </div>
         
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-            {/* Display message if shipment is not editable */}
             {!isShipmentEditable && (
               <div className="info-message" style={{ 
                 margin: '0 0 1rem', 
@@ -684,7 +883,7 @@ const ShipmentModal = ({
                   justifyContent: 'center',
                   marginRight: '0.75rem'
                 }}>
-                  <span style={{ fontSize: '0.8rem' }}>i</span>
+                  <FaInfoCircle style={{fontSize: '0.8rem'}} />
                 </div>
                 <span style={{ color: statusInfo.color }}>
                   This shipment has been processed and cannot be edited. You can only view details or manage the delivery receipt.
@@ -692,7 +891,6 @@ const ShipmentModal = ({
               </div>
             )}
             
-            {/* Tab Content */}
             {activeTab === 'details' && (
               <div className="tab-content">
                 {hasAttemptedSubmit && formErrors.carrier_id && <ErrorSummary />}
@@ -738,7 +936,7 @@ const ShipmentModal = ({
                         alignItems: 'center',
                         color: '#495057'
                       }}>
-                        <span style={{ marginRight: '0.5rem' }}>📍</span>
+                        <FaMapMarkerAlt style={{ marginRight: '0.5rem', color: '#00a8a8' }} />
                         Source Location
                       </div>
                       <div style={{ fontSize: '0.9rem' }}>
@@ -758,7 +956,7 @@ const ShipmentModal = ({
                         alignItems: 'center',
                         color: '#495057'
                       }}>
-                        <span style={{ marginRight: '0.5rem' }}>🏁</span>
+                        <FaFlag style={{ marginRight: '0.5rem', color: '#dc3545' }} />
                         Destination
                       </div>
                       <div style={{ fontSize: '0.9rem' }}>
@@ -768,7 +966,6 @@ const ShipmentModal = ({
                   </div>
                 </div>
                 
-                {/* Carrier Selection Section */}
                 <div className="edit-section">
                   <h4>Carrier Information</h4>
                   <div className="carrier-selection">
@@ -793,12 +990,11 @@ const ShipmentModal = ({
                   {formErrors.carrier_id && (
                     <p className="error-message" style={{ 
                       color: '#dc3545', 
-                      // marginTop: '0.5rem', 
                       fontSize: '0.8rem',
                       display: 'flex',
                       alignItems: 'center' 
                     }}>
-                      <span style={{ marginRight: '0.25rem' }}>⚠️</span>
+                      <FaExclamationTriangle style={{ marginRight: '0.25rem' }} />
                       {formErrors.carrier_id}
                     </p>
                   )}
@@ -811,8 +1007,6 @@ const ShipmentModal = ({
                 {shouldShowMap ? (
                   <div className="info-section">
                     <h4>Shipping Route</h4>
-                    
-                    {/* Remove travel mode selector */}
                     
                     <div className="route-summary" style={{ 
                       display: 'flex', 
@@ -843,7 +1037,7 @@ const ShipmentModal = ({
                           display: 'flex',
                           alignItems: 'center'
                         }}>
-                          <span style={{ marginRight: '0.5rem' }}>🛣️</span>
+                          <FaRoad style={{ marginRight: '0.5rem', color: '#007bff' }} />
                           {routeMetrics.distance > 0 ? `${routeMetrics.distance} km` : `${formData.distance_km} km`}
                         </div>
                       </div>
@@ -871,84 +1065,83 @@ const ShipmentModal = ({
                           display: 'flex',
                           alignItems: 'center'
                         }}>
-                          <span style={{ marginRight: '0.5rem' }}>⏱️</span>
+                          <FaClock style={{ marginRight: '0.5rem', color: '#007bff' }} />
                           {routeMetrics.duration > 0 ? `${routeMetrics.duration} hours` : `${Math.ceil(formData.distance_km / 50)} hours`}
                         </div>
                       </div>
                     </div>
                     
                     <div className="map-container" style={{ position: 'relative' }}>
-                      {isLoaded ? (
-                        <GoogleMap
-                          mapContainerStyle={mapContainerStyle}
-                          center={destinationCoordinates || sourceCoordinates || defaultCenter}
-                          zoom={15}
-                          onLoad={onMapLoad}
-                          options={{
-                            fullscreenControl: true,
-                            streetViewControl: false,
-                            mapTypeControl: true,
-                            zoomControl: true
-                          }}
-                        >
-                          {/* Use DirectionsRenderer instead of Polyline when directions are available */}
-                          {directions && (
-                            <DirectionsRenderer
-                              directions={directions}
-                              options={{
-                                suppressMarkers: true, // We'll add our own custom markers
-                                polylineOptions: {
-                                  strokeColor: "#4285F4",
-                                  strokeOpacity: 0.8,
-                                  strokeWeight: 5
-                                }
-                              }}
-                            />
-                          )}
-                          
-                          {/* Fallback to Polyline if directions aren't available */}
-                          {!directions && sourceCoordinates && destinationCoordinates && (
-                            <Polyline
-                              path={[sourceCoordinates, destinationCoordinates]}
-                              options={polylineOptions}
-                            />
-                          )}
-                          
-                          {/* Render source marker */}
-                          {sourceCoordinates && (
-                            <Marker
-                              position={sourceCoordinates}
-                              icon={{
-                                url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
-                                labelOrigin: new window.google.maps.Point(15, -10)
-                              }}
-                              label={{
-                                text: "Source",
-                                color: "#333",
-                                fontSize: "12px",
-                                fontWeight: "bold"
-                              }}
-                            />
-                          )}
-                          
-                          {/* Render destination marker */}
-                          {destinationCoordinates && (
-                            <Marker
-                              position={destinationCoordinates}
-                              icon={{
-                                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                                labelOrigin: new window.google.maps.Point(15, -10)
-                              }}
-                              label={{
-                                text: "Destination",
-                                color: "#333",
-                                fontSize: "12px",
-                                fontWeight: "bold"
-                              }}
-                            />
-                          )}
-                        </GoogleMap>
-                      ) : (
+                    {isLoaded ? (
+                          <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={destinationCoordinates || sourceCoordinates || defaultCenter}
+                            zoom={14}
+                            onLoad={onMapLoad}
+                          >
+                            {warehouseCoordinates.length > 0 && warehouseCoordinates.map((warehouse, index) => (
+                              <Marker
+                                key={`warehouse-${warehouse.id || index}`}
+                                position={warehouse.coordinates}
+                                icon={{
+                                  url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                                  labelOrigin: new window.google.maps.Point(15, -10)
+                                }}
+                                label={{
+                                  text: `Warehouse ${index + 1}`,
+                                  color: "#333",
+                                  fontSize: "12px",
+                                  fontWeight: "bold"
+                                }}
+                              />
+                            ))}
+                            
+                            {destinationCoordinates && (
+                              <Marker
+                                position={destinationCoordinates}
+                                icon={{
+                                  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                                  labelOrigin: new window.google.maps.Point(15, -10)
+                                }}
+                                label={{
+                                  text: "Destination",
+                                  color: "#333",
+                                  fontSize: "12px",
+                                  fontWeight: "bold"
+                                }}
+                              />
+                            )}
+                            
+                            {multipleRoutes.length > 0 && multipleRoutes.map((route, index) => (
+                              <DirectionsRenderer
+                                key={`route-${index}`}
+                                directions={route}
+                                options={{
+                                  suppressMarkers: true,
+                                  polylineOptions: {
+                                    strokeColor: getRouteColor(index),
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 5,
+                                  }
+                                }}
+                              />
+                            ))}
+                            
+                            {directions && multipleRoutes.length === 0 && (
+                              <DirectionsRenderer
+                                directions={directions}
+                                options={{
+                                  suppressMarkers: true,
+                                  polylineOptions: {
+                                    strokeColor: "#0f53ff",
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 5,
+                                  }
+                                }}
+                              />
+                            )}
+                          </GoogleMap>
+                        ) : (
                         <div className="map-placeholder" style={{ 
                           height: '300px', 
                           display: 'flex', 
@@ -959,13 +1152,12 @@ const ShipmentModal = ({
                           border: '1px solid #e0e0e0'
                         }}>
                           <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🗺️</div>
+                            <FaMapMarkedAlt style={{ fontSize: '2rem', marginBottom: '0.5rem', color: '#6c757d' }} />
                             <div>Loading Google Maps...</div>
                           </div>
                         </div>
                       )}
                       
-                      {/* Show route error if any */}
                       {routeError && (
                         <div className="route-error" style={{ 
                           position: 'absolute', 
@@ -981,7 +1173,7 @@ const ShipmentModal = ({
                           alignItems: 'center',
                           fontSize: '0.85rem'
                         }}>
-                          <span style={{ marginRight: '0.5rem' }}>⚠️</span>
+                          <FaExclamationTriangle style={{ marginRight: '0.5rem' }} />
                           {routeError}
                         </div>
                       )}
@@ -1027,13 +1219,12 @@ const ShipmentModal = ({
                           display: 'flex',
                           alignItems: 'center'
                         }}>
-                          <span style={{ marginRight: '0.5rem' }}>⚠️</span>
+                          <FaExclamationTriangle style={{ marginRight: '0.5rem' }} />
                           {mapError || "Failed to load Google Maps"}
                         </div>
                       )}
                     </div>
                     
-                    {/* Update the map tip to be more shipping-focused */}
                     <div className="map-tip" style={{ 
                       marginTop: '0.75rem',
                       padding: '0.5rem',
@@ -1044,7 +1235,7 @@ const ShipmentModal = ({
                       display: 'flex',
                       alignItems: 'center'
                     }}>
-                      <span style={{ marginRight: '0.5rem' }}>💡</span>
+                      <FaLightbulb style={{ marginRight: '0.5rem' }} />
                       <span>The route shown represents the optimal shipping path. Actual routes may vary depending on logistics constraints and carrier capabilities.</span>
                     </div>
                   </div>
@@ -1056,7 +1247,7 @@ const ShipmentModal = ({
                     borderRadius: '4px',
                     color: '#666'
                   }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🗺️</div>
+                    <FaMapMarkedAlt style={{ fontSize: '3rem', marginBottom: '1rem', color: '#6c757d' }} />
                     <h4 style={{ marginBottom: '0.5rem' }}>No Route Data Available</h4>
                     <p>Source or destination location information is missing.</p>
                   </div>
@@ -1067,7 +1258,6 @@ const ShipmentModal = ({
             {activeTab === 'costs' && (
               <div className="tab-content">
                 {hasAttemptedSubmit && (formErrors.weight_kg || formErrors.distance_km) && <ErrorSummary />}
-                {/* Shipping Cost Section */}
                 <div className="edit-section">
                   <h4>Shipping Details & Dimensions</h4>
                   <div className="dimensions-grid">
@@ -1097,7 +1287,9 @@ const ShipmentModal = ({
                             transform: 'translateY(-50%)',
                             color: '#dc3545',
                             fontSize: '0.8rem'
-                          }}>⚠️</div>
+                          }}>
+                            <FaExclamationTriangle />
+                          </div>
                         )}
                       </div>
                       {formErrors.weight_kg && (
@@ -1123,9 +1315,10 @@ const ShipmentModal = ({
                           min="0"
                           max="2000"
                           step="0.01"
-                          disabled={!isShipmentEditable}
+                          disabled={!isShipmentEditable || isDistanceAutoSet}
                           style={{ 
                             borderColor: formErrors.distance_km ? '#dc3545' : '',
+                            backgroundColor: isDistanceAutoSet ? '#f0f8ff' : '',
                             width: '100%'
                           }}
                         />
@@ -1137,7 +1330,21 @@ const ShipmentModal = ({
                             transform: 'translateY(-50%)',
                             color: '#dc3545',
                             fontSize: '0.8rem'
-                          }}>⚠️</div>
+                          }}>
+                            <FaExclamationTriangle />
+                          </div>
+                        )}
+                        {isDistanceAutoSet && (
+                          <div className="auto-set-icon" style={{ 
+                            position: 'absolute', 
+                            right: '10px', 
+                            top: '50%', 
+                            transform: 'translateY(-50%)',
+                            color: '#007bff',
+                            fontSize: '0.8rem'
+                          }}>
+                            <FaMapMarkedAlt />
+                          </div>
                         )}
                       </div>
                       {formErrors.distance_km && (
@@ -1149,12 +1356,42 @@ const ShipmentModal = ({
                           {formErrors.distance_km}
                         </p>
                       )}
-                      <small className="limit-text">Maximum: 2000km</small>
+                      {isDistanceAutoSet && (
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginTop: '0.25rem'
+                        }}>
+                          <small style={{ color: '#007bff', display: 'flex', alignItems: 'center' }}>
+                            <FaInfoCircle style={{ marginRight: '0.25rem', fontSize: '0.75rem' }} />
+                            Auto-calculated from map
+                          </small>
+                          {isShipmentEditable && (
+                            <button
+                              type="button"
+                              onClick={handleOverrideDistance}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#6c757d',
+                                fontSize: '0.75rem',
+                                textDecoration: 'underline',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Override
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      {!isDistanceAutoSet && (
+                        <small className="limit-text">Maximum: 2000km</small>
+                      )}
                     </div>
                   </div>
                 </div>
                 
-                {/* Cost breakdown section */}
                 <div className="edit-section">
                   <h4>Cost Breakdown</h4>
                   
@@ -1230,39 +1467,7 @@ const ShipmentModal = ({
                         {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem'
-                    }}>
-                      <span className="cost-label">Packing Cost:</span>
-                      <span className="cost-value">
-                        {formatCurrency(shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0)}
-                      </span>
-                    </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem',
-                      alignItems: 'center'
-                    }}>
-                      <span className="cost-label">Additional Cost:</span>
-                      <input
-                        type="number"
-                        className="cost-input"
-                        name="additional_cost"
-                        value={formData.additional_cost}
-                        onChange={handleInputChange}
-                        min="0"
-                        step="0.01"
-                        disabled={!isShipmentEditable}
-                        style={{ 
-                          width: '150px',
-                          textAlign: 'right',
-                          padding: '0.5rem'
-                        }}
-                      />
-                    </div>
+                    
                     <div className="cost-total-row" style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',
@@ -1271,13 +1476,13 @@ const ShipmentModal = ({
                       borderRadius: '4px',
                       marginTop: '0.75rem'
                     }}>
-                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Operational Cost:</span>
+                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Cost:</span>
                       <span className="cost-total-value" style={{ 
                         fontWeight: '700',
                         fontSize: '1.1rem',
                         color: '#00a8a8'
                       }}>
-                        {formatCurrency(calculateOperationalCost())}
+                        {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
                   </div>
@@ -1287,7 +1492,6 @@ const ShipmentModal = ({
             
             {activeTab === 'related' && (
               <div className="tab-content">
-                {/* Related Information Section */}
                 <div className="info-section">
                   <h4>Related Documents</h4>
                   <div className="documents-grid" style={{ 
@@ -1307,13 +1511,11 @@ const ShipmentModal = ({
                         alignItems: 'center',
                         marginBottom: '0.75rem'
                       }}>
-                        <span style={{ 
+                        <FaBoxes style={{ 
                           fontSize: '1.25rem', 
                           marginRight: '0.5rem',
                           color: shipment.packing_list_id ? '#00a8a8' : '#6c757d'
-                        }}>
-                          📦
-                        </span>
+                        }} />
                         <span style={{ fontWeight: '500', color: '#333' }}>Packing List</span>
                       </div>
                       <div style={{ 
@@ -1356,13 +1558,11 @@ const ShipmentModal = ({
                         alignItems: 'center',
                         marginBottom: '0.75rem'
                       }}>
-                        <span style={{ 
+                        <FaReceipt style={{ 
                           fontSize: '1.25rem', 
                           marginRight: '0.5rem',
                           color: shipment.delivery_receipt_id ? '#00a8a8' : '#6c757d'
-                        }}>
-                          🧾
-                        </span>
+                        }} />
                         <span style={{ fontWeight: '500', color: '#333' }}>Delivery Receipt</span>
                       </div>
                       <div style={{ 
@@ -1405,13 +1605,11 @@ const ShipmentModal = ({
                         alignItems: 'center',
                         marginBottom: '0.75rem'
                       }}>
-                        <span style={{ 
+                        <FaTruck style={{ 
                           fontSize: '1.25rem', 
                           marginRight: '0.5rem',
                           color: shipment.delivery_id ? '#00a8a8' : '#6c757d'
-                        }}>
-                          🚚
-                        </span>
+                        }} />
                         <span style={{ fontWeight: '500', color: '#333' }}>Delivery Order</span>
                       </div>
                       <div style={{ 
@@ -1445,8 +1643,13 @@ const ShipmentModal = ({
                 </div>
               </div>
             )}
+
+            {activeTab === 'items' && (
+              <div className="items-section">
+                {renderItemsByWarehouses()}
+              </div>
+            )}
             
-            {/* Status Action Section - Always visible at bottom */}
             <div className="status-section" style={{ 
               marginTop: '1rem',
               padding: '1rem',
@@ -1459,7 +1662,7 @@ const ShipmentModal = ({
                 display: 'flex',
                 alignItems: 'center'
               }}>
-                <span style={{ marginRight: '0.5rem' }}>🔄</span>
+                <FaTruck style={{ marginRight: '0.5rem', color: '#00a8a8' }} />
                 Status Actions
               </h4>
               
@@ -1473,7 +1676,7 @@ const ShipmentModal = ({
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  {/* <span style={{ marginRight: '0.5rem', fontSize: '1.25rem' }}>✅</span> */}
+                  <FaClipboardCheck style={{ marginRight: '0.5rem' }} />
                   This shipment has been delivered successfully. No further actions required.
                 </div>
               )}
@@ -1488,7 +1691,7 @@ const ShipmentModal = ({
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  {/* <span style={{ marginRight: '0.5rem', fontSize: '1.25rem' }}>❌</span> */}
+                  <FaExclamationTriangle style={{ marginRight: '0.5rem' }} />
                   This shipment has failed. Please check the failure details.
                 </div>
               )}
@@ -1506,8 +1709,27 @@ const ShipmentModal = ({
                       onClick={handleShip}
                       disabled={isActionDisabled}
                     >
-                      <span style={{ marginRight: '0.5rem', fontSize: '1.1rem' }}>📦</span>
+                      <FaBox style={{ marginRight: '0.5rem' }} />
                       Mark as Shipped
+                    </button>
+                  )}
+
+                  {hasDeliveryReceipt && (
+                    <button
+                      type="button"
+                      className="status-update-button delivery"
+                      onClick={() => onShowDeliveryReceipt(shipment)}
+                      style={{ 
+                        flex: '1',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: canBeShipped ? '0.5rem' : '0',
+                        backgroundColor: '#28a745'
+                      }}
+                    >
+                      <FaReceipt style={{ marginRight: '0.5rem' }} />
+                      Manage Delivery Receipt
                     </button>
                   )}
 
@@ -1521,17 +1743,16 @@ const ShipmentModal = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        // marginTop: (canBeShipped || hasDeliveryReceipt) ? '0.5rem' : '0',
                         cursor: 'pointer',
                         backgroundColor: '#dc3545'
                       }}
                     >
-                      <span style={{ marginRight: '0.5rem', fontSize: '1.1rem' }}>⚠️</span>
+                      <FaExclamationTriangle style={{ marginRight: '0.5rem' }} />
                       Report Failure
                     </button>
                   )}
 
-                  {canBeShipped && isActionDisabled && (
+                  {/* {canBeShipped && isActionDisabled && (
                     <div style={{ 
                       fontSize: '0.8rem', 
                       color: '#666', 
@@ -1546,8 +1767,7 @@ const ShipmentModal = ({
                         {parseFloat(formData.distance_km) <= 0 && <li>Enter shipping distance</li>}
                       </ul>
                     </div>
-                  )}
-
+                  )} */}
                 </div>
               )}
             </div>
@@ -1567,7 +1787,7 @@ const ShipmentModal = ({
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  <span style={{ marginRight: '0.25rem' }}>*</span>
+                  <FaExclamationCircle style={{ marginRight: '0.25rem' }} />
                   You have unsaved changes
                 </div>
               )}
@@ -1610,7 +1830,7 @@ const ShipmentModal = ({
                     alignItems: 'center'
                   }}
                 >
-                  <span style={{ marginRight: '0.35rem' }}>💾</span>
+                  <FaSave style={{ marginRight: '0.35rem' }} />
                   Save Changes
                 </button>
               )}
@@ -1622,7 +1842,6 @@ const ShipmentModal = ({
   );
 };
 
-// PropTypes for better documentation and validation
 ShipmentModal.propTypes = {
   shipment: PropTypes.object.isRequired,
   carriers: PropTypes.array.isRequired,

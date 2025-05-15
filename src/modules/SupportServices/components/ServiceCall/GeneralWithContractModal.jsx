@@ -43,8 +43,8 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
       setPriority(callData.priority_level || "")
       setTicketId(callData.service_ticket?.ticket_id || "")
       setPhoneNumber(callData.customer?.phone_number || "");
-      setProductId(callData.product?.product_id || "");
-      setProductName(callData.product?.product_name || "");
+      setProductId(callData.product?.item_id || "");
+      setProductName(callData.product?.item_name || "");
       setContractNo(callData.contract?.contract_id || "")
       setTerminationDate(callData.contract?.end_date || "")
       setCallType(callData.call_type || "")
@@ -89,8 +89,8 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   };
 
   const handleSelectProduct = (product) => {
-    setProductId(product.product_id); 
-    setProductName(product.product_name)
+    setProductId(product.item_id); 
+    setProductName(product.item_name)
     setOpenProdDD(false); 
   };
 
@@ -299,11 +299,11 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
                         {products.length > 0 ? (
                           products
                             .filter((product) =>
-                            product.product_id.toLowerCase().includes(productId.toLowerCase())
+                            product.item_id.toLowerCase().includes(productId.toLowerCase())
                             )
                             .map((product) => (
-                              <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
-                                {product.product_id}
+                              <li key={product.item_id} onClick={() => handleSelectProduct(product)}>
+                                {product.item_id}
                               </li>
                             ))
                         ) : (

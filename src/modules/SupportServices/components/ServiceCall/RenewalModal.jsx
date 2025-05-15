@@ -32,12 +32,17 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
       setCallId(callData.service_call_id || "")
       setCustomerId(callData.customer?.customer_id || "")
       setName(callData.customer?.name || "");
-      setProductId(callData.product?.product_id || "");
-      setSellingPrice(callData.product?.selling_price || "");
+      setProductId(callData.product?.item_id || "");
       setContractId(callData.contract?.contract_id)
       setContractStatus(callData.contract?.contract_status)
     }
   }, [callData])
+
+  useEffect(() => {
+    if (productId) {
+      fetchPrice(productId);
+    }
+  }, [productId])
 
   useEffect(() => {
     if (duration && sellingPrice) {
@@ -48,6 +53,16 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
       setRenewalFee(""); 
     }
   }, [duration, sellingPrice]);
+
+  const fetchPrice = async (productId) => {
+    try {
+      const response = await GET(`renewal/price/${productId}`);
+      console.log("contracts", response)
+      setSellingPrice(response.item_price);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+    }
+  };
 
   const handleSubmitReq = () => {
     if (contractStatus === "Active") {

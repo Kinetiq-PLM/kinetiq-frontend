@@ -11,6 +11,9 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
   const [error, setError] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [showDayModal, setShowDayModal] = useState(false);
+  // Add new state for interviews and leave request data
+  const [interviews, setInterviews] = useState([]);
+  const [leaves, setLeaves] = useState([]);
 
   /* Add this mapping for leave type icons */
   const getLeaveTypeEmoji = (leaveType) => {
@@ -34,6 +37,26 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     }
   };
 
+  /* Update the getInterviewEmoji function to handle null/undefined values safely */
+  const getInterviewEmoji = (interviewType) => {
+    if (!interviewType) return '📋'; // Default emoji for undefined types
+    
+    switch (interviewType.toLowerCase()) {
+      case 'technical':
+        return '💻';
+      case 'hr':
+        return '👔';
+      case 'panel':
+        return '👥';
+      case 'final':
+        return '🏆';
+      case 'initial':
+        return '🤝';
+      default:
+        return '📋';
+    }
+  };
+
   /* Add a function to get the primary leave emoji for a cell */
   const getPrimaryLeaveEmoji = (leaves) => {
     if (!leaves || leaves.length === 0) return null;
@@ -45,6 +68,19 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     
     // If multiple leave types, use a mixed emoji or count
     return leaves.length > 1 ? `${leaves.length}+` : getLeaveTypeEmoji(leaves[0].leave_type);
+  };
+
+  /* Add a function to get the primary interview emoji for a cell */
+  const getPrimaryInterviewEmoji = (interviews) => {
+    if (!interviews || interviews.length === 0) return null;
+    
+    // If only one interview, return its emoji
+    if (interviews.length === 1) {
+      return getInterviewEmoji(interviews[0].interview_type);
+    }
+    
+    // If multiple interviews, use a count
+    return interviews.length > 1 ? `${interviews.length}+` : getInterviewEmoji(interviews[0].interview_type);
   };
 
   /* ── data fetch ─────────────────────────────────────────────────────── */
@@ -66,6 +102,59 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     })();
   }, []);
 
+  // Update the fetchInterviewsAndLeaves function inside useEffect
+  useEffect(() => {
+    const fetchInterviewsAndLeaves = async () => {
+      setLoading(true);
+      try {
+        // Fetch interviews
+        const interviewsResponse = await axios.get(
+          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/"
+        );
+        
+        console.log("Interviews API response:", interviewsResponse.data);
+        
+        // Add this after the API call in the fetchInterviewsAndLeaves function
+        console.log("First interview object structure:", 
+          interviewsResponse.data.length > 0 ? interviewsResponse.data[0] : "No interviews");
+        
+        // Process interview data to ensure date format is correct
+        const processedInterviews = interviewsResponse.data.map(interview => {
+          if (interview.interview_date) {
+            // Ensure interview_date is in YYYY-MM-DD format
+            const date = new Date(interview.interview_date);
+            if (!isNaN(date.getTime())) {
+              interview.interview_date = date.toISOString().split('T')[0];
+            }
+          }
+          return interview;
+        });
+        
+        setInterviews(processedInterviews);
+        console.log("Processed interviews:", processedInterviews);
+        
+        // Fetch leave requests
+        const leavesResponse = await axios.get(
+          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/"
+        );
+        setLeaves(leavesResponse.data);
+        
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching interviews or leave requests:", err);
+        console.log("Error details:", err.response?.data || err.message);
+        setError("Failed to load interviews or leave requests");
+        // Set empty arrays to prevent undefined errors
+        setInterviews([]);
+        setLeaves([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchInterviewsAndLeaves();
+  }, []);
+
   /* ── navigation ─────────────────────────────────────────────────────── */
   const prevMonth = () =>
     setCurrentDate(
@@ -82,7 +171,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
   /* ── helpers ────────────────────────────────────────────────────────── */
   const todayISO = new Date().toISOString().split("T")[0];
 
-  /** build an array of 42 cells (6 rows × 7 cols) for the current view */
+  /** build an array of 42 cells (6 rows × 7 cols) for the current view */
   const getMonthData = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -101,11 +190,26 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       const meta = calendarData.find((c) => c.date === dateStr) || {};
 
       // Find leave requests for this date
-      const dayLeaves = leaveRequests.filter((leave) => {
+      const dayLeaves = leaves.filter((leave) => {
         const startDate = new Date(leave.start_date);
         const endDate = new Date(leave.end_date);
         const currentDate = new Date(dateStr);
         return currentDate >= startDate && currentDate <= endDate;
+      });
+
+      // Find interviews for this date
+      const dayInterviews = interviews.filter((interview) => {
+        if (!interview || !interview.interview_date) return false;
+        
+        try {
+          // Try to normalize the date format for comparison
+          const interviewDateObj = new Date(interview.interview_date);
+          const interviewDateStr = interviewDateObj.toISOString().split('T')[0];
+          return interviewDateStr === dateStr;
+        } catch (err) {
+          console.error("Error processing interview date:", err);
+          return false;
+        }
       });
 
       cells.push({
@@ -118,6 +222,8 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         holidayName: meta.holiday_name || "",
         leaves: dayLeaves,
         hasLeaves: dayLeaves.length > 0,
+        interviews: dayInterviews,
+        hasInterviews: dayInterviews.length > 0
       });
     }
     /* trailing cells so the grid is always complete */
@@ -152,6 +258,56 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       // Pass the selected date as a query parameter or state
       navigateTo(path, { selectedDate: dateStr });
     }
+  };
+
+  /* Add this improved renderInterviewItem function for better display of interview details */
+  const renderInterviewItem = (interview, index) => {
+    // If we don't have a valid interview object, render a placeholder
+    if (!interview) {
+      return <li key={`unknown-interview-${index}`}>Unknown interview</li>;
+    }
+    
+    // Debug the actual interview object structure in the console
+    console.log("Interview data structure:", interview);
+    
+    // Try different possible field names for candidate name
+    const candidateName = interview.candidate_name || 
+                         interview.candidate?.name || 
+                         interview.applicant_name || 
+                         interview.name || 
+                         'Unnamed Candidate';
+    
+    // Try different possible field names for interview time
+    const time = interview.interview_time || 
+                interview.time || 
+                interview.schedule_time || 
+                (interview.schedule ? interview.schedule.time : null) || 
+                'No time specified';
+    
+    // Try different possible field names for interview type
+    const type = interview.interview_type || 
+                interview.type || 
+                interview.interview_category || 
+                'Unknown';
+    
+    // Safely get ID for key
+    const id = interview.interview_id || 
+              interview.id || 
+              `interview-${index}`;
+    
+    // Safely get CSS class name
+    const typeClass = type && typeof type === 'string' ? type.toLowerCase() : 'unknown';
+    
+    return (
+      <li key={id}>
+        <span className="interview-emoji">{getInterviewEmoji(type)}</span>
+        <strong>{candidateName}</strong> -{" "}
+        <span className={`interview-type ${typeClass}`}>
+          {type} Interview
+        </span>
+        <span className="interview-time"> at {time}</span>
+      </li>
+    );
   };
 
   /* ── derived ────────────────────────────────────────────────────────── */
@@ -222,13 +378,15 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
                 c.isHoliday && "holiday",
                 c.isSpecial && "special",
                 c.hasLeaves && "has-leaves",
+                c.hasInterviews && "has-interviews",
                 c.isWorkday ? "workday" : "nonwork",
               ]
                 .filter(Boolean)
                 .join(" ")}
               title={
                 c.holidayName ||
-                (c.hasLeaves ? `${c.leaves.length} leave request(s)` : "")
+                (c.hasLeaves ? `${c.leaves.length} leave request(s)` : "") ||
+                (c.hasInterviews ? `${c.interviews.length} interview(s)` : "")
               }
               onClick={() => handleDayClick(c)}
             >
@@ -238,6 +396,11 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
               {c.hasLeaves && (
                 <span className="badge leaves" title={`${c.leaves.length} leave(s)`}>
                   {getPrimaryLeaveEmoji(c.leaves)}
+                </span>
+              )}
+              {c.hasInterviews && (
+                <span className="badge interviews" title={`${c.interviews.length} interview(s)`}>
+                  {getPrimaryInterviewEmoji(c.interviews)}
                 </span>
               )}
             </div>
@@ -326,6 +489,21 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
                 </div>
               )}
 
+              {/* Interview information */}
+              {selectedDay.hasInterviews && (
+                <div className="hr-calendar-modal-interviews">
+                  <h5>
+                    {selectedDay.interviews.length} Interview
+                    {selectedDay.interviews.length !== 1 ? "s" : ""} Scheduled
+                  </h5>
+                  <ul>
+                    {selectedDay.interviews.map((interview, index) => 
+                      renderInterviewItem(interview, index)
+                    )}
+                  </ul>
+                </div>
+              )}
+
               {/* Link to attendance or leave requests for this day */}
               <div className="hr-calendar-modal-actions">
                 <button 
@@ -340,6 +518,14 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
                 >
                   View Leave Requests
                 </button>
+                {selectedDay.hasInterviews && (
+                  <button 
+                    className="hr-calendar-modal-btn interviews"
+                    onClick={() => handleNavigate('/recruitment', selectedDay.dateStr)}
+                  >
+                    View Interviews
+                  </button>
+                )}
               </div>
             </div>
           </div>

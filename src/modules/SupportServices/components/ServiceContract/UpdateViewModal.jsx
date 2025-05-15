@@ -41,14 +41,14 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
       console.log("contract: ", contract)
       setFormData({
         contractId: contract.contract_id || "",
-        productId: contract.product?.product_id || "",
-        productName: contract.product?.product_name  || "",
+        productId: contract.product?.item_id || "",
+        productName: contract.product?.item_name  || "",
         productQuantity: contract.product_quantity || "",
         customerId: contract.customer?.customer_id || "",
         phoneNumber: contract.customer?.phone_number || "",
         name: contract.customer?.name || "",
         emailAddress: contract.customer?.email_address  || "",
-        dateIssued: contract.date_issued || "",
+        dateIssued: contract.date_issued || ""  ,
         terminationDate: contract.end_date || "",
         contractStatus: contract.contract_status || "",
         contractDescription: contract.contract_description || "",
@@ -467,7 +467,7 @@ const handleRenewalCheckbox = () => {
                 </div>
               </div>
 
-              <div className="form-group" style={{ flex: 1 }}>
+              <div className="form-group view-cont-desc" style={{ flex: 1 }}>
                 <label htmlFor="contractDescription">Contract Description</label>
                 <textarea
                   id="contractDescription"

@@ -76,6 +76,8 @@ const OfficialReceipts = () => {
     "Invoice ID",
     "Customer ID",
     "Official Receipt Date",
+    "Total Amount",
+    "Amount Due",
     "Settled Amount",
     "Remaining Amount",
     "Payment Method",
@@ -84,7 +86,8 @@ const OfficialReceipts = () => {
   ];
 
   const [data, setData] = useState([]);
-  const [invoices, setInvoices] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [invoiceIds, setInvoiceIds] = useState([]);
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -99,7 +102,6 @@ const OfficialReceipts = () => {
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const OFFICIAL_RECEIPTS_ENDPOINT = `${API_URL}/api/official-receipts/`;
-  const INVOICES_ENDPOINT = `${API_URL}/api/invoices/`;
 
   const openModal = () => setModalOpen(true);
 
@@ -108,6 +110,9 @@ const OfficialReceipts = () => {
     setReportForm({
       startDate: getCurrentDate(),
       salesInvoiceId: "",
+      customerId: "SALES-CUST-2025",
+      totalAmount: "",
+      amountDue: "",
       amountPaid: "",
       paymentMethod: "",
       bankAccount: "",
@@ -118,6 +123,9 @@ const OfficialReceipts = () => {
   const [reportForm, setReportForm] = useState({
     startDate: getCurrentDate(),
     salesInvoiceId: "",
+    customerId: "SALES-CUST-2025",
+    totalAmount: "",
+    amountDue: "",
     amountPaid: "",
     paymentMethod: "",
     bankAccount: "",
@@ -131,17 +139,21 @@ const OfficialReceipts = () => {
     }));
   }, [user]);
 
-  const fetchData = async () => {
+  const fetchData = async (retries = 3, delay = 500) => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT, config);
+      console.log("Fetched receipts:", response.data);
+      setReceipts(response.data);
       setData(
         response.data.map((entry) => [
           entry.or_id || "-",
           entry.invoice_id || "-",
           entry.customer_id || "-",
           entry.or_date ? new Date(entry.or_date).toLocaleString() : "-",
+          entry.total_amount || "-",
+          entry.amount_due || "-",
           entry.settled_amount || "-",
           entry.remaining_amount || "-",
           entry.payment_method || "-",
@@ -149,7 +161,17 @@ const OfficialReceipts = () => {
           entry.created_by || "-",
         ])
       );
+      setInvoiceIds(
+        response.data
+          .filter((entry) => entry.invoice_id)
+          .map((entry) => entry.invoice_id)
+      );
     } catch (error) {
+      if (retries > 0) {
+        console.warn(`Retrying fetchData (${retries} attempts left)...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return fetchData(retries - 1, delay * 2);
+      }
       console.error("Error fetching receipts:", error);
       setValidation({
         isOpen: true,
@@ -160,65 +182,53 @@ const OfficialReceipts = () => {
     }
   };
 
-  const fetchInvoices = async () => {
-    try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const response = await axios.get(INVOICES_ENDPOINT, config);
-      setInvoices(response.data);
-      if (response.data.length === 0) {
-        // REVISED: Improved validation message
-        setValidation({
-          isOpen: true,
-          type: "warning",
-          title: "No Invoices Available",
-          message: "No invoices with a remaining balance found. All invoices may be fully paid or returned.",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching invoices:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
-      let message = "Could not load invoice list. Please ensure the API is accessible.";
-      if (error.response?.status === 404) {
-        message = "Invoice endpoint not found. Verify the API configuration.";
-      } else if (error.response?.status === 403) {
-        message = "Access denied. Please check your authentication credentials.";
-      } else if (error.code === "ERR_NETWORK") {
-        message = "Network error. Please ensure the API is running.";
-      } else if (error.response?.status === 504) {
-        message = "Gateway timeout. Check the backend response time.";
-      }
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Invoice Fetch Failed",
-        message: error.response?.data?.detail || message,
-      });
-    }
-  };
-
   useEffect(() => {
     fetchData();
-    fetchInvoices();
   }, []);
 
-  const calculateRemainingAmount = (invoiceId, newSettledAmount) => {
-    const selectedInvoice = invoices.find((inv) => inv.invoice_id === invoiceId);
-    if (!selectedInvoice) {
-      throw new Error("Invalid invoice ID.");
+  const calculateRemainingAmount = (newSettledAmount, invoiceId, amountDue, totalAmount) => {
+    const settledAmount = parseFloat(newSettledAmount) || 0;
+    if (isNaN(settledAmount) || settledAmount < 0) {
+      throw new Error("Invalid settled amount. Please enter a valid non-negative number.");
     }
 
-    const settledAmount = parseFloat(newSettledAmount);
-    if (isNaN(settledAmount) || settledAmount <= 0) {
-      throw new Error("Invalid settled amount. Please enter a valid positive number.");
+    if (!invoiceId) {
+      throw new Error("Invoice ID is required to calculate remaining amount.");
     }
 
-    const remainingBalance = parseFloat(selectedInvoice.remaining_balance);
+    console.log("All receipts for invoiceId:", invoiceId, receipts.filter((r) => r.invoice_id === invoiceId));
+
+    const invoiceReceipts = receipts
+      .filter((r) => r.invoice_id === invoiceId && !isNaN(parseFloat(r.remaining_amount)))
+      .sort((a, b) => {
+        const amountA = parseFloat(a.remaining_amount);
+        const amountB = parseFloat(b.remaining_amount);
+        return amountA - amountB; // Lowest remaining_amount first
+      });
+
+    console.log("Sorted receipts by remaining_amount:", invoiceReceipts);
+
+    const lowestReceipt = invoiceReceipts[0];
+    let remainingBalance;
+
+    if (lowestReceipt && !isNaN(parseFloat(lowestReceipt.remaining_amount))) {
+      remainingBalance = parseFloat(lowestReceipt.remaining_amount);
+      console.log(`Using lowest remaining_amount from ${lowestReceipt.or_id} (${lowestReceipt.or_date}): ${remainingBalance}`);
+    } else {
+      remainingBalance = parseFloat(amountDue) || parseFloat(totalAmount) || 0;
+      console.log(`No valid receipts found. Falling back to amountDue: ${amountDue} or totalAmount: ${totalAmount}, remainingBalance: ${remainingBalance}`);
+    }
+
+    if (isNaN(remainingBalance) || remainingBalance < 0) {
+      throw new Error("Invalid remaining balance. Please check the invoice receipts or input amounts.");
+    }
+
+    if (settledAmount > remainingBalance) {
+      throw new Error(`Settled amount (${settledAmount}) exceeds remaining balance (${remainingBalance}).`);
+    }
+
     const newRemaining = remainingBalance - settledAmount;
-    return newRemaining >= 0 ? newRemaining : 0;
+    return newRemaining;
   };
 
   const generateReferenceNumber = () => {
@@ -240,16 +250,23 @@ const OfficialReceipts = () => {
   };
 
   const handleInputChange = (field, value) => {
-    setReportForm((prevForm) => ({
-      ...prevForm,
-      [field]: value,
-    }));
+    setReportForm((prevForm) => {
+      const newForm = { ...prevForm, [field]: value };
+      if (field === "salesInvoiceId") {
+        const selectedReceipt = receipts.find((r) => r.invoice_id === value);
+        newForm.customerId = selectedReceipt?.customer_id || "SALES-CUST-2025";
+        newForm.totalAmount = selectedReceipt?.total_amount?.toString() || "";
+        newForm.amountDue = selectedReceipt?.amount_due?.toString() || "";
+      }
+      return newForm;
+    });
   };
 
   const handleSubmit = async () => {
     if (
       !reportForm.startDate ||
       !reportForm.salesInvoiceId ||
+      !reportForm.amountDue ||
       !reportForm.amountPaid ||
       !reportForm.paymentMethod ||
       !reportForm.createdBy
@@ -263,43 +280,35 @@ const OfficialReceipts = () => {
       return;
     }
 
-    const selectedInvoice = invoices.find(
-      (inv) => inv.invoice_id === reportForm.salesInvoiceId
-    );
-    if (!selectedInvoice) {
-      setValidation({
-        isOpen: true,
-        type: "warning",
-        title: "Invalid Invoice",
-        message: "Please select a valid invoice.",
-      });
-      return;
-    }
-
     try {
-      const newRemainingAmount = calculateRemainingAmount(
-        reportForm.salesInvoiceId,
-        reportForm.amountPaid
-      );
-
-      if (
-        parseFloat(reportForm.amountPaid) > parseFloat(selectedInvoice.remaining_balance)
-      ) {
-        setValidation({
-          isOpen: true,
-          type: "warning",
-          title: "Invalid Payment",
-          message: `The settled amount (${reportForm.amountPaid}) exceeds the remaining invoice balance (${selectedInvoice.remaining_balance}).`,
-        });
-        return;
+      // Fallback for total_amount if blank
+      let totalAmount = parseFloat(reportForm.totalAmount);
+      if (isNaN(totalAmount) || !reportForm.totalAmount) {
+        const invoiceReceipts = receipts
+          .filter((r) => r.invoice_id === reportForm.salesInvoiceId && !isNaN(parseFloat(r.remaining_amount)))
+          .sort((a, b) => parseFloat(a.remaining_amount) - parseFloat(b.remaining_amount));
+        const lowestReceipt = invoiceReceipts[0];
+        totalAmount = lowestReceipt ? parseFloat(lowestReceipt.total_amount) : 0;
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+          throw new Error("Invalid total amount. Please ensure a valid invoice is selected.");
+        }
       }
+
+      const newRemainingAmount = calculateRemainingAmount(
+        reportForm.amountPaid,
+        reportForm.salesInvoiceId,
+        reportForm.amountDue,
+        totalAmount
+      );
 
       const referenceNumber = generateReferenceNumber();
       const newReceipt = {
         or_id: generateCustomORID(),
         invoice_id: reportForm.salesInvoiceId,
-        customer_id: selectedInvoice.customer_id || "SALES-CUST-2025",
+        customer_id: reportForm.customerId,
         or_date: reportForm.startDate,
+        total_amount: totalAmount.toFixed(2),
+        amount_due: parseFloat(reportForm.amountDue).toFixed(2),
         settled_amount: parseFloat(reportForm.amountPaid).toFixed(2),
         remaining_amount: newRemainingAmount.toFixed(2),
         payment_method: reportForm.paymentMethod,
@@ -309,12 +318,13 @@ const OfficialReceipts = () => {
           reportForm.paymentMethod === "Bank Transfer" ? reportForm.bankAccount : null,
       };
 
+      console.log("Submitting receipt:", newReceipt);
+
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.post(OFFICIAL_RECEIPTS_ENDPOINT, newReceipt, config);
       if (response.status === 201) {
-        fetchData();
-        fetchInvoices();
+        await fetchData();
         closeModal();
         setValidation({
           isOpen: true,
@@ -336,42 +346,245 @@ const OfficialReceipts = () => {
         isOpen: true,
         type: "error",
         title: "Submission Failed",
-        message: error.response?.data?.detail || "Failed to connect to the API.",
+        message: error.message || "Failed to connect to the API.",
       });
     }
   };
 
   const sortedData = [...data].sort((a, b) => {
     if (sortOrder === "asc" || sortOrder === "desc") {
-      const valA = parseFloat(a[5]);
-      const valB = parseFloat(b[5]);
+      const valA = parseFloat(a[7]); // Sort by Remaining Amount
+      const valB = parseFloat(b[7]);
       if (isNaN(valA) || isNaN(valB)) return 0;
       return sortOrder === "asc" ? valA - valB : valB - valA;
     }
 
-    // Explicit default case
     if (sortOrder === "default" || !sortOrder) {
       const idA = a[1]?.toString().toLowerCase() || "";
       const idB = b[1]?.toString().toLowerCase() || "";
       return idA.localeCompare(idB);
     }
 
-    return 0; // fail-safe
+    return 0;
   });
-
-
-
 
   const filteredData = sortedData.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searching.toLowerCase().trim())
   );
 
+  const handlePrintRow = (rowData) => {
+    const printWindow = window.open('', '_blank');
+  
+    const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Kinetiq - PLM - Official Receipt</title>
+        <style>
+          @page {
+            size: letter;
+            margin: 0.5in;
+          }
+          body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #2c3e50;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border-radius: 8px;
+            background-color: #fff;
+          }
+          .header {
+            border-bottom: 3px solid #0055a5;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .logo {
+            width: 6rem;
+            height: auto;
+          }
+          .logo-subtitle {
+            font-size: 15px;
+            color: #546e7a;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+          }
+          .document-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 25px 0;
+            color: #0055a5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+          }
+          .document-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #0055a5;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+          th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+          }
+          th {
+            background-color: #0055a5;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+          }
+          tr:nth-child(even) {
+            background-color: #f8f9fa;
+          }
+          tr:hover {
+            background-color: #f1f7fd;
+          }
+          .receipt-number {
+            font-size: 16px;
+            color: #0055a5;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: right;
+          }
+          .summary-section {
+            margin-top: 30px;
+            background-color: #f8fbff;
+            border-left: 4px solid #0055a5;
+            padding: 15px;
+            border-radius: 4px;
+          }
+          .total-amount {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 600;
+            color: #0055a5;
+            margin: 15px 0;
+          }
+          .footer {
+            margin-top: 50px;
+            font-size: 13px;
+            text-align: center;
+            color: #607d8b;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+          }
+          .footer div {
+            margin: 5px 0;
+          }
+          .confidential {
+            color: #cc0000;
+            font-style: italic;
+            margin-bottom: 10px;
+            font-weight: 500;
+          }
+          .watermark {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 120px;
+            color: rgba(0, 85, 165, 0.03);
+            transform: rotate(-45deg);
+            z-index: -1;
+            font-weight: bold;
+          }
+          @media print {
+            .container {
+              box-shadow: none;
+              padding: 0;
+            }
+            body {
+              background-color: #fff;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="watermark">COPY</div>
+        <div class="container">
+          <div class="header">
+            <div>
+              <img class="logo" src="../../public/images/kinetiq.png" alt="Kinetiq Logo" />
+              <div class="logo-subtitle">Medical Equipment Manufacturing Company</div>
+            </div>
+            <div style="text-align: right; font-size: 14px; color: #546e7a;">
+              <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})}</div>
+            </div>
+          </div>
+          
+          <div class="document-title">Official Receipt</div>
+          
+          <table>
+            <tbody>
+              ${columns.map((col, i) => `
+                <tr>
+                  <td><strong>${col}</strong></td>
+                  <td>${rowData[i] ?? '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
 
-
+          <div class="footer">
+            <div class="confidential">CONFIDENTIAL</div>
+            <div>Kinetiq - PLM</div>
+            <div>Generated on ${new Date().toLocaleString('en-US', {
+              month: 'long',
+              day: 'numeric', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</div>
+          </div>
+        </div>
+        <script>
+          window.onload = () => {
+            window.print();
+          };
+          window.onafterprint = () => {
+            window.close();
+          };
+        </script>
+      </body>
+    </html>
+    `;
+  
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
 
   return (
     <div className="officialReceipts">
@@ -405,13 +618,13 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Create Receipt"
+              name="Update Receipt"
               variant="standard2"
               onclick={openModal}
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        <Table data={filteredData} columns={columns} handlePrintRow={handlePrintRow} showPrintButton={true} />
       </div>
       {modalOpen && (
         <CreateReceiptModal
@@ -421,7 +634,7 @@ const OfficialReceipts = () => {
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           setValidation={setValidation}
-          invoiceOptions={invoices.map((inv) => inv.invoice_id)}
+          invoiceOptions={invoiceIds}
         />
       )}
       {validation.isOpen && (

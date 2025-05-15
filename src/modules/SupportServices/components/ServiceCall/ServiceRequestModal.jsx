@@ -194,6 +194,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
                               .filter((technician) =>
                                 technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
                               )
+                              .slice(0, 1)
                               .map((technician) => (
                                 <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
                                   {technician.employee_id}

@@ -10,7 +10,7 @@
 .recruitment-body-content-container {
   width: 100%;
   height: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -446,49 +446,23 @@
   letter-spacing: 0.02em;
 }
 
-/* Status-specific colors */
-.recruitment-tag.draft,
-.recruitment-tag.pending {
-  background-color: #fff3cd;
-  color: #664d03;
-}
-
-.recruitment-tag.open,
-.recruitment-tag.approved {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.recruitment-tag.closed,
-.recruitment-tag.rejected {
-  background-color: #f8d7da;
-  color: #842029;
-}
-
-.recruitment-tag.active {
-  background-color: #cfe2ff;
-  color: #084298;
-}
-
-.recruitment-tag.unknown {
-  background-color: #e2e3e5;
-  color: #41464b;
-}
-
 /* Employment Type Pills */
 .recruitment-tag.regular {
   background-color: #e6f3ff;
   color: #0066cc;
+  border: 1px solid #6ba5e7; /* Darker border for regular employment type */
 }
 
 .recruitment-tag.contractual {
   background-color: #fff3e6;
   color: #cc6600;
+  border: 1px solid #e8964a; /* Darker border for contractual employment type */
 }
 
 .recruitment-tag.seasonal {
   background-color: #ffb6f0;
   color: #3d0033;
+  border: 1px solid #d678c0; /* Darker border for seasonal employment type */
 }
 
 /* Duration Days Pills */
@@ -511,16 +485,53 @@
 .recruitment-tag.pending-finance {
   background-color: #fff3cd;
   color: #664d03;
+  border: 1px solid #d6c254; /* Darker border for pending finance status */
 }
 
 .recruitment-tag.approved-finance {
   background-color: #d1e7dd;
   color: #0f5132;
+  border: 1px solid #7fb891; /* Darker border for approved finance status */
 }
 
 .recruitment-tag.rejected-finance {
   background-color: #f8d7da;
   color: #842029;
+  border: 1px solid #df8089; /* Darker border for rejected finance status */
+}
+
+/* Posting Status Pills */
+.recruitment-tag.draft,
+.recruitment-tag.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+  border: 1px solid #d6c254; /* Darker border for draft/pending status */
+}
+
+.recruitment-tag.open,
+.recruitment-tag.approved {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #7fb891; /* Darker border for open/approved status */
+}
+
+.recruitment-tag.closed,
+.recruitment-tag.rejected {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #df8089; /* Darker border for closed/rejected status */
+}
+
+.recruitment-tag.active {
+  background-color: #cfe2ff;
+  color: #084298;
+  border: 1px solid #74a2e5; /* Darker border for active status */
+}
+
+.recruitment-tag.unknown {
+  background-color: #e2e3e5;
+  color: #41464b;
+  border: 1px solid #aaacae; /* Darker border for unknown status */
 }
 
 /* Clearance Status Pills */
@@ -574,6 +585,94 @@
   background-color: #f9f0ff;
   color: #531dab;
   border: 1px solid #d3adf7;
+}
+
+/* Interview Type Tags */
+.recruitment-tag.technical {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.recruitment-tag.hr {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.recruitment-tag.cultural-fit {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.final {
+  background-color: #f9f0ff;
+  color: #722ed1;
+  border: 1px solid #d3adf7;
+}
+
+/* Interview Status Tags */
+.recruitment-tag.scheduled {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.recruitment-tag.in-progress {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.completed {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.recruitment-tag.cancelled {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.recruitment-tag.rescheduled {
+  background-color: #f9f0ff;
+  color: #722ed1;
+  border: 1px solid #d3adf7;
+}
+
+/* Onboarding Task Status Tags */
+.recruitment-tag.pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.delayed {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+/* Priority Tags */
+.recruitment-tag.high {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.recruitment-tag.medium {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.low {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
 }
 
 /* ---------------------------------------------------------
@@ -988,7 +1087,7 @@
 /* Base responsive adjustments - Apply to all screens */
 .recruitment-body-content-container {
   width: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   padding: 1rem;
 }
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/PurchaseCredMemo.css";
 import PurchaseCredMemoForm from "./PurchaseCredMemoForm";
 
-const PurchaseCredMemoBody = () => {
+const PurchaseCredMemoBody = ({ onBackToDashboard }) => {
   const [showForm, setShowForm] = useState(false);
   const [creditMemos, setCreditMemos] = useState([]);
   const [filteredMemos, setFilteredMemos] = useState([]);
@@ -22,12 +22,18 @@ const PurchaseCredMemoBody = () => {
     "Last 3 days",
     "Last 1 day",
   ];
-  const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
+  const statusOptions = ["All", "Approved", "Under Review", "Forwarded"];
 
 
+  // Back button handler to toggle dashboard
   const handleBackToDashboard = () => {
-    const event = new CustomEvent("purchasing-back-to-dashboard");
-    window.dispatchEvent(event);
+    if (onBackToDashboard) {
+      onBackToDashboard();
+    } else {
+      // Fallback to the old method if prop is not provided
+      const event = new CustomEvent('purchasing-back-to-dashboard');
+      window.dispatchEvent(event);
+    }
   };
 
   useEffect(() => {
@@ -113,6 +119,8 @@ const PurchaseCredMemoBody = () => {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
+
+
 
   return (
     <div className="credmemo">

@@ -65,7 +65,7 @@ const [isRequestEditModalOpen, setIsRequestEditModalOpen] = useState(false);
 const [selectedRequestRows, setSelectedRequestRows] = useState([]);
 const [isReturnsEditModalOpen, setIsReturnsEditModalOpen] = useState(false);
 const [selectedReturnsRows, setSelectedReturnsRows] = useState([]);
-
+const [approvedByError, setApprovedByError] = useState({});
 const closeWarningPopup = () => { setIsWarningPopupVisible(false); };
 const closeApprovedByWarning = () => { setIsApprovedByWarningVisible(false); };
 
@@ -266,6 +266,8 @@ const patchEditedRows = async () => {
         payload = {
           approved_by: row.approvedBy || "N/A",
           final_approved_amount: row.approvedAmount || "",
+          approval_status: row.approvalStatus || "",
+          remarks: row.remarks || "",               
           
         };
       } else if (activeTab === "Budget Request List" && row.reqID) {
@@ -273,6 +275,8 @@ const patchEditedRows = async () => {
         payload = {
           approved_by: row.approvedBy || "N/A",
           final_approved_amount: row.approvedAmount || "",
+          approval_status: row.approvalStatus || "",
+          remarks: row.remarks || "",
         };
       } else {
         console.error("Unsupported tab or missing ID:", row);
@@ -421,91 +425,199 @@ const handleProcessClick = () => {
 const handleRejectClick = () => {
 setApprovalStatus("Rejected");
 setIsConfirmationVisible(true);
-setConfirmationMessage(`Are you sure you want to reject the selected data?\n` +
-`Submission ID(s): ${editingRows.map(row => row.requestId || row.reqID).join(', ')}\n` +
-`Requested Amount(s): ${editingRows.map(row => row.amount).join(', ')}`
-);
+setConfirmationMessage(
+    `Are you sure you want to reject the selected data?\n` + 
+    `ID(s): ${editedDataForConfirmation.map(row => row.requestId || row.reqID).join(', ')}\n` +
+    `Requested Amount(s): ${editedDataForConfirmation.map(row => row.amount).join(', ')}\n` +
+    `Approved By: ${editedDataForConfirmation.map(row => row.approvedBy || '').join(', ')}`
+  );
 };
 
 const handleApproveClick = () => {
-setApprovalStatus("Approved");
-setIsConfirmationVisible(true);
-setConfirmationMessage(
-`Are you sure you want to approve the selected data?\n` +
-`Submission ID(s): ${editingRows.map(row => row.requestId || row.reqID).join(', ')}\n` +
-`Requested Amount(s): ${editingRows.map(row => row.amount).join(', ')}\n` +
-`Approved Amount(s): ${editingRows.map(row => row.approvedAmount || row.amount).join(', ')}`
-);
+  let hasError = false;
+  const errorObj = {};
+  editedDataForConfirmation.forEach(row => {
+    if (!row.approvedBy || row.approvedBy.trim() === "") {
+      errorObj[row.requestId] = true;
+      hasError = true;
+    }
+  });
+  setApprovedByError(errorObj);
+  if (hasError) return;
+
+  setApprovalStatus("Approved");
+  setIsConfirmationVisible(true);
+  setConfirmationMessage(
+    `Are you sure you want to approve the selected data?\n` +
+    `ID(s): ${editedDataForConfirmation.map(row => row.requestId || row.reqID).join(', ')}\n` +
+    `Requested Amount(s): ${editedDataForConfirmation.map(row => row.amount).join(', ')}\n` +
+    `Approved Amount(s): ${editedDataForConfirmation.map(row => row.approvedAmount || row.amount).join(', ')}\n` +
+    `Approved By: ${editedDataForConfirmation.map(row => row.approvedBy).join(', ')}`
+  );
 };
 
-const handleProceedApproval = (status) => {
-if (status === "Approved" && !editedApprovedBy.trim()) {
-setIsApprovedByWarningVisible(true);
-return;
-}
+const handleProceedApproval = async (status) => {
+  if (status === "Approved" && !editedApprovedBy.trim()) {
+    setIsApprovedByWarningVisible(true);
+    return;
+  }
 
-const currentDate = new Date();
-let updatedData;
-let dataToUpdate = activeTab === "Budget Submission List" ? originalData : originalRequestData;
+  const currentDate = new Date();
+  let updatedData;
+  let dataToUpdate = activeTab === "Budget Submission List" ? originalData : originalRequestData;
 
-updatedData = dataToUpdate.map(row => {
-const editingRow = editingRows.find(editRow => (activeTab === "Budget Submission List" ? editRow.requestId === row.requestId : editRow.reqID === row.reqID));
-if (editingRow) {
-if (status === "Approved") {
-const approvedAmount = parseFloat((row.approvedAmount || row.amount).replace(/,/g, ''));
-const departmentName = departmentIds[row.departmentId];
+  updatedData = dataToUpdate.map(row => {
+    const editingRow = editingRows.find(editRow =>
+      activeTab === "Budget Submission List"
+        ? editRow.requestId === row.requestId
+        : editRow.reqID === row.reqID
+    );
+    if (editingRow) {
+      if (status === "Approved") {
+        const approvedAmount = parseFloat((row.approvedAmount || row.amount).replace(/,/g, ''));
+        const departmentName = departmentIds[row.departmentId];
 
-if (departmentName) {
-setDepartmentBudgets(prevBudgets => {
-const updatedBudgets = {
-...prevBudgets,
-[departmentName]: {
-...prevBudgets[departmentName],
-allocatedBudget: prevBudgets[departmentName].allocatedBudget,
-remainingBudget: prevBudgets[departmentName].remainingBudget - approvedAmount,
-totalSpent: prevBudgets[departmentName].totalSpent + approvedAmount,
-}
-};
-return updatedBudgets;
-});
-}
+        if (departmentName) {
+          setDepartmentBudgets(prevBudgets => {
+            const updatedBudgets = {
+              ...prevBudgets,
+              [departmentName]: {
+                ...prevBudgets[departmentName],
+                allocatedBudget: prevBudgets[departmentName].allocatedBudget,
+                remainingBudget: prevBudgets[departmentName].remainingBudget - approvedAmount,
+                totalSpent: prevBudgets[departmentName].totalSpent + approvedAmount,
+              }
+            };
+            return updatedBudgets;
+          });
+        }
 
-return {
-...row,
-approvalStatus: "Approved",
-approvedBy: editedApprovedBy,
-approvalDate: currentDate,
-remarks: "Approved",
-validationDate: currentDate,
-validatedBy: "Sexbomb Aiah",
-approvedAmount: row.approvedAmount
-};
-} else if (status === "Rejected") {
-return {
-...row,
-approvalStatus: "Rejected",
-approvedBy: editedApprovedBy,
-approvalDate: currentDate,
-remarks: "For Resubmission"
-};
-}
-}
-return row;
-});
+        return {
+          ...row,
+          approvalStatus: "Approved",
+          approvedBy: editedApprovedBy,
+          approvalDate: currentDate,
+          remarks: "Approved",
+          validationDate: currentDate,
+          validatedBy: "Sexbomb Aiah",
+          approvedAmount: row.approvedAmount
+        };
+      } else if (status === "Rejected") {
+        return {
+          ...row,
+          approvalStatus: "Rejected",
+          approvedBy: editedApprovedBy,
+          approvalDate: currentDate,
+          remarks: "For Resubmission"
+        };
+      }
+    }
+    return row;
+  });
 
-if (activeTab === "Budget Submission List") {
-setOriginalData(updatedData);
-updateSubmissionTable(updatedData);
-} else if (activeTab === "Budget Request List") {
-setOriginalRequestData(updatedData);
-updateSubmissionTable(updatedData);
-}
-setIsConfirmationVisible(false);
-setSelectedRows([]);
-setIsEditModalVisible(false);
-setEditingRows([]);
-setEditedApprovedBy("");
-setApprovalStatus(null);
+  // PATCH to backend if rejected
+  if (status === "Rejected") {
+    try {
+      // For each editing row, PATCH the rejection
+      await Promise.all(editingRows.map(async (row) => {
+        let endpoint = "";
+        let payload = {};
+        if (activeTab === "Budget Submission List" && row.requestId) {
+          endpoint = `/approvals/budget-submissions/${row.requestId}/`;
+          payload = {
+            approved_by: editedApprovedBy || "N/A",
+            approval_status: "Rejected",
+            remarks: "For Resubmission",
+            approval_date: currentDate,
+          };
+        } else if (activeTab === "Budget Request List" && row.reqID) {
+          endpoint = `/approvals/budget-requests/${row.reqID}/`;
+          payload = {
+            approved_by: editedApprovedBy || "N/A",
+            approval_status: "Rejected",
+            remarks: "For Resubmission",
+            approval_date: currentDate,
+          };
+        }
+        if (endpoint) {
+          await PATCH(endpoint, payload);
+        }
+      }));
+      // Refresh rejected table from backend
+      fetchRejectedApprovals();
+      // Also refresh main data
+      if (activeTab === "Budget Submission List") {
+        fetchApprovals();
+      } else if (activeTab === "Budget Request List") {
+        fetchBudgetRequests();
+      }
+    } catch (error) {
+      console.error("Error patching rejected rows:", error);
+    }
+  }
+
+  if (activeTab === "Budget Submission List") {
+    setOriginalData(updatedData);
+    updateSubmissionTable(updatedData);
+    setRejectedData(
+      updatedData
+        .filter(item => item.approvalStatus === "Rejected")
+        .map(item => ({
+          approvalsId: item.approvalsId,
+          requestId: item.requestId,
+          amount: item.amount,
+          requestDate: item.submissionDate,
+          approvedBy: item.approvedBy,
+          remarks: item.remarks,
+          approvalStatus: item.approvalStatus,
+        }))
+    );
+    // Force update filteredData and rejectedData for table refresh
+    setFilteredData(
+      filterDataBySearch(
+        filterDataByDate(
+          updatedData,
+          dateRange,
+          'submissionDate'
+        ),
+        searchTerm,
+        'requestId'
+      )
+    );
+  } else if (activeTab === "Budget Request List") {
+    setOriginalRequestData(updatedData);
+    updateSubmissionTable(updatedData);
+    setRejectedData(
+      updatedData
+        .filter(item => item.approvalStatus === "Rejected")
+        .map(item => ({
+          approvalsId: item.approvalsId,
+          requestId: item.reqID,
+          amount: item.amount,
+          requestDate: item.requestDate,
+          approvedBy: item.approvedBy,
+          remarks: item.remarks,
+          approvalStatus: item.approvalStatus,
+        }))
+    );
+    setFilteredRequestData(
+      filterDataBySearch(
+        filterDataByDate(
+          updatedData,
+          dateRange,
+          'requestDate'
+        ),
+        searchTerm,
+        'reqID'
+      )
+    );
+  }
+  setIsConfirmationVisible(false);
+  setSelectedRows([]);
+  setIsEditModalVisible(false);
+  setEditingRows([]);
+  setEditedApprovedBy("");
+  setApprovalStatus(null);
 };
 
 const getSortedFilteredData = () => {
@@ -623,19 +735,19 @@ try {
   console.log("Fetched Budget Approvals:", data);
   
   const mappedData = data.map(sub => ({
-    approvalsId: sub.budget_approvals_id || "",
-    requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
-    departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "",
-    amount: sub?.validation?.amount_requested || "",
-    approvedAmount: sub?.validation?.final_approved_amount || "",
-    submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
-    validatedBy: sub?.validation?.validated_by || "",
-    validationDate: sub?.validation?.validation_date || "",
-    approvedBy: sub?.approved_by || "",
-    approvalDate: sub?.approval_date || "",
-    remarks: sub?.remarks || "",
-    validationStatus: sub?.validation?.validation_status || "",
-    approvalStatus: sub.approval_status || ""
+    approvalsId: sub.budget_approvals_id || "N/A",
+    requestId: sub?.validation?.budget_submission?.budget_submission_id || "N/A",
+    departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "N/A",
+    amount: sub?.validation?.amount_requested || "N/A",
+    approvedAmount: sub?.validation?.final_approved_amount || "N/A",
+    submissionDate: sub?.validation?.budget_submission?.date_submitted || "N/A",
+    validatedBy: sub?.validation?.validated_by || "N/A",
+    validationDate: sub?.validation?.validation_date || "N/A",
+    approvedBy: sub?.approved_by || "N/A",
+    approvalDate: sub?.approval_date || "N/A",
+    remarks: sub?.remarks || "N/A",
+    validationStatus: sub?.validation?.validation_status || "N/A",
+    approvalStatus: sub.approval_status || "N/A"
   }));
   
   setOriginalData(mappedData);
@@ -683,6 +795,7 @@ fetchAllocation();
 fetchApprovals();
 fetchRejectedApprovals();
 fetchBudgetRequests();
+fetchRejectedRequests();
 }, []);
 
 
@@ -714,6 +827,26 @@ const getSelectedRows = () => {
   return [];
 };
 
+const fetchRejectedRequests = async () => {
+try {
+const data = await GET("/approvals/rejected-budget-requests/"); 
+console.log("Fetched rejected requests:", data);
+setRejectedData(data.map(item => ({
+approvalsId: item.budget_approvals_id || "",
+requestId: item?.validation?.budget_request?.budget_request_id || "",
+amount: item?.validation?.amount_requested || "",
+requestDate: item?.validation?.budget_request?.requested_date || "",
+approvedBy: item.approved_by || "",
+remarks: item.remarks || "",
+approvalStatus: item.approval_status || "",
+})));
+console.log("Rejected Requests Data:", data);
+}
+catch (error) {
+console.error("Failed to load rejected requests:", error);
+}
+};
+
 
 return (
 <div className="approvals">
@@ -734,7 +867,7 @@ return (
 <InfoCard className="summary-infocard">
 <div className="summary-container">
 <div className="date-status-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="summary-status">
 <span className="status-prefix">Status:</span>
 <span className={`summary-status-label ${budgetPlanStatus.toLowerCase()}`}>
@@ -788,7 +921,7 @@ Total Remaining
 {/* Budget Submission List content */}
 <InfoCard className="summary-infocard">
 <div className="summary-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="date-range-border"></div>
 <div className="summary-details">
 <div className="summary-total-budget">
@@ -851,7 +984,7 @@ Rejected <span className="status-circle rejected"></span>
 </tr>
 </thead>
 <tbody>
-{originalData.map((row, index) => (
+{filteredData.map((row, index) => (
 <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedSubmissionRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.approvalStatus === "Approved" ? "#f0f0f0" : "white" }}>
 <td><div className="row-wrapper"><input type="checkbox" checked={selectedSubmissionRows.includes(row.requestId)} readOnly /></div></td>
 <td><div className="row-wrapper">{row.requestId}</div></td>
@@ -904,31 +1037,33 @@ readOnly
 <strong>Validation Date:</strong> {formatDate(row.validationDate)}
 </p>
 <p>
-<strong>Approved Amount:</strong>
-<input
-type="number"
-value={row.approvedAmount}
-onChange={(e) => {
-  const updatedData = editedDataForConfirmation.map(item =>
-    item.requestId === row.requestId ? { ...item, approvedAmount: e.target.value } : item
-  );
-  setEditedDataForConfirmation(updatedData);
-}}
-/>
+<strong>Approved Amount:</strong> {row.approvedAmount}
+
 </p>
 <p>
-<strong>Validated By:</strong>
-<input
-type="text"
-value={row.validatedBy}
-onChange={(e) => {
-  const updatedData = editedDataForConfirmation.map(item =>
-    item.requestId === row.requestId ? { ...item, validatedBy: e.target.value } : item
-  );
-  setEditedDataForConfirmation(updatedData);
-}}
-/>
+<strong>Validated By:</strong> {row.validatedBy}
 </p>
+<div className="edit-modal-input-group approved-by-group">
+  <label>
+    <strong>Approved By:</strong>
+  </label>
+  <input
+    type="text"
+    value={editedDataForConfirmation.find(item => item.requestId === row.requestId)?.approvedBy || ""}
+    onChange={e => {
+      const updatedData = editedDataForConfirmation.map(item =>
+        item.requestId === row.requestId
+          ? { ...item, approvedBy: e.target.value }
+          : item
+      );
+      setEditedDataForConfirmation(updatedData);
+      setApprovedByError(prev => ({ ...prev, [row.requestId]: false }));
+    }}
+  />
+  {approvedByError[row.requestId] && (
+    <p className="error-message">Approved By is required</p>
+  )}
+</div>
 </div>
 </div>
 </div>
@@ -955,7 +1090,61 @@ Save Changes
 <p>{confirmationMessage}</p>
 <div className="popup-buttons">
 <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
-<button className="proceed-button" onClick={() => handleProceedApproval(approvalStatus)}>Confirm</button>
+<button
+  className="proceed-button"
+  onClick={() => {
+    // 1. Update approvalStatus for selected/edited rows from "Pending" to "Approved"
+    const updatedData = originalData.map(row => {
+      if (selectedSubmissionRows.includes(row.requestId) && row.approvalStatus === "Pending") {
+        return {
+          ...row,
+          approvalStatus: "Approved",
+          approvedBy: editedDataForConfirmation.find(item => item.requestId === row.requestId)?.approvedBy || row.approvedBy,
+          approvalDate: new Date(),
+          remarks: "Approved"
+        };
+      }
+      return row;
+    });
+
+    // 2. Update state
+    setOriginalData(updatedData);
+
+    // 3. Optionally update filteredData and rejectedData for immediate UI update
+    setFilteredData(
+      filterDataBySearch(
+        filterDataByDate(
+          updatedData,
+          dateRange,
+          'submissionDate'
+        ),
+        searchTerm,
+        'requestId'
+      )
+    );
+    setRejectedData(
+      updatedData
+        .filter(item => item.approvalStatus === "Rejected")
+        .map(item => ({
+          approvalsId: item.approvalsId,
+          requestId: item.requestId,
+          amount: item.amount,
+          requestDate: item.submissionDate,
+          approvedBy: item.approvedBy,
+          remarks: item.remarks,
+          approvalStatus: item.approvalStatus,
+        }))
+    );
+
+    // 4. Close the modal and clear selection
+    setIsConfirmationVisible(false);
+    setIsSubmissionEditModalOpen(false);
+    setSelectedSubmissionRows([]);
+    setEditedDataForConfirmation([]);
+  }}
+>
+  Confirm
+</button>
 </div>
 </div>
 </InfoCard>
@@ -1009,7 +1198,7 @@ Save Changes
 <>
 <InfoCard className="summary-infocard">
 <div className="summary-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="date-range-border"></div>
 <div className="summary-details">
 <div className="summary-total-budget">
@@ -1190,8 +1379,61 @@ Save Changes
 <p>{confirmationMessage}</p>
 <div className="popup-buttons">
 <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
-<button className="proceed-button" onClick={() => handleProceedApproval(approvalStatus)}>Confirm</button>
-</div>
+<button
+  className="proceed-button"
+  onClick={() => {
+    // 1. Update approvalStatus for selected/edited rows from "Pending" to "Approved"
+    const updatedData = originalData.map(row => {
+      if (selectedSubmissionRows.includes(row.reqId) && row.approvalStatus === "Pending") {
+        return {
+          ...row,
+          approvalStatus: "Approved",
+          approvedBy: editedDataForConfirmation.find(item => item.reqId === row.reqId)?.approvedBy || row.approvedBy,
+          approvalDate: new Date(),
+          remarks: "Approved"
+        };
+      }
+      return row;
+    });
+
+    // 2. Update state
+    setOriginalData(updatedData);
+
+    // 3. Optionally update filteredData and rejectedData for immediate UI update
+    setFilteredData(
+      filterDataBySearch(
+        filterDataByDate(
+          updatedData,
+          dateRange,
+          'submissionDate'
+        ),
+        searchTerm,
+        'requestId'
+      )
+    );
+    setRejectedData(
+      updatedData
+        .filter(item => item.approvalStatus === "Rejected")
+        .map(item => ({
+          approvalsId: item.approvalsId,
+          reqId: item.reqId,
+          amount: item.amount,
+          requestDate: item.requested_date,
+          approvedBy: item.approvedBy,
+          remarks: item.remarks,
+          approvalStatus: item.approvalStatus,
+        }))
+    );
+
+    // 4. Close the modal and clear selection
+    setIsConfirmationVisible(false);
+    setIsSubmissionEditModalOpen(false);
+    setSelectedSubmissionRows([]);
+    setEditedDataForConfirmation([]);
+  }}
+>
+  Confirm
+</button></div>
 </div>
 </InfoCard>
 )}
@@ -1239,15 +1481,7 @@ Save Changes
 </div>
 </div>
 )}
-{isApprovedByWarningVisible && (
-<div className="warning-popup">
-<div className="warning-popup-content">
-<h3>Warning</h3>
-<p>Please fill out this field.</p>
-<button className="close-popup-button" onClick={closeApprovedByWarning}>OK</button>
-</div>
-</div>
-)}
+
 </div>
 </div>
 );

@@ -16,10 +16,16 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
   const [selectedStatus, setSelectedStatus] = useState("Draft");
   const [activeTab, setActiveTab] = useState("document");
+  const [duplicateDetails, setDuplicateDetails] = useState({});
+  
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
+    if (!selectedData?.document_items) return 0;
+    
     return selectedData.document_items.reduce((sum, item) => {
-      return sum + parseFloat(item.quantity * item.cost);
+      const price = item.item_price !== 0 ? item.item_price : 
+                   (duplicateDetails[item.item_id]?.[0]?.price || 0);
+      return sum + (parseFloat(item.quantity) * parseFloat(price));
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
@@ -87,7 +93,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const selectedInvoice = invoices.find(inv => inv.invoice_id === invoiceId);
     if (!selectedInvoice) return;
  
-    // Format the date by removing the time portion
     const formattedDate = selectedInvoice.invoice_date.split('T')[0];
  
     setDocumentDetails(prev => ({
@@ -99,10 +104,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   };
   useEffect(() => {
     if (selectedData?.status) {
-      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
+      setSelectedStatus(selectedData.status); 
     }
     if (selectedData?.invoice_id) {
-      // Directly update the state instead of calling handleInvoiceSelect
       const selectedInvoice = invoices.find(inv => inv.invoice_id === selectedData.invoice_id);
       if (selectedInvoice) {
         const formattedDate = selectedInvoice.invoice_date?.split('T')[0] || date_today;
@@ -146,10 +150,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
  
-  const [documentItems, setDocumentItems] = useState(
-    isCreateMode ? [{}] : [...selectedData.document_items, {}]
-  );
-
+ 
 
 
 
@@ -159,15 +160,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
  
   const today = new Date().toISOString().slice(0, 10);
-  // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
     vendor_code: isCreateMode ? "" : vendorID,
-    vendor_name: isCreateMode ? "" : selectedVendor,
+    company_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? employee_id : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedData.owner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     ar_credit_memo: isCreateMode ? "" : selectedData.ar_credit_memo || "",
+    invoice_id: isCreateMode ? "" : selectedData.invoice_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
     posting_date: isCreateMode ? today  : selectedData.posting_date || "",
@@ -202,7 +203,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             ...prev,
             document_no: data.next_document_no,
             transaction_id: data.next_transaction_id,
-            ar_credit_memo: data.next_credit_memo_id || "AR-1000"
+            ar_credit_memo: data.next_credit_memo_id
           }));
          
         } catch (error) {
@@ -225,32 +226,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
-
-    // Handle date fields
-    if (field === 'manuf_date' || field === 'expiry_date') {
-      updatedItems[index] = {
-        ...currentItem,
-        product_details: {
-          ...(currentItem.product_details || {}),
-          [field]: e.target.value // This will be in YYYY-MM-DD format from the date input
-        }
-      };
-    }
-    else {
-      updatedItems[index][field] = e.target.value;
-    }
+    updatedItems[index][field] = e.target.value;
     setDocumentItems(updatedItems);
-
-
-
-
-
-
-
-
-    // Check if the row is NOT the last row and the item_name was cleared
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
-      // If this item exists in the database, delete it
       try {
         await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
@@ -258,19 +236,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            document_id: "",  // or null, depending on the backend expectations
+            document_id: "",  
           }),
         });
       } catch (error) {
         toast.error('Error deleting row from database:', error);
       }
- 
-      // Remove the item from local state
+  
       updatedItems.splice(index, 1);
       setDocumentItems(updatedItems);
     }
- 
-    // If you're editing the last row and it was just filled, add a new row
+
     if (index === documentItems.length - 1) {
       handleAddRow();
     }
@@ -288,166 +264,40 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   };
   const [isAddingRow, setIsAddingRow] = useState(false);
-  const handleAddRow = async () => {
+  const handleAddRow = () => {
     const lastRow = documentItems[documentItems.length - 1];
-   
+    
     if (isRowFilled(lastRow)) {
-      try {
-        setIsAddingRow(true);
-        if (isCreateMode) {
-          // In create mode, just add the item to state without API calls
-          const updatedItems = [...documentItems];
-          updatedItems[updatedItems.length - 1] = {
-            ...lastRow,
-            // Calculate total for display
-            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost))).toFixed(2)
-          };
-         
-          // Add new empty row
-          updatedItems.push({
-            item_id: '',
-            item_name: '',
-            unit_of_measure: '',
-            quantity: '',
-            cost: ''
-          });
- 
-          setDocumentItems(updatedItems);
-          return
-        }else{
-        // Prepare the payload
-        const payload = {
-          document_id: selectedData.document_id,
-          quantity: parseInt(lastRow.quantity),
-          cost: parseFloat(lastRow.cost)
-        };
- 
-        // Set the appropriate item type field
-        if (lastRow.item_id.startsWith("ADMIN-MATERIAL")) {
-          payload.material_id = lastRow.item_id;
-        } else if (lastRow.item_id.startsWith("ADMIN-ASSET")) {
-          payload.asset_id = lastRow.item_id;
-        } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
-          // First create product docu item
-          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              product_id: lastRow.item_id,
-              document_id: selectedData.document_id,
-              manufacturing_date: lastRow.manufacturing_date,
-              expiry_date: lastRow.manufacturing_date
-            })
-          });
-         
-          if (!productDocuResponse.ok) {
-            const errorData = await productDocuResponse.json();
-            throw new Error(`Create product item ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
-          }
-          const productDocuItem = await productDocuResponse.json();
-          payload.productdocu_id = productDocuItem.productdocu_id;
-        }
- 
-        // Create the document item
-        const createResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-document-item/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
- 
-        if (!createResponse.ok) {
-          const errorData = await createResponse.json();
-          throw new Error(`Create item ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
-        }
-        const createdItem = await createResponse.json();
- 
-        // Update state
-        const freshItems = await reloadDocumentItems();
-     
-        // Find the newly created item by matching properties
-        const newItem = freshItems.find(item =>
-          item.item_id === lastRow.item_id &&
-          item.quantity === parseInt(lastRow.quantity)
-        );
-
-
-
-
-
-
-
-
-        if (!newItem) {
-          throw new Error('Newly created item not found in reloaded data');
-        }
-
-
-
-
-
-
-
-
-        // Update state with the fresh data
-        const updatedItems = [...documentItems];
-        updatedItems[updatedItems.length - 1] = {
-          ...lastRow,
-          content_id: newItem.content_id,
-          productdocu_id: newItem.productdocu_id || null
-        };
-       
-        updatedItems.push({
-          item_id: '',
-          item_name: '',
-          unit_of_measure: '',
-          quantity: '',
-          cost: ''
-        });
- 
-        setDocumentItems(updatedItems);
-        const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
-
-
-
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-
-
-
-        const updatedDoc = await response.json();  
-        updatedDoc.document_items.push({          
-          item_id: '',
-          item_name: '',
-          unit_of_measure: '',
-          quantity: '',
-          cost: ''
-        });
-
-
-
-
-        setDocumentItems(updatedDoc.document_items);  
-      }
-      } catch (error) {
-        toast.error(`Failed to add item: ${error.message}`);
-      } finally {
-        setIsAddingRow(false);
-      }
+      const updatedItems = [...documentItems];
+      updatedItems[updatedItems.length - 1] = {
+        ...lastRow,
+        total: (parseFloat(lastRow.quantity) * parseFloat(lastRow.cost)).toFixed(2) - parseFloat(lastRow.ar_discount).toFixed(2),
+      };
+      
+      updatedItems.push({
+        item_id: '',
+        item_name: '',
+        item_type: '',
+        unit_of_measure: '',
+        quantity: '',
+        cost: '',
+        item_no: ''
+      });
+  
+      setDocumentItems(updatedItems);
     }
   };
  
  
  
   const isRowFilled = (row) => {
-    return (
-      row.item_id,
-      row.item_name,
-      row.quantity,
-      row.cost
+    const baseFieldsFilled = (
+      row.item_id &&
+      row.item_name &&
+      row.quantity
     );
+
+    return baseFieldsFilled;
   };
 
 
@@ -466,7 +316,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
-        // Sort A–Z by location
         const sorted = data.sort((a, b) => a.warehouse_location.localeCompare(b.warehouse_location));
         setWarehouseOptions(sorted);
       })
@@ -474,102 +323,110 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
-
-
-
-
-
-
-
-
+ 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-data/')
-      .then(res => res.json())
-      .then(data => {
-        const options = [];
-
-
-
-
-
-
-
-
-        data.products.forEach(prod => {
-          options.push({
-            id: prod.product_id,
-            name: prod.product_name,
-            cost: parseFloat(prod.selling_price),
-            unit: prod.unit_of_measure,
-            type: 'product',
+      fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
+        .then(res => res.json())
+        .then(data => {
+          const typePriority = { product: 1, material: 2, asset: 3 };
+    
+          const filtered = data.filter(item => {
+            const priceValid = item.item_price != null && parseFloat(item.item_price) > 0;
+  
+            const type = item.item_type?.toLowerCase();
+            const isAssetOrMaterial = type?.includes('asset') || type?.includes('material');
+            const hasValidDate = item.purchase_date;
+    
+            return priceValid && (!isAssetOrMaterial || hasValidDate);
           });
-        });
-
-
-
-
-
-
-
-
-        data.material.forEach(mat => {
-          options.push({
-            id: mat.material_id,
-            name: mat.material_name,
-            cost: parseFloat(mat.cost_per_unit),
-            unit: mat.unit_of_measure,
-            type: 'material',
+    
+          const uniqueMap = new Map();
+          const duplicateDetails = {};
+    
+          filtered.forEach(item => {
+            const id = item.item_id;
+            const price = parseFloat(item.item_price);
+            const date = item.purchase_date;
+    
+            if (!uniqueMap.has(id)) {
+              uniqueMap.set(id, item);
+              duplicateDetails[id] = [{ price, date }];
+            } else {
+              duplicateDetails[id].push({ price, date });
+            }
           });
-        });
-
-
-
-
-
-
-
-
-        data.asset?.forEach(asset => {
-          options.push({
-            id: asset.asset_id,
-            name: asset.asset_name,
-            cost: parseFloat(asset.purchase_price),
-            unit: "---",
-            type: 'asset',
+    
+          Object.keys(duplicateDetails).forEach(id => {
+            duplicateDetails[id].sort((a, b) => new Date(b.date) - new Date(a.date));
           });
+    
+          setDuplicateDetails(duplicateDetails);
+    
+          const options = Array.from(uniqueMap.values()).map(item => ({
+            id: item.item_id,
+            name: item.item_name,
+            cost: parseFloat(item.item_price),
+            unit: item.unit_of_measure || '---',
+            type: item.item_type?.toLowerCase().includes("asset") ? 'asset' :
+                  item.item_type?.toLowerCase().includes("product") ? 'product' :
+                  'material',
+          }));
+    
+          options.sort((a, b) => {
+            const typeCompare = typePriority[a.type] - typePriority[b.type];
+            if (typeCompare !== 0) return typeCompare;
+            return a.name.localeCompare(b.name);
+          });
+    
+          setItemOptions(options);
         });
-
-
-
-
-
-
-
-
-        setItemOptions(options);
-      });
-  }, []);
-
-
-
-
-
-
+    }, []);
 
 
   const handleItemSelection = async (index, selectedName) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
- 
-    // If "-- Select Item --" was chosen (empty value)
+  
     if (selectedName === "") {
-      // Only delete if it's not the last row
       if (index !== updatedItems.length - 1) {
-        // If this item exists in the database, delete it
         try {
-          const confirmDelete = window.confirm('Are you sure you want to archive this row?');
-          if (!confirmDelete) {
-            // Reset the select value to the previous item name
+          const userConfirmed = await new Promise((resolve) => {
+            toast.info(
+              <div>
+                <p style={{fontSize:"1em"}}>Do you want to archive this row?</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                  <button 
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(true);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    Yes
+                  </button>
+                  <button 
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(false);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>,
+              {
+                position: "top-right",
+                autoClose: false,
+                closeButton: false,
+                draggable: false,
+                closeOnClick: false,
+                toastId: 'archive-confirmation'
+              }
+            );
+          });
+  
+          if (!userConfirmed) {
             updatedItems[index] = {
               ...currentItem,
               item_name: currentItem.item_name || ''
@@ -577,9 +434,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             setDocumentItems(updatedItems);
             return;
           }
- 
-
-
+  
 
 
           await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
@@ -588,62 +443,77 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              document_id: "",  // or null, depending on the backend expectations
+              document_id: "",  
             }),
           });
-         
-
-
+          
 
 
         } catch (error) {
           toast.error('Error deleting row from database:', error);
           return;
         }
- 
-        // Remove the item from local state
+  
         updatedItems.splice(index, 1);
       } else {
-        // For last row, just clear the values
         updatedItems[index] = {
           ...currentItem,
           item_id: '',
           item_name: '',
           unit_of_measure: '',
+          ar_discount: '',
           cost: ''
         };
       }
-     
+      
       setDocumentItems(updatedItems);
       return;
     }
- 
-    // Normal item selection
+  
     const selectedItem = itemOptions.find(opt => opt.name === selectedName);
     if (!selectedItem) return;
- 
-    updatedItems[index] = {
-      ...currentItem,
-      item_name: selectedItem.name,
-      item_id: selectedItem.id,
-      cost: selectedItem.cost,
-      unit_of_measure: selectedItem.unit,
-    };
- 
+    const duplicatePrices = duplicateDetails[selectedItem.id] || [];
+    if (duplicatePrices.length <= 1) {
+      updatedItems[index] = {
+        ...currentItem,
+        item_name: selectedItem.name,
+        item_id: selectedItem.id,
+        cost: duplicatePrices[0]?.price || selectedItem.cost,
+        unit_of_measure: selectedItem.unit,
+        available_costs: null 
+      };
+    } else {
+      const latestPrice = duplicatePrices[0]?.price;
+      updatedItems[index] = {
+        ...currentItem,
+        item_name: selectedItem.name,
+        item_id: selectedItem.id,
+        cost: latestPrice || 0, 
+        unit_of_measure: selectedItem.unit,
+        available_costs: duplicatePrices.map(priceObj => ({
+          price: priceObj.price,
+          date: priceObj.date
+        }))
+      };
+    }
+  
     setDocumentItems(updatedItems);
- 
-    // Add new row if this is the last row and we're selecting an item
+  
     if (index === updatedItems.length - 1) {
       handleAddRow();
     }
   };
-
-
-
-
-
-
-
+  const handleCostSelection = (index, selectedPrice) => {
+    const updatedItems = [...documentItems];
+    updatedItems[index].cost = selectedPrice;
+    
+    updatedItems[index].total = (
+      parseFloat(updatedItems[index].quantity || 0) * 
+      parseFloat(selectedPrice)
+    ).toFixed(2);
+    
+    setDocumentItems(updatedItems);
+  };
 
   useEffect(() => {
     const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
@@ -657,7 +527,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       tax_amount: tax_amount,
       total: total,
     }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount, documentDetails.invoice_amount]);
+  }, [documentDetails.ar_discount, documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount, documentDetails.invoice_amount]);
  
  
   const handleDocumentDetailChange = (e, field) => {
@@ -667,47 +537,41 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }));
   };
  
-  // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
       
-      // Prepare the document items for creation
-      const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
+      const itemsToCreate = documentItems.slice(0, -1); 
      
-      // Prepare the payload for the create API
       const payload = {
-        document_type: "A/R Credit Memo",
-        status: selectedStatus,
         vendor_code: null,
-        buyer: vendorID,
-        employee_id: employee_id,
+        document_type: "A/R Credit Memo",
+        transaction_id: documentDetails.transaction_id,
+        document_no: documentDetails.document_no,
+        purchase_id: documentDetails?.purchase_id || null,
+        status: selectedStatus,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails?.document_no || null,
-        transaction_id: documentDetails.transaction_id,
+        buyer: vendorID,
+        owner: documentDetails.owner,
         ar_credit_memo: documentDetails.ar_credit_memo,
-        invoice_id: documentDetails.invoice_id,
-        initial_amount: documentDetails.initialAmount,
-        tax_rate: documentDetails.tax_rate,
-        tax_amount: documentDetails.tax_amount,
-        discount_rate: documentDetails.discount_rate,
-        discount_amount: documentDetails.discount_amount,
-        freight: documentDetails.freight,
-        transaction_cost: documentDetails.transaction_cost,
+        invoice_id : documentDetails.invoice_id,
+        initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
+        discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
+        discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
+        freight: parseFloat(documentDetails.freight).toFixed(2) || 0,
+        tax_rate: parseFloat(documentDetails.tax_rate).toFixed(2) || 0,
+        tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
         document_items: itemsToCreate.map(item => ({
           item_id: item.item_id,
-          item_name: item.item_name,
-          quantity: item.quantity,
-          cost: item.cost,
-          batch: item.batch_no || null,
-          ...(item.item_id.startsWith("ADMIN-PROD") && { product_id: item.item_id }),
-          ...(item.item_id.startsWith("ADMIN-ASSET") && { asset_id: item.item_id }),
-          ...(item.item_id.startsWith("ADMIN-MATERIAL") && { material_id: item.item_id }),
+          quantity: parseInt(item.quantity, 10),
+          item_price: parseFloat(item.cost) || 0,
+          ar_discount: parseFloat(item.ar_discount) || 0,
+          total: parseFloat(item.total) || 0,
+          item_no: null
         }))
       };
-      console.log(payload)
-      // Call the create API
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
@@ -733,187 +597,142 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
-
-
       const result = await response.json();
-      toast.success('Create successful:', result);
-     
-      // Call onSuccess with the created data if needed
-      onSuccess(result);
-     
+      if(onSuccess){
+        await onSuccess(result);
+      }
     } catch (error) {
       toast.error(`Failed to create document. Please try again later`);
       console.log(error)
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handleBackWithUpdate = async () => {
-    const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
-    const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if(!selectedOwner){
-      toast.error("Owner is required")
-      return
-    }else if(!(documentDetails.invoice_id)){
-      toast.dismiss()
-      toast.error("Invoice ID required")
-      return
-    }else if(!vendorID){
-      toast.dismiss()
-      toast.error("Customer is required")
-      return
-    }else if (updatedDocumentItems.length === 0) {
-      toast.dismiss()
-      toast.error("At least one item is required. Please fill all necessary data");
-      return;
-    }else if (documentDetails.transaction_cost > 1000000000) {
-      toast.dismiss()
-      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
-      return;
-    }
-    try {
-      if (isCreateMode) {
-        await handleCreateDocument();
-      } else {
-      // Step 1: Update Product Document Items
-      for (let item of updatedDocumentItems) {
-        if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
-        const updatedDocumentItemData = {
-          product_id: item.item_id,
-        };
-        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedDocumentItemData),
-        });
- 
-        if (!documentItemResponse.ok) {
-          const errorData = await documentItemResponse.json();
-          throw new Error(`Product Items update failed for productdocu_id ${item.productdocu_id}: ${JSON.stringify(errorData)}`);
+      const updatedDocumentItems = documentItems.slice(0, -1);   
+      let rowNum = 0
+      if (!selectedOwner){
+        toast.error("Owner is required")
+        return
+      }else if (updatedDocumentItems.length === 0) {
+        toast.error("At least one item is required. Please fill all necessary data");
+        return;
+      }else if (documentDetails.transaction_cost > 1000000000) {
+        toast.dismiss()
+        toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+        return;
+      }
+      for (let item of updatedDocumentItems){
+        rowNum += 1
+        if (!item.item_id){
+          toast.dismiss()
+          toast.error(`Please add item for Row: ${rowNum}.`);
+          return
+        }else if(!item.quantity){
+          toast.dismiss()
+          toast.error(`Please add quantity for ${item.item_name} (Row: ${rowNum}).`);
+          return
         }
-       
-        const documentItemResult = await documentItemResponse.json();
-        console.log('Product Items update successful:', documentItemResult);
-      }}
- 
-     
- 
-      // Step 3: Update ProductDocuItemData after DocumentItems
-      //id name uom quanity cost total location serial
-      for (let item of updatedDocumentItems) {
-        const updateDocomentItems = {
-          quantity: parseInt(item.quantity) || 0,
-          cost: parseFloat(item.cost) || 0,
-          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0
-        };
-        if (item.item_id?.startsWith("ADMIN-MATERIAL")) {
-          updateDocomentItems.material_id = item.item_id;
-        } else if (item.item_id?.startsWith("ADMIN-ASSET")) {
-          updateDocomentItems.asset_id = item.item_id;
-        } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
-          updateDocomentItems.productdocu_id = item.productdocu_id;
+      }
+      try {
+        toast.dismiss()
+        if (isCreateMode) {
+          toast.loading("Saving changes...")
+          await handleCreateDocument();
+          toast.dismiss()
+        } else {
+          rowNum = 0
+          toast.loading("Saving changes...")
+        
+          for (let item of updatedDocumentItems){
+            rowNum += 1
+            const payload = {
+              document_id: selectedData.document_id,
+              item_id: item.item_id,
+              quantity: parseInt(item.quantity, 10),
+              item_price: parseFloat(item.cost) || 0,
+              ar_discount: parseFloat(item.ar_discount) || 0,
+              total: parseFloat(item.total) || 0,
+              manuf_date: item.manuf_date,
+              expiry_date: item.expiry_date,
+              purchase_date: item.purchase_date || null,
+              item_no: item?.item_no || null
+            }
+            let itemResponse
+            if (item.content_id){
+              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
+            }else{
+              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
+            }
+            
+            if (!itemResponse.ok) {
+              const errorData = await itemResponse.json();
+              toast.error(`Row ${rowNum}: ${errorData.error || 'Failed to save item.'}`);
+              return;
+            }
+          }
+          const updatedDocumentsData = {
+            vendor_code: null,
+            document_type: "A/R Credit Memo",
+            transaction_id: documentDetails.transaction_id,
+            document_no: documentDetails.document_no,
+            purchase_id: documentDetails?.purchase_id || null,
+            status: selectedStatus,
+            delivery_date: documentDetails.delivery_date,
+            posting_date: documentDetails.posting_date,
+            document_date: documentDetails.document_date,
+            buyer: vendorID,
+            owner: documentDetails.owner,
+            invoice_id : documentDetails.invoice_id,
+            initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
+            discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
+            discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
+            freight: parseFloat(documentDetails.freight).toFixed(2) || 0,
+            tax_rate: parseFloat(documentDetails.tax_rate).toFixed(2) || 0,
+            tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
+            transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
+          };
+          const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedDocumentsData),
+          });
+          if (!goodsTrackingResponse.ok) {
+            const errorData = await goodsTrackingResponse.json();
+            throw new Error(`GoodsTrackingData update failed for document_id ${selectedData.document_id}: ${JSON.stringify(errorData)}`);
+          }
         }
-        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateDocomentItems),
-        });
- 
-        if (!productDocuItemResponse.ok) {
-          const errorData = await productDocuItemResponse.json();
-          throw new Error(`document item update failed for content_id ${item.content_id}: ${JSON.stringify(errorData)}`);
+        if (onSuccess) {
+          await onSuccess();
+          toast.dismiss()
+          toast.success("Successfully updated documents.", {
+            autoClose: 1000,
+            onClose: () => onBack(), 
+          });
         }
- 
-        const productDocuItemResult = await productDocuItemResponse.json();
-        console.log('`document item update successful:', productDocuItemResult);
+      } catch (error) {
+        toast.error(`Failed to update data. Please try again later`);
+        console.log(error.message)
       }
-      const updatedData = {
-        status: selectedStatus,
-        vendor_code: null,
-        buyer: vendorID,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
-        transaction_id: documentDetails.transaction_id,
-        invoice_id: documentDetails.invoice_id,
-        ar_credit_memo: documentDetails.ar_credit_memo,
-        document_no: documentDetails?.document_no || null,
-        delivery_date: documentDetails.delivery_date,
-        posting_date: documentDetails.posting_date,
-        document_date: documentDetails.document_date,
-        initial_amount: parseFloat(initialAmount) || 0,
-        discount_rate: parseFloat(documentDetails.discount_rate) || 0,
-        discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
-        tax_rate: parseFloat(documentDetails.tax_rate) || 0,
-        tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
-        freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
-      };
-      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData),
-      });
+    };
  
-      if (!goodsTrackingResponse.ok) {
-        const errorData = await goodsTrackingResponse.json();
-        throw new Error(`GoodsTrackingData update failed for document_id ${selectedData.document_id}: ${JSON.stringify(errorData)}`);
-      }
- 
-      const goodsTrackingResult = await goodsTrackingResponse.json();
-      toast.loading("Updating...");
-      }
-      if (onSuccess) {
-        await onSuccess();  // Refresh the data in GoodsTracking
-      }
- 
-      
-      if (onBack) {
-        onBack();  // Navigate back to GoodsTracking
-      }
-    } catch (error) {
-      toast.error(`Failed to update data. Please try again later`);
-      console.log(error)
-    }
-  };
- 
-
-
-
-
-
-
-
-
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
 
 
-
-
-
-
-
-
-  // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
       const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
@@ -936,21 +755,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
   const handlePOSelect = async (poId) => {
     if (!poId) return;
-    setSelectedPO(""); // Update the selected PO state
+    setSelectedPO(""); 
  
     try {
-      // Fetch the selected purchase order details
       const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
       const quotation = selectedPO.quotation_id || {};
  
-      // Update document details with PO information
       setDocumentDetails(prev => ({
         ...prev,
         vendor_code: quotation.vendor_code || null,
-        vendor_name: quotation.vendor_name || null,
+        company_name: quotation.company_name || null,
         contact_person: quotation.contact_person || null,
         buyer: null,
         owner: quotation.request_id?.employee_name || null,
@@ -963,7 +780,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         freight: parseFloat(quotation.freight || 0).toFixed(2),
       }));
  
-      // Get item details from pre-fetched itemOptions
       const poItems = (selectedPO.quotation_contents || []).map(content => {
         const itemId = content.material_id || content.asset_id || content.product_id;
         const matchedItem = itemOptions.find(opt => opt.id === itemId);
@@ -979,10 +795,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         };
       }).filter(item => item !== null);
  
-      // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
       setInitialAmount(poInitialAmount.toFixed(2));
-      // Set document items (add empty row)
       setDocumentItems([...poItems, {}]);
  
     } catch (error) {
@@ -1017,24 +831,44 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_balance, initialAmount]);
 
 
+  const [documentItems, setDocumentItems] = useState(
+    isCreateMode 
+      ? [{}] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            content_id: item.content_id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_of_measure: item.unit_of_measure,
+            quantity: item.quantity,
+            cost: item.item_price !== 0 ? item.item_price : (duplicateDetails[item.item_id]?.[0]?.price || 0),
+            ar_discount: item.ar_discount || 0, 
+            item_no: item.item_no 
+          })), 
+          {}
+        ]
+  );
 
 
   useEffect(() => {
     const newInitialAmount = documentItems
-      .slice(0, -1) // exclude the last empty row
+      .slice(0, -1) 
       .reduce((sum, item) => {
-        return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
+        const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
+        const discount_percent = item?.ar_discount || 0;
+        const discount = (parseFloat(item.quantity || 0) * parseFloat(price)*(discount_percent/100))
+        const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(price))-discount);
+        return total + sum;
       }, 0)
       .toFixed(2);
-   
     setInitialAmount(newInitialAmount);
-  }, [documentItems]);
+  }, [documentItems, duplicateDetails]);
 
 
   return (
     <div className="ar-cred">
       <div className="body-content-container">
-        <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
+        <div className="back-button" onClick={handleBackWithUpdate}> ← Save</div>
         <div className="content-wrapper">
         <ToastContainer transition={Slide} />
           <div className="details-grid">
@@ -1070,8 +904,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   type="text"
                   readOnly
                   value={
-                    selectedData?.employee_id
-                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                    selectedData?.owner
+                      ? employeeList.find(e => e.employee_id === selectedData.owner)?.employee_name || selectedData.employee_id
                       : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
                   }
                   style={{
@@ -1182,8 +1016,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       <div className="date-input clickable">
                       <input
                         type="date"
-                        defaultValue="2025-01-31"
-                        value={documentDetails.posting_date}
+                        value={documentDetails?.posting_date || "2025-01-31"}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
                         min={date_today}
                       />
@@ -1197,8 +1030,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <div className="date-input clickable">
                       <input
                         type="date"
-                        defaultValue="2025-01-31"
-                        value={documentDetails.document_date}
+                        value={documentDetails?.document_date || "2025-01-31"}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
                         max={date_today}
                       />
@@ -1349,27 +1181,57 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         />
                       </td>
                       <td>
+                        {item.item_id && duplicateDetails[item.item_id]?.length > 1 ? (
+                          <select
+                            value={item.cost || ''}
+                            onChange={(e) => handleCostSelection(index, parseFloat(e.target.value))}
+                            required
+                          >
+                            {duplicateDetails[item.item_id].map((costObj, costIndex) => (
+                              <option key={costIndex} value={costObj.price}>
+                                {costObj.price.toFixed(2)} (Purchased: {costObj.date || 'Unknown'})
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="number"
+                            value={
+                              item.cost || 
+                              (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 
+                              '0.00'
+                            }
+                            readOnly
+                            style={{ cursor: 'not-allowed' }}
+                          />
+                        )}
+                      </td>
+                      <td style={{ cursor: 'not-allowed' }}>
                         <input
-                          type="number"
-                          value={item.cost || ''}
-                          onChange={(e) => handleInputChange(e, index, 'cost')}
-                          readOnly style={{ cursor: 'not-allowed' }}
+                        type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          placeholder="0.00"
+                          value={item.ar_discount || ""}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            if (value <= 100) {
+                              handleInputChange(e, index, "ar_discount");
+                            } else {
+                              toast.dismiss();
+                              toast.warning("Discount cannot exceed 100%");
+                            }
+                          }}
                         />
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
-                      <td>
-                         <input
-                         type="number"
-    min="0"
-    max="100"
-    step="0.01"
-    placeholder="0.00"
-    value={item.discount || ""}
-    onChange={(e) => handleInputChange(e, index, "discount")}
-  />
-</td>
                         {(() => {
-                          const total = (item.quantity * item.cost) || 0;
+                          const currentCost = item.cost || 
+                          (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
+                          const discount_percent = item?.ar_discount || 0;
+                          const discount = (parseFloat(item.quantity || 0) * parseFloat(currentCost)*(discount_percent/100))
+                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-discount);
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");
@@ -1394,7 +1256,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           <div className="button-section">
           <button
             className="copy-from-button"
-            style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
+            style={{ cursor: 'not-allowed' }}
             >
             Copy From
           </button>

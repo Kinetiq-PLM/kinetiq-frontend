@@ -136,7 +136,7 @@
 .packing .stats-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
   flex-wrap: wrap;
 }
 
@@ -562,7 +562,7 @@
   background-color: #218838;
 }
 
-.picking .status-update-button:disabled {
+.packing .status-update-button:disabled {
   background-color: #cccccc !important;
   cursor: not-allowed;
 }
@@ -1758,7 +1758,7 @@
   }
 }
 
-/* Related Picking List - Card-based Layout */
+/* Related packing List - Card-based Layout */
 .packing .status-banner {
   display: flex;
   align-items: center;
@@ -2019,4 +2019,1380 @@
     font-weight: 500;
     border-radius: 4px;
   }
+}
+
+/* Add these styles to your frontend/src/modules/Distribution/styles/Packing.css */
+
+.packing .items-section {
+  margin-top: 1rem;
+}
+
+.packing .section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.packing .section-icon {
+  margin-right: 0.5rem;
+  color: #00a8a8;
+}
+
+.packing .warehouse-group {
+  margin-bottom: 1.5rem;
+}
+
+.packing .warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+}
+
+.packing .warehouse-icon {
+  margin-right: 0.5rem;
+  color: #28a745;
+}
+
+.packing .warehouse-items-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  background-color: #e8f8ee;
+  color: #28a745;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.packing .warehouse-divider {
+  border-top: 1px dashed #e0e0e0;
+  margin: 1rem 0;
+}
+
+.packing .items-table-container {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.packing .items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.packing .items-table th {
+  text-align: left;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.packing .items-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.packing .items-table .no-data {
+  text-align: center;
+  padding: 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.packing .item-count-badge {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 5px;
+}
+
+.packing .items-section .section-title {
+  margin-bottom: 1rem;
+}
+
+.packing .warehouse-items-count {
+  background-color: #f0f8ff;
+  border: 1px solid #b8d0e8;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  margin-left: 8px;
+  color: #0066cc;
+}
+
+.warehouse-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f5f7f9;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.warehouse-icon {
+  margin-right: 8px;
+  color: #3d5170;
+}
+
+.warehouse-items-count {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.warehouse-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pack-button, .unpack-button {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #ddd;
+}
+
+.pack-button {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.unpack-button {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.pack-button:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.unpack-button:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.packed-quantity-cell {
+  min-width: 120px;
+}
+
+.packed-quantity-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.packed-quantity-input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.quantity-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.packing-status-cell {
+  width: 130px;
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.status-indicator.packed {
+  background-color: #d1e7dd;
+  color: #0a3622;
+}
+
+.status-indicator.partial {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.status-indicator.unpacked {
+  background-color: #f8d7da;
+  color: #58151c;
+}
+
+tr.fully-packed {
+  background-color: rgba(209, 231, 221, 0.3);
+}
+
+tr.partially-packed {
+  background-color: rgba(255, 243, 205, 0.3);
+}
+
+.packing-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.pack-action-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+}
+
+.pack-all {
+  background-color: #28a745;
+  color: white;
+}
+
+.unpack-all {
+  background-color: #6c757d;
+  color: white;
+}
+
+.pack-action-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+
+.packing .warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.packing .warehouse-icon {
+  margin-right: 0.5rem;
+}
+
+.packing .warehouse-divider {
+  border: none;
+  border-top: 1px dashed #e0e0e0;
+}
+
+/* Add to your packing.css file */
+.packing-progress {
+  margin: 15px 0;
+}
+
+.packing .progress-bar-container {
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.packing .progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.packing .progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.packing .warehouse-progress {
+  font-size: 0.8em;
+  margin-left: 10px;
+  color: #666;
+}
+
+.packing .item-toggle-button {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.packing .item-toggle-button.pick {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+.packing .item-toggle-button.unpick {
+  background-color: #f1f8e9;
+  color: #558b2f;
+}
+
+.packing .item-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.packing .picked-status {
+  color: #4caf50;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.packing .not-picked-status {
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.packing .picked-row {
+  background-color: #f1f8e9 !important;
+}
+
+
+.packing .delivery-note-header {
+  background-color: #e8f4ff;
+  padding: 8px 12px;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid #bde0fe;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #0077cc;
+}
+
+.packing .delivery-note-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.packing .delivery-note-id {
+  font-size: 0.9rem;
+}
+
+.packing .item-count {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: normal;
+}
+
+.packing .delivery-note-divider {
+  margin: 16px 0;
+  border: none;
+  height: 1px;
+  background-color: #e3f2fd;
+  border-bottom: 1px dashed #b3e0ff;
+}
+
+/* Multiple delivery note indicator */
+.packing .warehouse-group .warehouse-progress {
+  background-color: #ffeb3b;
+  color: #333;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+/* Delivery note badges */
+.packing .detail-item.full-width {
+  flex-basis: 100%;
+}
+
+.packing .detail-value-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.packing .delivery-note-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e3f2fd;
+  color: #0277bd;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #bbdefb;
+}
+
+.packing .delivery-note-badge-icon {
+  margin-right: 5px;
+  font-size: 0.75rem;
+}
+
+/* Partial Delivery Styles */
+
+/* Main container for partial delivery info */
+.packing .partial-delivery-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header with title and counter */
+.packing .partial-delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.packing .partial-delivery-title {
+  display: flex;
+  align-items: center;
+}
+
+.packing .partial-delivery-title h4 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #495057;
+  margin-left: 8px;
+}
+
+.packing .partial-delivery-icon {
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.packing .partial-delivery-counter {
+  background-color: #e9ecef;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.packing .delivery-counter-text {
+  font-size: 0.8em;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.packing .delivery-counter-numbers {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Progress bar */
+.packing .partial-delivery-progress {
+  margin-bottom: 15px;
+}
+
+.packing .progress-bar-container {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.packing .progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.packing .progress-text {
+  font-size: 0.9em;
+  color: #6c757d;
+  text-align: right;
+}
+
+/* Delivery notes list */
+.packing .delivery-notes-list {
+  margin-bottom: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.packing .delivery-note-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.packing .delivery-note-item:last-child {
+  border-bottom: none;
+}
+
+.packing .delivery-note-item:hover {
+  background-color: #f8f9fa;
+}
+
+.packing .delivery-note-item.current-delivery {
+  background-color: #e6f7ff;
+  border-left: 4px solid #007bff;
+}
+
+.packing .delivery-note-item.completed-delivery {
+  background-color: #f0f8f0;
+  border-left: 4px solid #28a745;
+}
+
+.packing .delivery-note-item.pending-delivery {
+  opacity: 0.7;
+}
+
+.packing .delivery-note-sequence {
+  width: 24px;
+  height: 24px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.packing .current-delivery .delivery-note-sequence {
+  background-color: #007bff;
+}
+
+.packing .completed-delivery .delivery-note-sequence {
+  background-color: #28a745;
+}
+
+.packing .delivery-note-content {
+  flex: 1;
+}
+
+.packing .delivery-note-id {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+  font-size: 0.95em;
+}
+
+.packing .delivery-note-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #6c757d;
+}
+
+.packing .item-count {
+  display: inline-block;
+}
+
+.packing .status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.packing .status-badge-pending {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.packing .status-badge-packing {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.packing .status-badge-packed {
+  background-color: #e5f9e0;
+  color: #198754;
+}
+
+.packing .status-badge-shipped {
+  background-color: #d8f3e9;
+  color: #20c997;
+}
+
+.packing .admin-override-warning {
+  margin-top: 4px;
+  font-size: 0.8em;
+  color: #fd7e14;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.packing .warning-icon {
+  font-size: 12px;
+}
+
+/* Info message */
+.packing .delivery-notes-info {
+  margin-top: 10px;
+}
+
+.packing .info-message {
+  font-size: 0.9em;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border-radius: 4px;
+  border-left: 4px solid #ffc107;
+}
+
+.packing .info-icon {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+/* Partial delivery badge in completion modal */
+.packing .partial-delivery-badge {
+  font-size: 0.8em;
+  background-color: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+  color: #495057;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* Partial delivery alert in completion modal */
+.packing .partial-delivery-alert {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #fff3cd;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.packing .alert-icon {
+  color: #ffc107;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.packing .alert-text {
+  flex: 1;
+}
+
+.packing .alert-title {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #212529;
+}
+
+.packing .alert-message {
+  margin: 0;
+  color: #495057;
+  font-size: 0.95em;
+}
+
+/* Partial delivery indicator in packing table */
+.packing .partial-delivery-row {
+  position: relative;
+}
+
+.packing .partial-delivery-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #ffc107;
+}
+
+.packing .partial-delivery-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.packing .partial-icon {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.packing .partial-text {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Add this to your packing.css file */
+
+.packing .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.packing .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.packing .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.packing .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.packing .sort-icon {
+  display: inline-flex;
+  margin-left: 0.25rem;
+  color: #00a8a8;
+  vertical-align: middle;
+}
+
+/* Add at the end of your current packing.css */
+
+.packing .info-note {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #6c757d;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.packing .batch-info {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.packing .status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.packing .status-badge-packing {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.packing .section-header.status-in-progress {
+  color: #00a8a8;
+}
+
+/* Enhanced Delivery Notes Section */
+.packing .delivery-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.packing .delivery-note-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.packing .delivery-note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.packing .delivery-note-header {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.packing .delivery-note-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.packing .delivery-note-icon {
+  color: #0077cc;
+  font-size: 18px;
+}
+
+.packing .delivery-note-id {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .delivery-note-content {
+  padding: 12px 16px;
+}
+
+.packing .delivery-note-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.packing .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.packing .info-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.packing .info-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .packing .delivery-notes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .packing .delivery-note-info-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Add these styles to improve the look with icons */
+
+/* Page header with icon */
+.packing .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.packing .page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.packing .title-icon {
+  margin-right: 12px;
+  color: #00a8a8;
+  font-size: 1.5rem;
+}
+
+.packing .refresh-button {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.packing .refresh-button:hover {
+  background-color: #e9ecef;
+}
+
+.packing .refresh-icon {
+  margin-right: 6px;
+}
+
+/* Search container with icon */
+.packing .search-container {
+  position: relative;
+  flex: 1 1 250px;
+}
+
+.packing .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.packing .search-input {
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.15s ease-in-out;
+}
+
+/* Filter improvements */
+.packing .filter-container {
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.packing .filter-label {
+  color: #495057;
+  font-weight: 500;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.packing .filter-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Status buttons with icons */
+.packing .status-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.packing .status-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.packing .button-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+}
+
+.packing .status-button:hover {
+  background-color: #e9ecef;
+}
+
+.packing .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* Stats row with icons */
+.packing .stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.packing .stat-box {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.packing .stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.packing .stat-icon {
+  margin-right: 6px;
+  color: #00a8a8;
+}
+
+.packing .stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* Error state with icon */
+.packing .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+}
+
+.packing .error-icon {
+  font-size: 2rem;
+  color: #dc3545;
+  margin-bottom: 16px;
+}
+
+.packing .error-message {
+  color: #856404;
+  font-weight: 500;
+}
+
+/* Table improvements */
+.packing .packing-table th.sortable {
+  cursor: pointer;
+  position: relative;
+  padding-right: 24px;
+}
+
+.packing .sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+
+.packing .sort-icon.neutral {
+  color: #adb5bd;
+}
+
+.packing .sort-icon.ascending,
+.packing .sort-icon.descending {
+  color: #00a8a8;
+}
+
+/* Empty table state */
+.packing .no-data {
+  padding: 40px !important;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.packing .no-data-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #dc3545;
+}
+
+/* Delivery type cell with icon */
+.packing .delivery-type-cell {
+  /* display: flex; */
+  align-items: center;
+}
+
+.packing .delivery-type-icon {
+  margin-right: 8px;
+  color: #00a8a8;
+}
+
+/* Pagination controls */
+.packing .pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.packing .pagination-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.packing .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.packing .pagination-icon {
+  font-size: 0.8rem;
+  margin: 0 4px;
+}
+
+.packing .page-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+.packing .page-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.packing .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* New styles for improved packing items UI */
+.packing .packed-quantity-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 120px;
+}
+
+.packing .packed-quantity-input {
+  width: 60px;
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 0;
+  font-size: 0.9rem;
+}
+
+.packing .quantity-btn {
+  width: 30px;
+  height: 30px;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0;
+}
+
+.packing .quantity-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.packing .quantity-btn:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.packing .quantity-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.packing .quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.packing .status-indicator {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+}
+
+.packing .status-indicator.packed {
+  background-color: #d4edda;
+  color: #28a745;
+}
+
+.packing .status-indicator.partial {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.packing .status-indicator.unpacked {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.packing tr.fully-packed {
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+.packing tr.partially-packed {
+  background-color: rgba(255, 193, 7, 0.05);
+}
+
+.packing .packing-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.packing .pack-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: none;
+}
+
+.packing .pack-all {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.packing .pack-all:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.packing .unpack-all {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.packing .unpack-all:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.packing .warehouse-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f8f9fa;
+  padding: 10px 16px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.packing .warehouse-icon {
+  color: #00a8a8;
+  font-size: 16px;
+}
+
+.packing .warehouse-items-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.packing .warehouse-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: 10px;
+}
+
+.packing .pack-button,
+.packing .unpack-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+.packing .pack-button {
+  background-color: #e6f7ff;
+  color: #0069d9;
+}
+
+.packing .unpack-button {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.packing .warehouse-divider {
+  border-top: 1px solid #e9ecef;
+  margin: 20px 0;
 }

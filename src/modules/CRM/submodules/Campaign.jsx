@@ -9,16 +9,17 @@ import { AlertProvider } from "../../Sales/components/Context/AlertContext";
 
 import CampaignListTab from "./../components/CampaignTabs/CampaignListTab";
 import CampaignContactTab from "./../components/CampaignTabs/CampaignContactTab";
-
-const Campaign = () => {
+import { useEffect } from "react";
+import { useAlert } from "../../Sales/components/Context/AlertContext";
+const Campaign = ({ employee_id }) => {
   const tabs = [
     {
       name: "Campaign",
-      component: <CampaignListTab />,
+      component: <CampaignListTab employee_id={employee_id} />,
     },
     {
       name: "Campaign Contact",
-      component: <CampaignContactTab />,
+      component: <CampaignContactTab employee_id={employee_id} />,
     },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].name); // Default to first tab
@@ -71,10 +72,10 @@ const Campaign = () => {
   );
 };
 
-const BodyContent = () => {
+const BodyContent = ({ employee_id }) => {
   return (
     <AlertProvider>
-      <Campaign />
+      <Campaign employee_id={employee_id} />
     </AlertProvider>
   );
 };

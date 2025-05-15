@@ -27,7 +27,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [avgDealAmount, setAvgDealAmount] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
-  const [salesPeriod, setSalesPeriod] = useState("day");
+  const [salesPeriod, setSalesPeriod] = useState("month");
   const [conversionData, setConversionData] = useState([]);
 
   const ownerStatusData = [
@@ -162,52 +162,31 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         </div>
         <main>
           {/* Main Data Row */}
-          <section className="flex gap-4 flex-wrap justify-center mb-4">
-            <div>
-              <div className="bg-white rounded-lg p-4 px-16 w-full shadow text-center">
-                <h2 className="text-3xl font-light">
-                  {formatNumber(totalLeads)}
-                </h2>
-                <p className="text-lg text-[#9FA1A6]">Total Leads</p>
+          <section className="flex flex-wrap gap-4 justify-center mb-4">
+            {[
+              { label: "Total Leads", value: totalLeads },
+              { label: "Total Prospects", value: totalProspects },
+              { label: "Total Closed", value: totalClosed },
+              { label: "Active Campaigns", value: totalActiveCampaigns },
+              { label: "Opportunities", value: totalOpportunities },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="flex-1 min-w-[200px] sm:max-w-[calc(50%-1rem)] md:max-w-[calc(33.333%-1rem)] lg:max-w-[calc(20%-1rem)]"
+              >
+                <div className="bg-white rounded-lg p-4 w-full shadow text-center">
+                  <h2 className="text-3xl font-light">
+                    {formatNumber(item.value)}
+                  </h2>
+                  <p className="text-lg text-[#9FA1A6]">{item.label}</p>
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-lg p-4 px-16 w-full shadow text-center">
-                <h2 className="text-3xl font-light">
-                  {formatNumber(totalProspects)}
-                </h2>
-                <p className="text-lg text-[#9FA1A6]">Total Prospects</p>
-              </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-lg p-4 px-16 w-full shadow text-center">
-                <h2 className="text-3xl font-light">
-                  {formatNumber(totalClosed)}
-                </h2>
-                <p className="text-lg text-[#9FA1A6]">Total Closed</p>
-              </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-lg p-4 px-16 w-full shadow text-center">
-                <h2 className="text-3xl font-light">
-                  {formatNumber(totalActiveCampaigns)}
-                </h2>
-                <p className="text-lg text-[#9FA1A6]">Active Campaigns</p>
-              </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-lg p-4 px-16 w-full shadow text-center">
-                <h2 className="text-3xl font-light">
-                  {formatNumber(totalOpportunities)}
-                </h2>
-                <p className="text-lg text-[#9FA1A6]">Opportunities</p>
-              </div>
-            </div>
+            ))}
           </section>
 
           {/* Rate and Pipeline */}
-          <section className="flex gap-4 flex-col lg:flex-row flex-wrap">
-            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3">
+          <section className="flex gap-4 flex-col xl:flex-row flex-wrap">
+            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3 min-w-[600px]">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
                 Prospects Conversion Rate
               </h1>
@@ -254,7 +233,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                 />
               </div>
             </div>
-            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3">
+            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3 min-w-[600px]">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
                 Leads Conversion Rate
               </h1>
@@ -300,7 +279,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                 />
               </div>
             </div>
-            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3">
+            <div className="bg-white rounded-lg p-6 shadow flex-1 flex-col gap-3 min-w-[600px]">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
                 Business Pipeline
               </h1>

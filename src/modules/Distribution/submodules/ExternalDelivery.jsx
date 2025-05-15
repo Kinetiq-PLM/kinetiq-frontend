@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../styles/ExternalDelivery.css";
 import TabNavigation from "../components/delivery/TabNavigation.jsx";
 import DeliveryTable from "../components/delivery/DeliveryTable.jsx";
+// Import icons
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 const ExternalDelivery = () => {
   // State for tab management
@@ -16,6 +18,10 @@ const ExternalDelivery = () => {
   // State for search and filtering
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  
+  // Add state for project-based and partial delivery filters
+  const [projectFilter, setProjectFilter] = useState("All");
+  const [partialFilter, setPartialFilter] = useState("All");
   
   // Fetch data on component mount
   useEffect(() => {
@@ -62,6 +68,16 @@ const ExternalDelivery = () => {
     setStatusFilter(e.target.value);
   };
   
+  // Handle project filter change
+  const handleProjectFilterChange = (e) => {
+    setProjectFilter(e.target.value);
+  };
+  
+  // Handle partial delivery filter change
+  const handlePartialFilterChange = (e) => {
+    setPartialFilter(e.target.value);
+  };
+  
   return (
     <div className="external-delivery">
       <div className="body-content-container">
@@ -76,7 +92,7 @@ const ExternalDelivery = () => {
         {/* Search and Filters */}
         <div className="filters-row">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               className="search-input"
@@ -86,20 +102,51 @@ const ExternalDelivery = () => {
             />
           </div>
           
-          <div className="filter-container">
-            <span className="filter-label">Status:</span>
-            <select
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              className="status-filter"
-            >
-              <option value="All">All</option>
-              <option value="Created">Created</option>
-              <option value="Approved">Approved</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+          <div className="filters-group">
+            <div className="filter-container">
+              <span className="filter-label">Status:</span>
+              <select
+                value={statusFilter}
+                onChange={handleStatusFilterChange}
+                className="filter-select"
+              >
+                <option value="All">All</option>
+                <option value="Created">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            
+            {/* Show project-based and partial delivery filters only for sales tab */}
+            {activeTab === 'sales' && (
+              <>
+                <div className="filter-container">
+                  <span className="filter-label">Project-Based:</span>
+                  <select
+                    value={projectFilter}
+                    onChange={handleProjectFilterChange}
+                    className="filter-select"
+                  >
+                    <option value="All">All</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+                
+                <div className="filter-container">
+                  <span className="filter-label">Partial Delivery:</span>
+                  <select
+                    value={partialFilter}
+                    onChange={handlePartialFilterChange}
+                    className="filter-select"
+                  >
+                    <option value="All">All</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         </div>
         
@@ -118,6 +165,8 @@ const ExternalDelivery = () => {
             deliveries={activeTab === 'sales' ? salesDeliveries : serviceDeliveries}
             searchTerm={searchTerm}
             statusFilter={statusFilter}
+            projectFilter={activeTab === 'sales' ? projectFilter : null}
+            partialFilter={activeTab === 'sales' ? partialFilter : null}
             deliveryType={activeTab}
           />
         )}

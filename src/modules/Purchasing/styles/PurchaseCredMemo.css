@@ -77,6 +77,14 @@
     gap: 0.5rem;
 }
 
+.credmemo-no-data{
+    text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px;
+  grid-column: 1 / -1;
+}
+
 .credmemo .date-options-dropdown {
     position: absolute;
     top: 100%;
@@ -161,7 +169,7 @@
     gap: 0.5rem;
 }
 
-.credmemo .status-options-dropdown {
+.credmemo .credmemo-status-options-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
@@ -209,8 +217,7 @@
 
 .credmemo .credmemo-table-scrollable {
     width: 100%;
-    max-height: 50vh;
-    height: auto;
+    max-height: 60vh;
     overflow-x: auto;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -292,10 +299,9 @@
 }
 
 /* Status color badges */
-.status-approved,
-.status-pending,
-.status-rejected,
-.status-completed {
+.credmemo .status-approved,
+.credmemo .status-forwarded,
+.credmemo .status-under {
   border-radius: 12px;
   padding: 2px 10px;
   font-size: 0.85em;
@@ -303,25 +309,20 @@
   display: inline-block;
 }
 
-.status-approved {
+.credmemo .status-approved {
   color: #155724;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
 }
-.status-pending {
-  color: #856404;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
+.credmemo .status-forwarded {
+  color: #0284c7;
+  background-color: #e0f2fe;
+  border: 1px solid #e0f2fe;
 }
-.status-rejected {
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-}
-.status-completed {
-  color: #0c5460;
-  background-color: #d1ecf1;
-  border: 1px solid #bee5eb;
+.credmemo .status-under {
+  color: #d97706;
+  background-color:#fef3c7;
+  border: 1px solid #fef3c7;
 }
 
 .credmemo .credmemo-footer {

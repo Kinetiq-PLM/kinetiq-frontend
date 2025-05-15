@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const ApprovalTable = ({employee_id}) => {
+const ApprovalTable = ({employee_id, role_name, user}) => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
 
 
@@ -17,7 +17,7 @@ const ApprovalTable = ({employee_id}) => {
   const [selectedData, setSelectedData] = useState(null);
   const [warehouseList, setWarehouseList] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
-
+  const [userPositionID, setPositionID] = useState("");
 
   const [ITReworkOrderData, setITReworkOrder] = useState([]);
 
@@ -25,10 +25,8 @@ const ApprovalTable = ({employee_id}) => {
   const handleCheckboxChange = (index, row) => {
     setSelectedRow(index);
     setSelectedData(row);
-    const warehouse = warehouseList.find(w => w.warehouse_id === row.warehouse_id);
-    setSelectedWarehouse(warehouse ? warehouse.warehouse_location : "");
-
-
+    const warehouse = warehouseList.find(w => w.warehouse_location === row.warehouse_location);
+    setSelectedWarehouse(warehouse?.warehouse_location || "");
   };
 
 
@@ -43,7 +41,19 @@ const ApprovalTable = ({employee_id}) => {
 
 
       if (!Array.isArray(data)) throw new Error("Invalid warehouse format");
-      setWarehouseList(data);
+      const sortedWarehouses = [...data].sort((a, b) => {
+        const getLastWord = (str) => {
+          const words = str.split(/\s+/);
+          return words[words.length - 1];
+        };
+  
+        const lastWordA = getLastWord(a.warehouse_location);
+        const lastWordB = getLastWord(b.warehouse_location);
+  
+        return lastWordA.localeCompare(lastWordB);
+      });
+  
+      setWarehouseList(sortedWarehouses);
 
 
     } catch (error) {
@@ -59,8 +69,8 @@ const ApprovalTable = ({employee_id}) => {
 
   useEffect(() => {
     if (selectedData && warehouseList.length > 0) {
-      const warehouse = warehouseList.find(w => w.warehouse_id === selectedData.warehouse_id);
-      setSelectedWarehouse(warehouse ? warehouse.warehouse_location : "");
+      const warehouse = warehouseList.find(w => w.warehouse_location === selectedData.warehouse_location);
+      setSelectedWarehouse(warehouse?.warehouse_location || "");
     }
   }, [selectedData, warehouseList]);
 
@@ -68,22 +78,30 @@ const ApprovalTable = ({employee_id}) => {
   const fetchDeliveryRequest = async () => {
       try {
           setLoading(true);
-          setError(null); // Reset error state
+          setError(null); 
           const syncDataResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/sync-production/");
           const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/internal-transfer-delivery-request/");
           const reworkResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/rework-order/");
-          if (!response.ok || !syncDataResponse || !reworkResponse) throw new Error("Connection to database failed");
- 
+          const employeeResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+          if (!response.ok || !syncDataResponse || !reworkResponse || !employeeResponse) throw new Error("Connection to database failed");
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
-          console.log("Current filteredData:", filteredData);
-console.log("First item quantity:", filteredData[0]?.quantity);
-          console.log(data)
+          const employeeData = await employeeResponse.json();
+          const position_id = employeeData.employees.find(emp => emp.employee_id === employee_id)?.position_id;
+          setPositionID(position_id);
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
           }
-          setDeliveryRequest(data);
-          setITReworkOrder(reworkorderData)
+          const sortedRequestData = data.sort((a, b) => {
+            if (!a.warehouse_location && b.warehouse_location) return -1;
+            if (a.warehouse_location && !b.warehouse_location) return 1;
+          
+            const dateA = new Date(a.request_date);
+            const dateB = new Date(b.request_date);
+            return dateA - dateB;
+          });
+          setDeliveryRequest(sortedRequestData);
+          setITReworkOrder(reworkorderData);
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
       } finally {
@@ -107,7 +125,6 @@ console.log("First item quantity:", filteredData[0]?.quantity);
     }
   }, [activePrimaryTab, deliveryRequestData, ITReworkOrderData]);
  
-  // Filtered Data
   const filteredData = activePrimaryTab === "Delivery Request" ? deliveryRequestData : ITReworkOrderData;
 
 
@@ -126,7 +143,6 @@ console.log("First item quantity:", filteredData[0]?.quantity);
   const updateDeliveryRequest = async () => {
     if (!selectedData || !selectedWarehouse) return;
  
-    // Find the selected warehouse_id from the location name
     const selected = warehouseList.find(w => w.warehouse_location === selectedWarehouse);
     if (!selected) {
       toast.error("Invalid warehouse selection.");
@@ -134,7 +150,7 @@ console.log("First item quantity:", filteredData[0]?.quantity);
     }
  
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.content_id}/`, {
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.delivery_id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -162,40 +178,41 @@ console.log("First item quantity:", filteredData[0]?.quantity);
 
   const handleChange = (e, field) => {
     const newSelectedData = { ...selectedData };
-    newSelectedData.external_module[field] = e.target.value;
- 
-    if (field === 'rework_quantity') {
-      const actualQuantity = newSelectedData.production_order.actual_quantity;
+    if (field === 'quantity') {
+      const actualQuantity = newSelectedData.actual_quantity;
       const reworkQuantity = parseInt(e.target.value);
       
       if (reworkQuantity > actualQuantity) {
-        toast.dismiss()
+        toast.dismiss();
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         return;
       }
+      
+      newSelectedData.quantity = reworkQuantity;
+    } else if (field === 'reason_rework') {
+      newSelectedData.reason_rework = e.target.value;
     }
- 
+  
     setSelectedData(newSelectedData);
   };
  
   const updateRework = async (data) => {
-    const actualQuantity = selectedData.production_order.actual_quantity;
-    const reworkQuantity = parseInt(selectedData.external_module.rework_quantity);
+    const actualQuantity = selectedData.actual_quantity;
+    const reworkQuantity = Number(selectedData.quantity) || 0;
     try {
-  
       if (reworkQuantity > actualQuantity) {
         toast.dismiss()
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         fetchDeliveryRequest()
         return;
       }
-      if (data.external_module.reason_rework && (!data.external_module.rework_quantity || data.external_module.rework_quantity <= 0)) {
+      if (data.reason_rework && (!reworkQuantity || reworkQuantity <= 0)) {
         toast.dismiss();
         toast.error("Rework quantity is required when a rework reason is provided.");
         fetchDeliveryRequest()
         return;
       }
-      if (!data.external_module.reason_rework && (data.external_module.rework_quantity < 0)) {
+      if ((!data.reason_rework || data.reason_rework == null) && (data.quantity > 0)) {
         toast.dismiss();
         toast.error("Rework reason is required when a rework quantity is provided.");
         fetchDeliveryRequest()
@@ -207,15 +224,15 @@ console.log("First item quantity:", filteredData[0]?.quantity);
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          production_order_detail_id: data.production_order_detail_id,
-          rework_quantity: data.external_module.rework_quantity,
-          reason_rework: data.external_module.reason_rework,
+          production_order_detail_id: data.rework_id,
+          quantity: Number(data.quantity) || 0,  
+          reason_rework: data.reason_rework,
         }),
       });
- 
       if (response.ok) {
         const responseData = await response.json();
         if (responseData.status === 'success') {
+          await fetchDeliveryRequest()
           toast.success('Data updated successfully');
         } else {
           toast.error('Error updating database:', responseData.message);
@@ -236,7 +253,12 @@ console.log("First item quantity:", filteredData[0]?.quantity);
     }
   };
   
-
+  useEffect(() => {
+    if (userPositionID === 'REG-2504-d988' || userPositionID === 'REG-2504-5417') {
+      setActivePrimaryTab('Rework Order');
+    }
+    console.log("HELLO", activePrimaryTab, userPositionID)
+  }, [userPositionID, activePrimaryTab]);
   return (
     <div className={`InternalTransfer ${activePrimaryTab === "Rework Order" ? "rework" : ""}`}>
       <div className="body-content-container">
@@ -244,12 +266,28 @@ console.log("First item quantity:", filteredData[0]?.quantity);
 
         {/* Primary Tabs */}
         <div className="tabs">
-          <div
-            className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
-            onClick={() => setActivePrimaryTab("Delivery Request")}
-          >
-            Delivery Request
-          </div>
+          {userPositionID !== "REG-2504-d988" && userPositionID !== "REG-2504-5417"? (
+            <div
+              className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
+              onClick={() => setActivePrimaryTab("Delivery Request")}
+              style={{
+                cursor: 'pointer',
+                opacity: 1,
+              }}
+            >
+              Delivery Request
+            </div>
+          ) : (
+            <div
+              className={`tab ${activePrimaryTab === "Delivery Request" ? "active" : ""}`}
+              style={{
+                cursor: 'not-allowed',
+                opacity: 0.5,
+              }}
+            >
+              Delivery Request
+            </div>
+          )}
           <div
             className={`tab ${activePrimaryTab === "Rework Order" ? "active" : ""}`}
             onClick={() => setActivePrimaryTab("Rework Order")}
@@ -262,23 +300,25 @@ console.log("First item quantity:", filteredData[0]?.quantity);
           <table>
             <thead>
               <tr>
-                <th></th> {/* Checkbox column - no checkbox in header */}
-                <th>Request ID</th> {/* ID column next */}
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
-                    <th>Item Name</th>
-                    <th>Quantity</th>
-                    <th>Date</th>
-                    <th>Delivery Type</th>
-                    <th>Warehouse Location</th>
-                    <th>Receiving Unit</th>
+                    <th className="deliveryTH"></th>
+                    <th className="deliveryTH">Delivery ID</th> {/* ID column next */}
+                    <th className="deliveryTH">Item Name</th>
+                    <th className="deliveryTH">Quantity</th>
+                    <th className="deliveryTH">Date</th>
+                    <th className="deliveryTH">Delivery Type</th>
+                    <th className="deliveryTH">Warehouse Location</th>
+                    <th className="deliveryTH">Receiving Unit</th>
                   </>
                 ) : (
                   <>
-                    <th>Product Name</th>
-                    <th>Reason for Rework</th>
-                    <th>Actual Quantity</th>
-                    <th>Rework Quantity</th>
+                    <th className="reworkTH"></th>
+                    <th className="reworkTH">Rework ID</th>
+                    <th className="reworkTH">Product Name</th>
+                    <th className="reworkTH">Reason for Rework</th>
+                    <th className="reworkTH">Actual Quantity</th>
+                    <th className="reworkTH">Rework Quantity</th>
                   </>
                 )}
               </tr>
@@ -289,32 +329,40 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   <td colSpan="7" className="text-center">Loading...</td>
                 </tr>
               ) : filteredData.map((row, index) => (
-                <tr key={row.external_id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedRow === index}
-                      onChange={() => handleCheckboxChange(index, row)}
-                    />
-                  </td>
+                <tr key={row?.delivery_id || row.rework_id }>
+                  
                  
                   {activePrimaryTab === "Delivery Request" ? (
                     <>
-                      <td>{row.delivery_id}</td>
-                      <td>{row.item_name}</td>
-                      <td>{row.quantity || 0}</td> 
-                      <td>{row.request_date}</td>
-                      <td>{row.delivery_type}</td>
-                      <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
-                      <td>{row.module_name}</td>
+                      <td className="deliveryTD">
+                        <input
+                          type="checkbox"
+                          checked={selectedRow === index}
+                          onChange={() => handleCheckboxChange(index, row)}
+                        />
+                      </td>
+                      <td className="deliveryTD">{row.delivery_id}</td>
+                      <td className="deliveryTD">{row.item_name}</td>
+                      <td className="deliveryTD">{row.quantity || 0}</td> 
+                      <td className="deliveryTD">{row.request_date}</td>
+                      <td className="deliveryTD">{row.delivery_type}</td>
+                      <td className="deliveryTD">{row.warehouse_location}</td>
+                      <td className="deliveryTD">{row.module_name}</td>
                     </>
                   ) : (
                     <>
-                      <td>{row.production_order_detail_id}</td>
-                      <td>{row.product_name}</td>
-                      <td>{row.external_module?.reason_rework || ""}</td>
-                      <td>{row.production_order?.actual_quantity || ""}</td>
-                      <td>{row.external_module?.rework_quantity || ""}</td>
+                      <td className="reworkTD">
+                        <input
+                          type="checkbox"
+                          checked={selectedRow === index}
+                          onChange={() => handleCheckboxChange(index, row)}
+                        />
+                      </td>
+                      <td className="reworkTD">{row?.rework_id || ""}</td>
+                      <td className="reworkTD">{row?.product_name || ""}</td>
+                      <td className="reworkTD">{row?.reason_rework || ""}</td>
+                      <td className="reworkTD">{row?.actual_quantity || ""}</td>
+                      <td className="reworkTD">{row?.quantity ?? ""}</td>
                     </>
                   )}
                 </tr>
@@ -352,10 +400,6 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   }}
                 />
               </div>
-            </div>
-
-
-            <div className="input-row">
               <div className="input-group">
                 <label>Delivery Type</label>
                 <input 
@@ -369,6 +413,11 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   }}
                 />
               </div>
+            </div>
+
+
+            <div className="input-row">
+              
               <div className="input-group">
                 <label>Receiving Unit</label>
                 <input 
@@ -384,13 +433,13 @@ console.log("First item quantity:", filteredData[0]?.quantity);
               </div>
               <div className="input-group">
                 <label>Warehouse Location</label>
-                <select valueModul={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
+                <select value={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
                   <option value="">Select Warehouse</option>
                   {loading ? (
-                    <option value="">Loading vendors...</option>
+                    <option value="">Loading warehouse...</option>
                   ) : (
                     warehouseList.map((warehouse) => (
-                      <option key={warehouse.warehouse_id} value={warehouse.warehouse_location}>
+                      <option key={warehouse.warehouse_location} value={warehouse.warehouse_location}>
                         {warehouse.warehouse_location}
                       </option>
                     ))
@@ -402,14 +451,14 @@ console.log("First item quantity:", filteredData[0]?.quantity);
         )}
         {/* Input Fields (Only for Rework Order) */}
         {activePrimaryTab === "Rework Order" && (
-          <div className="input-container">
+          <div className="input-container reworkOrder">
             <div className="input-row">
               <div className="input-group">
-                <label>Product ID</label>
+                <label>Rework ID</label>
                 <input 
                   type="text" 
                   className="short-input req-input" 
-                  value={selectedData.production_order_detail_id} 
+                  value={selectedData?.rework_id || ""} 
                   style={{ cursor: 'default' }} readOnly
                 />
               </div>
@@ -418,17 +467,19 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                 <input
                   type="text"
                   className="short-input"
-                  value={selectedData?.external_module?.reason_rework || ''}
+                  value={selectedData?.reason_rework || ''}
                   onChange={(e) => handleChange(e, 'reason_rework')}
                 />
               </div>
+              </div>
+            <div className="input-row">
               <div className="input-group">
                 <label>Actual Quantity</label>
                 <input 
                   type="text" 
                   className="short-input req-input" 
                   max="10000000"
-                  value={selectedData?.production_order?.actual_quantity || ''} 
+                  value={selectedData?.actual_quantity || ''} 
                   style={{ cursor: 'not-alowed' }}
                   readOnly
                 />
@@ -440,15 +491,20 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   className="short-input"
                   min="0"
                   max="10000000"
-                  value={selectedData?.external_module?.rework_quantity || ''}
-                  onChange={(e) => handleChange(e, 'rework_quantity')}
+                  value={selectedData?.quantity ?? ''}
+                  onKeyDown={(e) => {
+                    if (e.key === '.') {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => handleChange(e, 'quantity')}
                 />
               </div>
             </div>
           </div>
         )}
         <div className="button-container">
-          <button className="send-to-button" onClick={handleSendClick}>Save</button>
+          <button className="send-to-button" onClick={handleSendClick} style={{ position: 'relative', bottom: '8px' }}>Save</button>
         </div>
       </div>
     </div>
@@ -484,8 +540,3 @@ export default ApprovalTable;
 
 
    
-
-
-
-
-

@@ -1,15 +1,15 @@
-// components/picking/PickingTable.jsx
 import React, { useState } from 'react';
 import '../../styles/Picking.css';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) => {
-  const [sortField, setSortField] = useState('picking_list_id');
+  const [sortField, setSortField] = useState('picking_list_id'); // Default sort can be changed
   const [sortDirection, setSortDirection] = useState('desc');
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
-  
+  const [itemsPerPage] = useState(10); // Adjusted items per page
+
   // Handle sort change
   const handleSort = (field) => {
     if (sortField === field) {
@@ -23,42 +23,62 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
     // Reset to first page when sorting changes
     setCurrentPage(1);
   };
-  
+
+  // Get appropriate sort icon
+  const getSortIcon = (field) => {
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === 'asc' ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
+  };
+
   // Sort the picking lists
   const sortedLists = [...pickingLists].sort((a, b) => {
     let aValue = a[sortField] || '';
     let bValue = b[sortField] || '';
-    
-    // Handle date comparison
+
+    // Handle specific field comparisons if needed (e.g., date, numbers)
     if (sortField === 'picked_date' && aValue && bValue) {
       aValue = new Date(aValue);
       bValue = new Date(bValue);
+    } else if (sortField === 'items_count') {
+      // Use items_details length for sorting items count
+      aValue = a.items_details?.length || 0;
+      bValue = b.items_details?.length || 0;
     }
-    
+
     // Handle missing values
-    if (!aValue && bValue) return 1;
-    if (aValue && !bValue) return -1;
-    if (!aValue && !bValue) return 0;
-    
+    if (aValue === null || aValue === undefined) aValue = '';
+    if (bValue === null || bValue === undefined) bValue = '';
+
     // Compare values
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
-  
+
   // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedLists.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedLists.length / itemsPerPage);
-  
+
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
+    try {
+      const date = new Date(dateString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (e) {
+      console.error("Error formatting date:", dateString, e);
+      return ''; // Return empty string if formatting fails
+    }
   };
-  
+
   // Get status display class
   const getStatusClass = (status) => {
     switch (status) {
@@ -68,7 +88,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
       default: return '';
     }
   };
-  
+
   // Get delivery type display
   const getDeliveryTypeDisplay = (type) => {
     switch (type) {
@@ -79,11 +99,22 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
       default: return 'Unknown';
     }
   };
-  
+
+  // Get employee name
   const getEmployeeName = (employeeId) => {
     if (!employeeId) return '-';
     const employee = employees.find(emp => emp.employee_id === employeeId);
-    return employee ? employee.full_name : employeeId;
+    return employee ? employee.full_name : employeeId; // Show ID if name not found
+  };
+
+  // Function to determine warehouse display value
+  const getWarehouseDisplay = (list) => {
+    // Prefer warehouse_name if available directly from the list object
+    if (list.warehouse_name) return list.warehouse_name;
+    // Fallback to warehouse_id if name is not present
+    if (list.warehouse_id) return list.warehouse_id;
+    // If neither is present, indicate not assigned
+    return '-';
   };
 
   return (
@@ -94,108 +125,80 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
           Page {currentPage} of {totalPages || 1}
         </span>
       </div>
-      
+
       <div className="table-wrapper">
         <table className="picking-table">
           <thead>
             <tr>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('picking_list_id')}
-              >
-                Picking ID
-                {sortField === 'picking_list_id' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('is_external')}
-              >
-                Order Type
-                {sortField === 'is_external' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('warehouse_name')}
-              >
-                Warehouse
-                {sortField === 'warehouse_name' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('delivery_type')}
-              >
-                Delivery Type
-                {sortField === 'delivery_type' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                className="sortable" 
+              <th
+                className="sortable"
                 onClick={() => handleSort('delivery_id')}
               >
                 Delivery ID
-                {sortField === 'delivery_id' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                {getSortIcon('delivery_id')}
               </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('items_count')}
+              <th
+                className="sortable"
+                onClick={() => handleSort('delivery_type')}
+              >
+                Delivery Type
+                {getSortIcon('delivery_type')}
+              </th>
+              <th
+                className="sortable"
+                // Use warehouse_name for sorting, as it's the displayed value
+                onClick={() => handleSort('warehouse_name')}
+              >
+                Warehouse
+                {getSortIcon('warehouse_name')}
+              </th>
+              <th
+                className="sortable"
+                // Sort by the number of items
+                onClick={() => handleSort('items_count')} // Use a consistent field name if possible, like 'items_count' from serializer
               >
                 Items
-                {sortField === 'items_count' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                {getSortIcon('items_count')}
               </th>
-              <th 
-                className="sortable" 
+              <th
+                className="sortable"
                 onClick={() => handleSort('picked_by')}
               >
                 Assigned To
-                {sortField === 'picked_by' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                {getSortIcon('picked_by')}
               </th>
-              <th 
-                className="sortable" 
+              <th
+                className="sortable"
                 onClick={() => handleSort('picked_status')}
               >
                 Status
-                {sortField === 'picked_status' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                {getSortIcon('picked_status')}
               </th>
-              <th 
-                className="sortable" 
+              <th
+                className="sortable"
                 onClick={() => handleSort('picked_date')}
               >
                 Date Picked
-                {sortField === 'picked_date' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                {getSortIcon('picked_date')}
               </th>
             </tr>
           </thead>
           <tbody>
             {currentItems.length > 0 ? (
               currentItems.map((list, index) => (
-                <tr 
+                <tr
                   key={list.picking_list_id}
-                  className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${selectedList && selectedList.picking_list_id === list.picking_list_id ? 'selected-row' : ''}`}
+                  className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${
+                    selectedList && selectedList.picking_list_id === list.picking_list_id ?
+                    'selected-row' : ''
+                  }`}
                   onClick={() => onListSelect(list)}
                 >
-                  <td>{list.picking_list_id}</td>
-                  <td>{list.is_external ? 'External' : 'Internal'}</td>
-                  <td>{list.warehouse_name || '-'}</td>
-                  <td>{getDeliveryTypeDisplay(list.delivery_type)}</td>
                   <td>{list.delivery_id || '-'}</td>
-                  <td className="centered-cell">{list.items_count || 0}</td>
+                  <td>{getDeliveryTypeDisplay(list.delivery_type)}</td>
+                  <td>{getWarehouseDisplay(list)}</td>
+                  {/* Display the count of items */}
+                  <td className="centered-cell">{list.items_details?.length || 0}</td>
                   <td>{getEmployeeName(list.picked_by)}</td>
                   <td className={`status-cell ${getStatusClass(list.picked_status)}`}>
                     {list.picked_status || 'Unknown'}
@@ -205,7 +208,8 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               ))
             ) : (
               <tr>
-                <td colSpan={window.innerWidth <= 576 ? 6 : 9} className="no-data">
+                {/* Adjusted colspan to 7 */}
+                <td colSpan={7} className="no-data">
                   No picking lists found with the current filters
                 </td>
               </tr>
@@ -213,7 +217,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
           </tbody>
         </table>
       </div>
-      
+
       {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="pagination-controls">
@@ -224,18 +228,21 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
           >
             Previous
           </button>
-          
+
           <div className="page-numbers">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               // Logic to show relevant page numbers around current page
-              const pageNum = totalPages <= 5 
+              const pageNum = totalPages <= 5
                 ? i + 1
                 : currentPage <= 3
                   ? i + 1
                   : currentPage >= totalPages - 2
                     ? totalPages - 4 + i
                     : currentPage - 2 + i;
-              
+
+              // Ensure pageNum is within valid range [1, totalPages]
+              if (pageNum < 1 || pageNum > totalPages) return null;
+
               return (
                 <button
                   key={pageNum}
@@ -247,7 +254,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               );
             })}
           </div>
-          
+
           <button
             className="pagination-button"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}

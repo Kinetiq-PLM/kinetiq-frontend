@@ -1,5 +1,17 @@
-// components/packing/PackingTable.jsx
 import React, { useState } from "react";
+import { 
+  FaSort, 
+  FaSortUp, 
+  FaSortDown, 
+  FaChevronLeft, 
+  FaChevronRight,
+  FaShoppingCart,
+  FaTools,
+  FaExchangeAlt,
+  FaBox,
+  FaClipboardList,
+  FaExclamationTriangle
+} from "react-icons/fa";
 
 const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) => {
   // Add sorting state
@@ -8,7 +20,7 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
   
   // Add pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
+  const [itemsPerPage] = useState(10);
   
   // Handle sort change
   const handleSort = (field) => {
@@ -24,19 +36,19 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
     setCurrentPage(1);
   };
   
-  // Get the delivery type name
-  const getDeliveryTypeName = (type) => {
+  // Get the delivery type name and icon
+  const getDeliveryTypeInfo = (type) => {
     switch (type) {
       case 'sales':
-        return 'Sales Order';
+        return { name: 'Sales Order', icon: <FaShoppingCart className="delivery-type-icon" /> };
       case 'service':
-        return 'Service Order';
+        return { name: 'Service Order', icon: <FaTools className="delivery-type-icon" /> };
       case 'content':
-        return 'Content Order';
+        return { name: 'Content Order', icon: <FaBox className="delivery-type-icon" /> };
       case 'stock':
-        return 'Stock Transfer';
+        return { name: 'Stock Transfer', icon: <FaExchangeAlt className="delivery-type-icon" /> };
       default:
-        return 'Unknown';
+        return { name: 'Unknown', icon: <FaClipboardList className="delivery-type-icon" /> };
     }
   };
   
@@ -105,6 +117,14 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
   const currentItems = sortedLists.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedLists.length / itemsPerPage);
   
+  // Get appropriate sort icon
+  const getSortIcon = (field) => {
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === 'asc' ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
+  };
+  
   // Render empty state when no data
   if (!packingLists || packingLists.length === 0) {
     return (
@@ -117,58 +137,37 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
             <thead>
               <tr>
                 <th className="sortable" onClick={() => handleSort('packing_list_id')}>
-                  Packing ID
-                  {sortField === 'packing_list_id' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Packing ID {getSortIcon('packing_list_id')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('delivery_type')}>
-                  Delivery Type
-                  {sortField === 'delivery_type' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Delivery Type {getSortIcon('delivery_type')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('delivery_id')}>
-                  Delivery ID
-                  {sortField === 'delivery_id' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Delivery ID {getSortIcon('delivery_id')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('packing_status')}>
-                  Status
-                  {sortField === 'packing_status' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Status {getSortIcon('packing_status')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('packed_by')}>
-                  Packed By
-                  {sortField === 'packed_by' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Packed By {getSortIcon('packed_by')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('total_items_packed')}>
-                  Items Count
-                  {sortField === 'total_items_packed' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Items Count {getSortIcon('total_items_packed')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('packing_type')}>
-                  Packing Type
-                  {sortField === 'packing_type' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Packing Type {getSortIcon('packing_type')}
                 </th>
                 <th className="sortable" onClick={() => handleSort('packing_date')}>
-                  Packing Date
-                  {sortField === 'packing_date' && (
-                    <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                  )}
+                  Packing Date {getSortIcon('packing_date')}
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colSpan={window.innerWidth <= 576 ? 4 : 8} className="no-data">No packing lists found</td>
+                <td colSpan={window.innerWidth <= 576 ? 4 : 8} className="no-data">
+                  <FaExclamationTriangle className="no-data-icon" />
+                  No packing lists found
+                </td>
               </tr>
             </tbody>
           </table>
@@ -176,6 +175,17 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
       </div>
     );
   }
+
+  // Add this function to calculate total quantity
+  const getTotalQuantity = (list) => {
+    if (!list.items_details || !list.items_details.length) {
+      return list.total_items_packed || 0;
+    }
+    
+    return list.items_details.reduce((sum, item) => {
+      return sum + (parseInt(item.quantity) || 0);
+    }, 0);
+  };
 
   return (
     <div className="packing-table-container">
@@ -190,77 +200,67 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
           <thead>
             <tr>
               <th className="sortable" onClick={() => handleSort('packing_list_id')}>
-                Packing ID
-                {sortField === 'packing_list_id' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Packing ID {getSortIcon('packing_list_id')}
               </th>
               <th className="sortable" onClick={() => handleSort('delivery_type')}>
-                Delivery Type
-                {sortField === 'delivery_type' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Delivery Type {getSortIcon('delivery_type')}
               </th>
               <th className="sortable" onClick={() => handleSort('delivery_id')}>
-                Delivery ID
-                {sortField === 'delivery_id' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Delivery ID {getSortIcon('delivery_id')}
               </th>
               <th className="sortable" onClick={() => handleSort('packing_status')}>
-                Status
-                {sortField === 'packing_status' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Status {getSortIcon('packing_status')}
               </th>
               <th className="sortable" onClick={() => handleSort('packed_by')}>
-                Packed By
-                {sortField === 'packed_by' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Packed By {getSortIcon('packed_by')}
               </th>
               <th className="sortable" onClick={() => handleSort('total_items_packed')}>
-                Items Count
-                {sortField === 'total_items_packed' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Items Count {getSortIcon('total_items_packed')}
               </th>
               <th className="sortable" onClick={() => handleSort('packing_type')}>
-                Packing Type
-                {sortField === 'packing_type' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Packing Type {getSortIcon('packing_type')}
               </th>
               <th className="sortable" onClick={() => handleSort('packing_date')}>
-                Packing Date
-                {sortField === 'packing_date' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
+                Packing Date {getSortIcon('packing_date')}
               </th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((list, index) => (
-              <tr
-                key={list.packing_list_id}
-                className={`
-                  ${index % 2 === 0 ? 'even-row' : 'odd-row'} 
-                  ${selectedList && selectedList.packing_list_id === list.packing_list_id ? 'selected-row' : ''}
-                `}
-                onClick={() => onListSelect(list)}
-              >
-                <td>{list.packing_list_id}</td>
-                <td>{getDeliveryTypeName(list.delivery_type)}</td>
-                <td>{list.delivery_id || '-'}</td>
-                <td className={`status-cell ${getStatusClass(list.packing_status)}`}>
-                  {list.packing_status || '-'}
-                </td>
-                <td>{getEmployeeName(list.packed_by)}</td>
-                <td className="centered-cell">{list.total_items_packed || '0'}</td>
-                <td>{list.packing_type || '-'}</td>
-                <td>{formatDate(list.packing_date)}</td>
-              </tr>
-            ))}
+            {currentItems.map((list, index) => {
+              const deliveryTypeInfo = getDeliveryTypeInfo(list.delivery_type);
+              return (
+                <tr
+                  key={list.packing_list_id}
+                  className={`
+                    ${index % 2 === 0 ? 'even-row' : 'odd-row'} 
+                    ${selectedList && selectedList.packing_list_id === list.packing_list_id ? 'selected-row' : ''}
+                  `}
+                  onClick={() => onListSelect(list)}
+                >
+                  <td>{list.packing_list_id}</td>
+                  <td className="delivery-type-cell">
+                    {/* {deliveryTypeInfo.icon} */}
+                    {deliveryTypeInfo.name}
+                  </td>
+                  <td>{list.delivery_id || '-'}</td>
+                  <td className={`status-cell ${getStatusClass(list.packing_status)}`}>
+                    {list.packing_status || '-'}
+                  </td>
+                  <td>{getEmployeeName(list.packed_by)}</td>
+                  
+                  {/* Update this line to show total quantity */}
+                  <td className="centered-cell">
+                    {getTotalQuantity(list)}
+                    {list.items_details?.length > 0 && (
+                      <span className="item-count-badge">({list.items_details.length} items)</span>
+                    )}
+                  </td>
+                  
+                  <td>{list.packing_type || '-'}</td>
+                  <td>{formatDate(list.packing_date)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -272,7 +272,9 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
             className="pagination-button"
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
+            aria-label="Previous page"
           >
+            <FaChevronLeft className="pagination-icon" aria-hidden="true" />
             Previous
           </button>
           
@@ -292,6 +294,8 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
                   key={pageNum}
                   className={`page-number ${currentPage === pageNum ? 'active' : ''}`}
                   onClick={() => setCurrentPage(pageNum)}
+                  aria-label={`Go to page ${pageNum}`}
+                  aria-current={currentPage === pageNum ? 'page' : undefined}
                 >
                   {pageNum}
                 </button>
@@ -303,8 +307,10 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
             className="pagination-button"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
+            aria-label="Next page"
           >
             Next
+            <FaChevronRight className="pagination-icon" aria-hidden="true" />
           </button>
         </div>
       )}

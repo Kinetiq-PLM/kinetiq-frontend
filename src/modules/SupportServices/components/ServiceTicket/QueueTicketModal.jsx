@@ -18,6 +18,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const [name, setName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [productId, setProductId] = useState("");
+  const [productName, setProductName] = useState("");
   const [technicianId, setTechnicianId] = useState("");
   const [technicianName, setTechnicianName] = useState("");
   const [callType, setCallType] = useState("");
@@ -127,7 +128,8 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   };
 
   const handleSelectProduct = (product) => {
-    setProductId(product.product_id); 
+    setProductId(product.item_id); 
+    setProductName(product.item_name); 
     setOpenProdDD(false); 
   };
 
@@ -254,11 +256,11 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                           {products.length > 0 ? (
                             products
                               .filter((product) =>
-                              product.product_id.toLowerCase().includes(productId.toLowerCase())
+                              product.item_id.toLowerCase().includes(productId.toLowerCase())
                               )
                               .map((product) => (
-                                <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
-                                  {product.product_id}
+                                <li key={product.item_id} onClick={() => handleSelectProduct(product)}>
+                                  {product.item_id}
                                 </li>
                               ))
                           ) : (
@@ -271,8 +273,6 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
             </div>
 
             <div className="form-column">
-              <h3 className="column-header">Assign To:</h3>
-
               <div className="form-group">
                 <label htmlFor="assignTechnicianId">
                   Technician ID <span className="required">*</span>
@@ -297,6 +297,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                               .filter((technician) =>
                                 technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
                               )
+                              .slice(0, 1)
                               .map((technician) => (
                                 <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
                                   {technician.employee_id}
@@ -346,6 +347,17 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                     </ul>
                   )}
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="productName">Product Name</label>
+                <input
+                  id="productName"
+                  value={productName}
+                  readOnly
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="Enter product name"
+                />
               </div>
 
               <div className="notification-message">

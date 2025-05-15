@@ -211,7 +211,7 @@ const ServiceContract = () => {
               onClick={handleUpdateClick}
               disabled={!selectedContract}
             >
-              Update
+              Edit
             </button>
             <button className="add-button" onClick={handleAddContract}>
               Add

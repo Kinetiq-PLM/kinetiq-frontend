@@ -88,7 +88,7 @@ const TabSystem = () => {
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="5" className="text-center">Loading...</td>
+                                                <td colSpan="4" className="text-center">Loading...</td>
                                             </tr>
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
@@ -101,7 +101,7 @@ const TabSystem = () => {
                                             ))
                                         ) : (  
                                             <tr>
-                                                <td colSpan="5" className="no-records">No records found.</td>
+                                                <td colSpan="4" className="no-records">No records found.</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -125,7 +125,7 @@ const TabSystem = () => {
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="4" className="text-center">Loading...</td>
+                                                <td colSpan="3" className="text-center">Loading...</td>
                                             </tr>
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
@@ -162,7 +162,7 @@ const TabSystem = () => {
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="5" className="text-center">Loading...</td>
+                                                <td colSpan="4" className="text-center">Loading...</td>
                                             </tr>
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
@@ -212,12 +212,12 @@ const TabSystem = () => {
                                                     <td>{row.issued_by}</td>
                                                     <td>{row.item_name}</td>
                                                     <td>{row.item_quantity}</td>
-                                                    <td>{row.warehouselocation}</td> 
+                                                    <td>{row.warehouse_location}</td> 
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="5" className="no-records">No records found.</td>
+                                                <td colSpan="6" className="no-records">No records found.</td>
                                             </tr>
                                         )}
                                     </tbody>

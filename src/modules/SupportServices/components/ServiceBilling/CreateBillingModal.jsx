@@ -78,8 +78,6 @@ const CreateBillingModal = ({ isOpen, onClose, onCreate, technician }) => {
 
   const reqDropdownRef = useRef(null);
   const renewalDropdownRef = useRef(null);
-  const analDropdownRef = useRef(null);
-  const orderDropdownRef = useRef(null);
   const opCostDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
 
@@ -90,12 +88,6 @@ const CreateBillingModal = ({ isOpen, onClose, onCreate, technician }) => {
       }
       if (reqDropdownRef.current && !reqDropdownRef.current.contains(event.target)) {
         setRequestDropdown(false); // Close the dropdown
-      }
-      if (analDropdownRef.current && !analDropdownRef.current.contains(event.target)) {
-        setAnalysesDropdown(false); // Close the dropdown
-      }
-      if (orderDropdownRef.current && !orderDropdownRef.current.contains(event.target)) {
-        setOpenOrder(false); // Close the dropdown
       }
       if (opCostDropdownRef.current && !opCostDropdownRef.current.contains(event.target)) {
         setOpenOpCost(false); // Close the dropdown
@@ -138,7 +130,6 @@ const [isRenewalDropdown, setOpenRenewal] = useState(false);
 const fetchRenewals = async () => {
   try {
     const response = await GET(`renewal/renewals/technician/${technician}/`);
-    // const response = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
     //const response = await GET(`renewal/`); 
     console.log("renewals", response)
     setRenewals(response);
@@ -177,8 +168,8 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 
 const fetchRequests = async () => {
   try {
-    // const response = await GET(`request/requests/technician/${technician}/`);
-    const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+    const response = await GET(`request/requests/technician/${technician}/`);
+    // const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
     //const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);
@@ -200,66 +191,59 @@ const handleSelectRequest = (request) => {
     requestId: request.service_request_id,
     requestType: request.request_type 
   }));
+  fetchAnalysis(request.service_request_id);
   setRequestDropdown(false);
 };
 
-const [analyses, setAnalyses] = useState([]);
-const [isAnalysesDropdown, setAnalysesDropdown] = useState(false);
 
-const fetchAnalyses = async () => {
+const fetchAnalysis = async (requestId) => {
   try {
-    const response = await GET(`analysis/request/${formData.requestId}/`); 
-    console.log("analyses", response)
-    setAnalyses(response);
+    const response = await GET(`analysis/request/${requestId}/`);
+    console.log("analyses", response);
+
+    if (response?.analysis_id) {
+      setFormData((prev) => ({
+        ...prev,
+        analysisId: response.analysis_id,
+        laborCost: response.labor_cost || ""
+      }));
+      return fetchOrder(response.analysis_id);
+    }
+
   } catch (error) {
     console.error("Error fetching analyses:", error);
   }
-}
 
-const handleToggleAnalysis = () => {
-  if (!isAnalysesDropdown) {
-    fetchAnalyses(); 
-  }
-  setAnalysesDropdown(!isAnalysesDropdown);
-};
-
-const handleSelectAnalysis = (analysis) => {
+  // If no valid analysis or error occurred, clear related fields
   setFormData((prev) => ({
     ...prev,
-    analysisId: analysis.analysis_id,
-    laborCost: analysis?.labor_cost || ""
+    analysisId: "",
+    laborCost: "",
+    ...(prev.orderId && { orderId: "", orderTotalPrice: "" })
   }));
-  setAnalysesDropdown(false);
 };
-
-const [orders, setOrders] = useState([]);
-const [isOrderDropdown, setOpenOrder] = useState(false);
-
-const fetchOrders = async () => {
+const fetchOrder = async (analysisId) => {
   try {
-    const response = await GET(`order/orders/${formData.analysisId}/`); 
-    console.log("orders", response)
-    setOrders(response);
+    const response = await GET(`order/orders/${analysisId}/`);
+    console.log("orders", response);
+
+    const data = response?.[0];
+    setFormData((prev) => ({
+      ...prev,
+      orderId: data?.service_order_id || "",
+      orderTotalPrice: data?.order_total_price || ""
+    }));
+
   } catch (error) {
     console.error("Error fetching orders:", error);
+    setFormData((prev) => ({
+      ...prev,
+      orderId: "",
+      orderTotalPrice: ""
+    }));
   }
-}
-
-const handleToggleOrder = () => {
-  if (!isOrderDropdown) {
-    fetchOrders(); 
-  }
-  setOpenOrder(!isOrderDropdown);
 };
 
-const handleSelectOrder = (order) => {
-  setFormData((prev) => ({
-    ...prev,
-    orderId: order.service_order_id,
-    orderTotalPrice: order?.order_total_price || ""
-  }));
-  setOpenOrder(false);
-};
 
 const [operationalCosts, setOperationalCosts] = useState([]);
 const [isOpCostDropdown, setOpenOpCost] = useState(false);
@@ -337,7 +321,8 @@ const handleCreate = () => {
                       if (!formData.requestId) handleToggleRenewals(); 
                     }}
                     placeholder="Renewal ID"
-                    disabled={!!formData.requestId}
+                    disabled={formData.requestId !== ""}
+                    className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
                   <span
                     className="select-arrow"
@@ -392,9 +377,11 @@ const handleCreate = () => {
                   value={formData.requestId}
                   onChange={(e) => {
                     handleChange(e); 
-                    setRequestDropdown(true);
+                    if (!formData.renewalId) setRequestDropdown(true);
                   }}
-                  onClick={handleToggleRequest}
+                  onClick={() => {
+                    if (!formData.renewalId) handleToggleRequest(); 
+                  }}
                   placeholder="Request id"
                   disabled={formData.renewalId !== ""}
                   className={formData.renewalId !== "" ? "disabled-input" : ""}
@@ -441,38 +428,19 @@ const handleCreate = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="analysisId">Analysis ID</label>
-                <div className="select-wrapper" ref={analDropdownRef}>
+                <div className="select-wrapper">
                   <input
                     type="text"
                     id="analysisId"
                     value={formData.analysisId}
                     onChange={(e) => {
                       handleChange(e); 
-                      setAnalysesDropdown(true);
                     }}
-                    onClick={handleToggleAnalysis}
+                    readOnly
                     placeholder="Analysis ID"
                     disabled={formData.renewalId !== ""}
                     className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
-                  <span className="select-arrow" onClick={handleToggleAnalysis}>▼</span>
-                    {isAnalysesDropdown && formData.renewalId === "" && (
-                      <ul className="dropdown-list">
-                        {analyses.length > 0 ? (
-                          analyses
-                              .filter((analysis) =>
-                              analysis.analysis_id.toLowerCase().includes(formData.analysisId.toLowerCase())
-                                )
-                              .map((analysis) => (
-                                <li key={analysis.analysis_id} onClick={() => handleSelectAnalysis(analysis)}>
-                                  {analysis.analysis_id}
-                                </li>
-                              ))
-                            ) : (
-                          <li>No analysis ID found</li>
-                        )}
-                      </ul>
-                    )}
                 </div>
               </div>
 
@@ -494,38 +462,18 @@ const handleCreate = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="orderId">Order ID</label>
-                <div className="select-wrapper" ref={orderDropdownRef}>
+                <div className="select-wrapper">
                   <input
                     type="text"
                     id="orderId"
                     value={formData.orderId}
                     onChange={(e) => {
                       handleChange(e); 
-                      setOpenOrder(true);
                     }}
-                    onClick={handleToggleOrder}
                     placeholder="Order ID"
                     disabled={formData.renewalId !== ""}
                     className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
-                  <span className="select-arrow" onClick={handleToggleOrder}>▼</span>
-                    {isOrderDropdown && formData.renewalId === "" && (
-                      <ul className="dropdown-list">
-                        {orders.length > 0 ? (
-                          orders
-                              .filter((order) =>
-                              order.service_order_id.toLowerCase().includes(formData.orderId.toLowerCase())
-                                )
-                              .map((order) => (
-                                <li key={order.service_order_id} onClick={() => handleSelectOrder(order)}>
-                                  {order.service_order_id}
-                                </li>
-                              ))
-                            ) : (
-                          <li>No order ID found</li>
-                        )}
-                      </ul>
-                    )}
                 </div>
               </div>
 

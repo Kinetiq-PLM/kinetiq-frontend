@@ -9,7 +9,7 @@
 .hr-attendance-body-content-container {
   width: 100%;
   height: 100%; /* or auto if you prefer */
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -300,6 +300,123 @@
   margin-left: 6px;
 }
 
+/* Add calendar date button */
+.hr-attendance-add-btn {
+  background-color: teal;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.75rem; /* Add margin to separate from filter */
+}
+
+.hr-attendance-add-btn .icon {
+  font-size: 1rem;
+}
+
+.hr-attendance-add-btn:hover {
+  background-color: #006666;
+}
+
+/* Modal styles */
+.hr-attendance-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hr-attendance-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hr-attendance-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.hr-attendance-modal-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.hr-attendance-modal-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.hr-attendance-modal-form .checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.hr-attendance-modal-form .checkbox-group input {
+  margin-right: 0.5rem;
+}
+
+.hr-attendance-modal-form input[type="text"],
+.hr-attendance-modal-form input[type="date"] {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.hr-attendance-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.hr-attendance-modal-buttons button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.hr-attendance-modal-buttons .submit-btn {
+  background-color: #00b0b5;
+  color: white;
+}
+
+.hr-attendance-modal-buttons .submit-btn:hover {
+  background-color: #009097;
+}
+
+.hr-attendance-modal-buttons .cancel-btn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.hr-attendance-modal-buttons .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
 /* Add these styles at the end of the file */
 
 /* Status Tag Styling */
@@ -317,21 +434,25 @@
 .hr-attendance-tag.present {
   background-color: #d1e7dd;
   color: #0f5132; /* Green - Present */
+  border: 1px solid #75b798; /* Darker border for present */
 }
 
 .hr-attendance-tag.absent {
   background-color: #f8d7da;
   color: #842029; /* Red - Absent */
+  border: 1px solid #ea868f; /* Darker border for absent */
 }
 
 .hr-attendance-tag.late {
   background-color: #fff3cd;
   color: #664d03; /* Yellow - Late */
+  border: 1px solid #ffe69c; /* Darker border for late */
 }
 
 .hr-attendance-tag.half-day {
   background-color: #cfe2ff;
   color: #084298; /* Blue - Half-day */
+  border: 1px solid #9ec5fe; /* Darker border for half-day */
 }
 
 /* Calendar Date Boolean Fields */
@@ -366,11 +487,13 @@
   background-color: #ff9e80;
   color: #7f0000;
   font-weight: bold;
+  border: 1px solid #ff6e40; /* Darker orange/red border */
 }
 
 .hr-attendance-tag.holiday-no {
   background-color: #e0e0e0;
   color: #424242;
+  border: 1px solid #bdbdbd; /* Darker gray border */
 }
 
 /* More specific calendar field type combinations */
@@ -380,23 +503,13 @@
   background-color: #d1e7dd;
   color: #0f5132;
   font-weight: bold;
+  border: 1px solid #75b798; /* Darker border */
 }
 
 .hr-attendance-tag.workday-no {
   background-color: #e0e0e0;
   color: #424242;
-}
-
-/* Holiday specific */
-.hr-attendance-tag.holiday-yes {
-  background-color: #ff9e80;
-  color: #7f0000;
-  font-weight: bold;
-}
-
-.hr-attendance-tag.holiday-no {
-  background-color: #e0e0e0;
-  color: #424242;
+  border: 1px solid #bdbdbd; /* Darker border */
 }
 
 /* Special day specific */
@@ -404,11 +517,63 @@
   background-color: #ffe082;
   color: #886a08;
   font-weight: bold;
+  border: 1px solid #ffc947; /* Darker yellow border */
 }
 
 .hr-attendance-tag.special-no {
   background-color: #e0e0e0;
   color: #424242;
+  border: 1px solid #bdbdbd; /* Darker gray border */
+}
+
+/* Overtime Request Status Tags */
+.hr-attendance-tag.pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.hr-attendance-tag.approved {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.hr-attendance-tag.rejected {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.hr-attendance-tag.completed {
+  background-color: #e6fffb;
+  color: #13c2c2;
+  border: 1px solid #87e8de;
+}
+
+/* Overtime Request Status Tags */
+.hr-attendance-tag.pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.hr-attendance-tag.approved {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.hr-attendance-tag.rejected {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.hr-attendance-tag.completed {
+  background-color: #e6fffb;
+  color: #13c2c2;
+  border: 1px solid #87e8de;
 }
 
 /* ---------------------------------------------------------
@@ -419,7 +584,7 @@
 .hr-attendance-body-content-container {
   min-width: unset; /* Remove fixed min-width to prevent overflow */
   width: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   padding: 1rem;
 }
 

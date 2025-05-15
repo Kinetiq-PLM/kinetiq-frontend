@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import "../styles/accounting-styling.css";
-import Dropdown from "../components/dropdown/Dropdown";
-import Table from "../components/table/Table";
-import Search from "../components/search/Search";
-import NotifModal from "../components/modalNotif/NotifModal";
 import ReportModalInput from "../components/ReportModalInput";
+import NotifModal from "../components/modalNotif/NotifModal";
+import Dropdown from "../components/dropdown/Dropdown";
+import React, { useState, useEffect } from "react";
+import Search from "../components/search/Search";
+import Table from "../components/table/Table";
+import "../styles/accounting-styling.css";
 import axios from "axios";
 
 const BodyContent = () => {
-  const [activeTab, setActiveTab] = useState("General Ledger");
-  const [data, setData] = useState([]);
   const [defaultSortedData, setDefaultSortedData] = useState([]);
+  const [activeTab, setActiveTab] = useState("General Ledger");
+  const [dateSortOption, setDateSortOption] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOption, setSortOption] = useState("");
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [scopedData, setScopedData] = useState(null);
+  const [data, setData] = useState([]);
   const [reportForm, setReportForm] = useState({
     startDate: "",
     endDate: "",
@@ -32,6 +33,9 @@ const BodyContent = () => {
     message: "",
   });
 
+
+
+  // Table Columns
   const columns = [
     "Entry Line ID",
     "GL Account ID",
@@ -43,15 +47,26 @@ const BodyContent = () => {
     "Description",
   ];
 
-  const API_URL = import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+
+
+  // API Fetching
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
 
+
+
+  // Functions: Modal open and Close
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
     setScopedData(null);
   };
 
+
+
+  // Function: Fetching Data from API
   const fetchData = async () => {
     try {
       const response = await axios.get(ENDPOINT);
@@ -69,7 +84,10 @@ const BodyContent = () => {
 
       return formatted;
     } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching data:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
@@ -80,10 +98,15 @@ const BodyContent = () => {
     }
   };
 
+
+
+  // Sorting: Fetch all data and sort it
   const fetchAllData = async () => {
     setIsLoading(true);
     const generalLedger = await fetchData();
-    const sortedData = [...generalLedger].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedData = [...generalLedger].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
     setData(sortedData);
     setDefaultSortedData(sortedData);
     setIsLoading(false);
@@ -93,13 +116,39 @@ const BodyContent = () => {
     fetchAllData();
   }, []);
 
+
+
+  // Function: Computing the net balance of the accounts after journal entry 
+  const computeNetBalances = (entries) => {
+    const accountSums = {};
+
+    entries.forEach(({ accountName, debit, credit }) => {
+      if (!accountSums[accountName]) {
+        accountSums[accountName] = { debit: 0, credit: 0 };
+      }
+
+      accountSums[accountName].debit += parseFloat(debit) || 0;
+      accountSums[accountName].credit += parseFloat(credit) || 0;
+    });
+
+    return Object.entries(accountSums).map(([name, { debit, credit }]) => ({
+      accountName: name,
+      debit: debit.toFixed(2),
+      credit: credit.toFixed(2),
+      net: (debit - credit).toFixed(2),
+    }));
+  };
+
+
+
+  // Function: Filtering the Accounts by account name
   const filterByActiveTab = () => {
     if (activeTab === "Accounts Payable") {
       const relevantJournalIds = new Set(
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Payable" || entry.accountName === "Raw Material Used"
+              entry.accountName === "Accounts Payable"
           )
           .map((entry) => entry.journalId)
       );
@@ -111,7 +160,7 @@ const BodyContent = () => {
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Receivable" || entry.accountName === "Sales Revenue"
+              entry.accountName === "Accounts Receivable"
           )
           .map((entry) => entry.journalId)
       );
@@ -121,8 +170,14 @@ const BodyContent = () => {
     return data;
   };
 
+
+
+  // Function: Filtering the data
   const getCurrentTabData = () => scopedData || filterByActiveTab();
 
+
+
+  // Sorting: Handles sorting of debit and credit
   const handleSort = (selected) => {
     setSortOption(selected);
     const currentData = getCurrentTabData();
@@ -143,26 +198,81 @@ const BodyContent = () => {
     }
   };
 
+
+
+  // Sorting: Handles sorting for date
+  const handleDateSort = (selected) => {
+    setDateSortOption(selected);
+    const currentData = getCurrentTabData();
+
+    const sorted = [...currentData].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return selected === "Ascending" ? dateA - dateB : dateB - dateA;
+    });
+
+    setData(sorted);
+  };
+
+
+
+  // Function: Searching function
   const filteredData = getCurrentTabData().filter((item) => {
     const searchContent = [
       item.entryLineId,
       item.glAccountId,
       item.accountName,
       item.journalId,
+      item.debit,
+      item.credit,
       item.date,
       item.description,
     ]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-    return searchContent.includes(searching.toLowerCase());
+    return searchContent.includes(searching.trim().toLowerCase());
   });
 
-  const totalDebit = filteredData.reduce((sum, item) => sum + (parseFloat(item.debit) || 0), 0);
-  const totalCredit = filteredData.reduce((sum, item) => sum + (parseFloat(item.credit) || 0), 0);
 
-  const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
 
+  // Netbalance
+  const netBalances = computeNetBalances(filteredData);
+
+  const accountsPayableNet = netBalances
+    .filter(
+      (item) =>
+        item.accountName === "Accounts Payable" ||
+        item.accountName === "Raw Material Used"
+    )
+    .reduce((sum, item) => sum + parseFloat(item.net), 0);
+
+  const accountsReceivableNet = netBalances
+    .filter(
+      (item) =>
+        item.accountName === "Accounts Receivable" ||
+        item.accountName === "Sales Revenue"
+    )
+    .reduce((sum, item) => sum + parseFloat(item.net), 0);
+
+  const totalDebit = filteredData.reduce(
+    (sum, item) => sum + (parseFloat(item.debit) || 0),
+    0
+  );
+  const totalCredit = filteredData.reduce(
+    (sum, item) => sum + (parseFloat(item.credit) || 0),
+    0
+  );
+
+
+
+  // Number formatter with comma
+  const formatNumber = (num) =>
+    num.toLocaleString("en-US", { minimumFractionDigits: 2 });
+
+
+
+  // Loading
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -173,19 +283,57 @@ const BodyContent = () => {
   return (
     <div className="generalLedger">
       <div className="body-content-container">
+
+        {/* Title */}
         <div className="title-subtitle-container">
           <h1 className="subModule-title">{activeTab}</h1>
+
+
+
+          {/* General Ledger Tabs: Accounts payable and receivables */}
+          <div className="flex border-b-2 border-gray-400 w-fit">
+            {["General Ledger", "Accounts Payable", "Accounts Receivable"].map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer duration-300 hover:text-teal-500 ${
+                    activeTab === tab
+                      ? "text-teal-500"
+                      : "text-gray-800 hover:text-teal-500"
+                  }`}
+                >
+                  {tab}
+                  {activeTab === tab && (
+                    <span className="absolute left-0 right-0 -bottom-1 h-1 bg-teal-500"></span>
+                  )}
+                </button>
+              )
+            )}
+          </div>
         </div>
 
+
+
+        {/* Components: Dropdown and Search */}
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
               options={["Ascending", "Descending"]}
               style="selection"
-              defaultOption="Sort Debit Credit.."
+              defaultOption="Sort by Debit and Credit"
               value={sortOption}
               onChange={handleSort}
             />
+
+            <Dropdown
+              options={["Ascending", "Descending"]}
+              style="selection"
+              defaultOption="Sort by Date"
+              value={dateSortOption}
+              onChange={handleDateSort}
+            />
+
             <Search
               type="text"
               placeholder="Search Entries.."
@@ -193,30 +341,12 @@ const BodyContent = () => {
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
-
-          <div className="flex border-b-2 border-gray-400">
-            {["General Ledger", "Accounts Payable", "Accounts Receivable"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer duration-300 hover:text-teal-500 ${activeTab === tab
-                    ? "text-teal-500"
-                    : "text-gray-800 hover:text-teal-500"
-                  }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <span className="absolute left-0 right-0 -bottom-1 h-1 bg-teal-500"></span>
-                )}
-              </button>
-            ))}
-          </div>
-
         </div>
 
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
+
+
+        {/* Table Component */}
+        {isLoading ? (<LoadingSpinner />) : (
           <>
             <Table
               data={filteredData.map((item) => [
@@ -232,11 +362,46 @@ const BodyContent = () => {
               columns={columns}
             />
 
+
+
+            {/* Debit and Credit: Total for each Tab */}
             <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light text-sm">
-              <div className="col-span-3"></div>
-              <div className="font-bold">Total</div>
-              <div>{formatNumber(totalDebit)}</div>
-              <div>{formatNumber(totalCredit)}</div>
+              <div className="col-span-3" />
+
+              {activeTab === "General Ledger" && (
+                <>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab === "Accounts Payable" && (
+                <>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab === "Accounts Receivable" && (
+                <>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab !== "General Ledger" &&
+                activeTab !== "Accounts Payable" &&
+                activeTab !== "Accounts Receivable" && (
+                  <div className="col-span-7 text-gray-500 italic text-center">
+                    Select a tab to view totals
+                  </div>
+                )}
             </div>
           </>
         )}
@@ -246,10 +411,15 @@ const BodyContent = () => {
         isModalOpen={isModalOpen}
         closeModal={closeModal}
         reportForm={reportForm}
-        handleInputChange={(field, value) => setReportForm((prev) => ({ ...prev, [field]: value }))}
-        handleSubmit={() => { }}
+        handleInputChange={(field, value) =>
+          setReportForm((prev) => ({ ...prev, [field]: value }))
+        }
+        handleSubmit={() => {}}
       />
 
+
+      
+      {/* User Validation Modal */}
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}

@@ -113,17 +113,18 @@ const Shipment = () => {
     // Function to fetch employees
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        // Use the carrier-specific endpoint instead of the general employees endpoint
+        const response = await fetch('http://127.0.0.1:8000/api/carrier-employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch employees');
+          throw new Error(errorData.detail || 'Failed to fetch carrier employees');
         }
         
         const data = await response.json();
         setEmployees(data);
       } catch (err) {
-        console.error('Error fetching employees:', err);
+        console.error('Error fetching carrier employees:', err);
       }
     };
   
@@ -173,6 +174,31 @@ const Shipment = () => {
   const getEmployeeFullName = (employeeId) => {
     const employee = employees.find(emp => emp.employee_id === employeeId);
     return employee ? employee.full_name : employeeId; // Fallback to ID if employee not found
+  };
+  
+  // Helper function to get readable shipment type based on delivery_id prefix
+  const getReadableShipmentType = (shipment) => {
+    if (!shipment) return 'Unknown'; // Handle case where shipment object is null/undefined
+    
+    const deliveryId = shipment.delivery_id;
+    
+    if (!deliveryId) {
+      // Fallback if delivery_id is missing, maybe use original type or default
+      return shipment.delivery_type || 'Unknown'; 
+    }
+    
+    if (deliveryId.startsWith('SERVICES-DO-')) {
+      return 'External - Service Order';
+    } else if (deliveryId.startsWith('SALES-ORD-')) {
+      return 'External - Sales Order';
+    } else if (deliveryId.startsWith('INV-WM-')) {
+      return 'Internal - Stock Transfer';
+    } else if (deliveryId.startsWith('OPS-DOI-')) {
+      return 'Internal - Content Delivery';
+    } else {
+      // Fallback for unknown prefixes, use original type or default
+      return shipment.delivery_type || 'Unknown Prefix'; 
+    }
   };
   
   // Handle tab change
@@ -649,6 +675,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : activeTab === "delivered" ? (
               <DeliveredShipmentsTable
@@ -658,6 +685,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : (
               <FailedShipmentsTable 
@@ -667,6 +695,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             )}
           </div>
@@ -700,6 +729,7 @@ const Shipment = () => {
             shipment={selectedShipment}
             onSave={handleUpdateDeliveryReceipt}
             onCancel={() => setShowDeliveryReceiptModal(false)}
+            employees={employees}
           />
         )}
         

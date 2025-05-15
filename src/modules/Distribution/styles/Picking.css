@@ -136,7 +136,7 @@
 .picking .stats-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
   flex-wrap: wrap;
 }
 
@@ -1294,7 +1294,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Important for containing the scrollable area */
+  overflow-y: scroll; /* Important for containing the scrollable area */
 }
 
 /* Modal Header */
@@ -1439,6 +1439,8 @@
 .picking .detail-value {
   font-size: 0.95rem;
   color: #212529;
+  display: flex;
+  align-items: center;
 }
 
 .picking .detail-value.highlight {
@@ -1699,4 +1701,1093 @@
     display: block;
     margin: 2px auto 0;
   }
+}
+
+/* Add these styles to the end of your Picking.css file */
+
+/* Modal Tab Navigation */
+.picking .modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.picking .tab-button {
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.picking .tab-button:hover {
+  color: #00a8a8;
+  background-color: #f8f9fa;
+}
+
+.picking .tab-button.active {
+  color: #00a8a8;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.picking .tab-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Items Section */
+.picking .items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picking .items-table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.picking .items-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.picking .items-table th {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.picking .items-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.9rem;
+  color: #212529;
+  text-align: center;
+}
+
+.picking .items-table tr:last-child td {
+  border-bottom: none;
+}
+
+.picking .items-table .even-row {
+  background-color: #fff;
+}
+
+.picking .items-table .odd-row {
+  background-color: #f8f9fa;
+}
+
+.picking .items-table .centered-cell {
+  text-align: center;
+}
+
+.picking .items-table .no-data {
+  text-align: center;
+  padding: 24px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Multi-warehouse warning */
+.picking .multi-warehouse-warning {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.picking .warning-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.picking .warning-text {
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .picking .modal-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .picking .tab-button {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .items-table th,
+  .picking .items-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+.picking .warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.picking .warehouse-icon {
+  margin-right: 0.5rem;
+}
+
+.picking .warehouse-divider {
+  border: none;
+  border-top: 1px dashed #e0e0e0;
+}
+
+/* Add to your Picking.css file */
+.picking-progress {
+  margin: 15px 0;
+}
+
+.picking .progress-bar-container {
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.picking .progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.picking .progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.picking .warehouse-progress {
+  font-size: 0.8em;
+  margin-left: 10px;
+  color: #666;
+}
+
+.picking .item-toggle-button {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.picking .item-toggle-button.pick {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+.picking .item-toggle-button.unpick {
+  background-color: #f1f8e9;
+  color: #558b2f;
+}
+
+.picking .item-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picking .picked-status {
+  color: #4caf50;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.picking .not-picked-status {
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.picking .picked-row {
+  background-color: #f1f8e9 !important;
+}
+
+
+.picking .delivery-note-header {
+  background-color: #e8f4ff;
+  padding: 8px 12px;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid #bde0fe;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #0077cc;
+}
+
+.picking .delivery-note-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.picking .delivery-note-id {
+  font-size: 0.9rem;
+}
+
+.picking .item-count {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: normal;
+}
+
+.picking .delivery-note-divider {
+  margin: 16px 0;
+  border: none;
+  height: 1px;
+  background-color: #e3f2fd;
+  border-bottom: 1px dashed #b3e0ff;
+}
+
+/* Multiple delivery note indicator */
+.picking .warehouse-group .warehouse-progress {
+  background-color: #ffeb3b;
+  color: #333;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+/* Delivery note badges */
+.picking .detail-item.full-width {
+  flex-basis: 100%;
+}
+
+.picking .detail-value-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.picking .delivery-note-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e3f2fd;
+  color: #0277bd;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #bbdefb;
+}
+
+.picking .delivery-note-badge-icon {
+  margin-right: 5px;
+  font-size: 0.75rem;
+}
+
+/* Partial Delivery Styles */
+
+/* Main container for partial delivery info */
+.picking .partial-delivery-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header with title and counter */
+.picking .partial-delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.picking .partial-delivery-title {
+  display: flex;
+  align-items: center;
+}
+
+.picking .partial-delivery-title h4 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #495057;
+  margin-left: 8px;
+}
+
+.picking .partial-delivery-icon {
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.picking .partial-delivery-counter {
+  background-color: #e9ecef;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.picking .delivery-counter-text {
+  font-size: 0.8em;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .delivery-counter-numbers {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Progress bar */
+.picking .partial-delivery-progress {
+  margin-bottom: 15px;
+}
+
+.picking .progress-bar-container {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.picking .progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.picking .progress-text {
+  font-size: 0.9em;
+  color: #6c757d;
+  text-align: right;
+}
+
+/* Delivery notes list */
+.picking .delivery-notes-list {
+  margin-bottom: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.picking .delivery-note-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.picking .delivery-note-item:last-child {
+  border-bottom: none;
+}
+
+.picking .delivery-note-item:hover {
+  background-color: #f8f9fa;
+}
+
+.picking .delivery-note-item.current-delivery {
+  background-color: #e6f7ff;
+  border-left: 4px solid #007bff;
+}
+
+.picking .delivery-note-item.completed-delivery {
+  background-color: #f0f8f0;
+  border-left: 4px solid #28a745;
+}
+
+.picking .delivery-note-item.pending-delivery {
+  opacity: 0.7;
+}
+
+.picking .delivery-note-sequence {
+  width: 24px;
+  height: 24px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.picking .current-delivery .delivery-note-sequence {
+  background-color: #007bff;
+}
+
+.picking .completed-delivery .delivery-note-sequence {
+  background-color: #28a745;
+}
+
+.picking .delivery-note-content {
+  flex: 1;
+}
+
+.picking .delivery-note-id {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+  font-size: 0.95em;
+}
+
+.picking .delivery-note-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #6c757d;
+}
+
+.picking .item-count {
+  display: inline-block;
+}
+
+.picking .status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.picking .status-badge-pending {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.picking .status-badge-picking {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.picking .status-badge-packed {
+  background-color: #e5f9e0;
+  color: #198754;
+}
+
+.picking .status-badge-shipped {
+  background-color: #d8f3e9;
+  color: #20c997;
+}
+
+.picking .admin-override-warning {
+  margin-top: 4px;
+  font-size: 0.8em;
+  color: #fd7e14;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.picking .warning-icon {
+  font-size: 12px;
+}
+
+/* Info message */
+.picking .delivery-notes-info {
+  margin-top: 10px;
+}
+
+.picking .info-message {
+  font-size: 0.9em;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border-radius: 4px;
+  border-left: 4px solid #ffc107;
+}
+
+.picking .info-icon {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+/* Partial delivery badge in completion modal */
+.picking .partial-delivery-badge {
+  font-size: 0.8em;
+  background-color: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+  color: #495057;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* Partial delivery alert in completion modal */
+.picking .partial-delivery-alert {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #fff3cd;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.picking .alert-icon {
+  color: #ffc107;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.picking .alert-text {
+  flex: 1;
+}
+
+.picking .alert-title {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #212529;
+}
+
+.picking .alert-message {
+  margin: 0;
+  color: #495057;
+  font-size: 0.95em;
+}
+
+/* Partial delivery indicator in picking table */
+.picking .partial-delivery-row {
+  position: relative;
+}
+
+.picking .partial-delivery-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #ffc107;
+}
+
+.picking .partial-delivery-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.picking .partial-icon {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.picking .partial-text {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Add this to your Picking.css file */
+
+.picking .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.picking .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.picking .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.picking .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.picking .sort-icon {
+  display: inline-flex;
+  margin-left: 0.25rem;
+  color: #00a8a8;
+  vertical-align: middle;
+}
+
+/* Add at the end of your current Picking.css */
+
+.picking .info-note {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #6c757d;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.picking .batch-info {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.picking .status-badge-picking {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.picking .section-header.status-in-progress {
+  color: #00a8a8;
+}
+
+/* Enhanced Delivery Notes Section */
+.picking .delivery-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.picking .delivery-note-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.picking .delivery-note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.picking .delivery-note-header {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picking .delivery-note-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.picking .delivery-note-icon {
+  color: #0077cc;
+  font-size: 18px;
+}
+
+.picking .delivery-note-id {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .delivery-note-content {
+  padding: 12px 16px;
+}
+
+.picking .delivery-note-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.picking .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.picking .info-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .info-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .picking .delivery-notes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .picking .delivery-note-info-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Add these styles to improve the look with icons */
+
+/* Page header with icon */
+.picking .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.picking .page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.picking .title-icon {
+  margin-right: 12px;
+  color: #00a8a8;
+  font-size: 1.5rem;
+}
+
+.picking .refresh-button {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.picking .refresh-button:hover {
+  background-color: #e9ecef;
+}
+
+.picking .refresh-icon {
+  margin-right: 6px;
+}
+
+/* Search container with icon */
+.picking .search-container {
+  position: relative;
+  flex: 1 1 250px;
+}
+
+.picking .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.picking .search-input {
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.15s ease-in-out;
+}
+
+/* Filter improvements */
+.picking .filter-container {
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.picking .filter-label {
+  color: #495057;
+  font-weight: 500;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.picking .filter-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Status buttons with icons */
+.picking .status-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.picking .status-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.picking .button-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+}
+
+.picking .status-button:hover {
+  background-color: #e9ecef;
+}
+
+.picking .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* Stats row with icons */
+.picking .stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.picking .stat-box {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.picking .stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.picking .stat-icon {
+  margin-right: 6px;
+  color: #00a8a8;
+}
+
+.picking .stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* Error state with icon */
+.picking .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+}
+
+.picking .error-icon {
+  font-size: 2rem;
+  color: #dc3545;
+  margin-bottom: 16px;
+}
+
+.picking .error-message {
+  color: #856404;
+  font-weight: 500;
+}
+
+/* Table improvements */
+.picking .picking-table th.sortable {
+  cursor: pointer;
+  position: relative;
+  padding-right: 24px;
+}
+
+.picking .sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+
+.picking .sort-icon.neutral {
+  color: #adb5bd;
+}
+
+.picking .sort-icon.ascending,
+.picking .sort-icon.descending {
+  color: #00a8a8;
+}
+
+/* Empty table state */
+.picking .no-data {
+  padding: 40px !important;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.picking .no-data-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #dc3545;
+}
+
+/* Delivery type cell with icon */
+.picking .delivery-type-cell {
+  display: flex;
+  align-items: center;
+}
+
+.picking .delivery-type-icon {
+  margin-right: 8px;
+  color: #00a8a8;
+}
+
+/* Pagination controls */
+.picking .pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.picking .pagination-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.picking .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picking .pagination-icon {
+  font-size: 0.8rem;
+  margin: 0 4px;
+}
+
+.picking .page-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+.picking .page-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.picking .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
 }

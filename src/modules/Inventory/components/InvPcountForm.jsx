@@ -13,6 +13,26 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     const [inventoryItemsList, setInventoryItemsList] = useState([]);
     const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
 
+    // Fetch logged-in user's employee_id from localStorage on mount
+    useEffect(() => {
+        try {
+            const rawStoredUser = localStorage.getItem("user");
+            if (rawStoredUser) {
+                const storedUser = JSON.parse(rawStoredUser);
+                if (storedUser && storedUser.employee_id) {
+                    setEmployeeId(storedUser.employee_id);
+                    console.log("InvPcountForm: Auto-set employeeId from localStorage:", storedUser.employee_id);
+                } else {
+                    console.warn("InvPcountForm: employee_id not found in stored user data.");
+                }
+            } else {
+                console.warn("InvPcountForm: No 'user' item found in localStorage for employee_id.");
+            }
+        } catch (error) {
+            console.error("InvPcountForm: Error reading user data from localStorage for employee_id:", error);
+        }
+    }, []); // Empty dependency array means this runs once on mount
+
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -24,7 +44,8 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
 
     const fetchWarehouses = async () => {
         try {
-            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+            // Using the updated API endpoint for warehouses
+            const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
 
             if (!response.ok) {
                 throw new Error(`Error fetching warehouses: ${response.status}`);
@@ -99,9 +120,11 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     useEffect(() => {
         if (Object.keys(inventoryItems).length > 0) {
             const itemsList = Object.values(inventoryItems);
+            // console.log("Inventory items from prop:", itemsList);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
+            // Using the updated local API endpoint for inventory items
+            fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -109,6 +132,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                     return res.json();
                 })
                 .then((data) => {
+                    // console.log("Fetched inventory items:", data);
                     if (data && data.length > 0) {
                         setInventoryItemsList(data);
                     }
@@ -139,16 +163,14 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                         setQuantity(itemDetails.current_quantity.toString());
                     }
                 }
-            } else if (selectedItem.item_id) {
+            } else if (selectedItem.item_id) { // Fallback if inventory_item_id is not directly on selectedItem
                 setInventoryItemId(selectedItem.item_id);
             }
 
             setQuantity(selectedItem.item_actually_counted || "");
-            setEmployeeId(selectedItem.employee || "");
             setStatus(selectedItem.status || "");
             setTimePeriod(selectedItem.time_period || "");
 
-            // Handle warehouse display for selected item
             if (selectedItem.warehouse_id && localWarehouses.length > 0) {
                 const warehouse = localWarehouses.find(w =>
                     w.id === selectedItem.warehouse_id
@@ -157,8 +179,10 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                 if (warehouse) {
                     setWarehouseId(warehouse.id);
                 } else {
-                    setWarehouseId(selectedItem.warehouse_id);
+                    setWarehouseId(selectedItem.warehouse_id); // Fallback if not found in formatted list
                 }
+            } else if (selectedItem.warehouse_id) { // Set if warehouses haven't loaded yet
+                setWarehouseId(selectedItem.warehouse_id);
             }
 
             setRemarks(selectedItem.remarks || "");
@@ -174,15 +198,18 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
         const item = inventoryItemsList.find(item => item.inventory_item_id === selectedId);
         setSelectedInventoryItem(item || null);
 
+        // Optionally clear or set quantity based on the new item
+        // For now, it sets quantity if available, otherwise keeps current or clears
         if (item && item.current_quantity) {
             setQuantity(item.current_quantity.toString());
+        } else {
+            setQuantity(""); // Or keep existing: setQuantity(selectedInventoryItem?.current_quantity.toString() || "");
         }
     };
 
     const handleClear = () => {
         setInventoryItemId("");
         setQuantity("");
-        setEmployeeId("");
         setStatus("");
         setTimePeriod("");
         setWarehouseId("");
@@ -218,15 +245,18 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             item_onhand: itemOnHand,
             item_actually_counted: actualCounted,
             difference_in_qty: diffQty,
-            employee_id: employeeId,
+            employee_id: employeeId, // Ensure your backend expects 'employee_id'
             status: status,
             time_period: timePeriod,
             remarks: remarks,
-            warehouse_id_input: warehouseId,
+            warehouse_id: warehouseId, // Ensure your backend expects 'warehouse_id_input'
         };
 
+        console.log("[InvPcountForm.jsx] Submitting new P-Count record:", newRecord); // Log data before sending
+
         try {
-            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
+            // Using the original API endpoint for cyclic counts
+            const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRecord),
@@ -238,7 +268,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             }
 
             const data = await response.json();
-            console.log("Successfully inserted new record:", data);
+            console.log("[InvPcountForm.jsx] Successfully inserted new record - Backend Response:", data); // Log backend response
             setSuccessMessage("Successfully inserted new record!");
 
             setTimeout(() => {
@@ -251,17 +281,16 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
         }
     };
 
-    // Force-fetch warehouses if none are available
     useEffect(() => {
-        if (localWarehouses.length === 0) {
+        if (localWarehouses.length === 0 && (!warehouses || warehouses.length === 0)) {
             fetchWarehouses();
         }
-    }, [localWarehouses]);
+    }, [localWarehouses, warehouses]);
+
 
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                {/* Header */}
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-xl font-semibold">Add P-count</h2>
                     <button onClick={onClose} className="close-btn">
@@ -269,7 +298,6 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                     </button>
                 </div>
 
-                {/* Success / Error messages */}
                 {successMessage && (
                     <p style={{ color: "green", marginBottom: "1rem" }}>
                         {successMessage}
@@ -281,13 +309,8 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                     </p>
                 )}
 
-                {/* Form Fields */}
                 <form className="flex flex-wrap" onSubmit={handleSubmit}>
-
-                    {/* Forms - Box 1 */}
                     <div className="max-h-[10rem]">
-
-                        {/* Inventory Item */}
                         <label>
                             Inventory Item <span className="text-red-500">*</span>
                         </label>
@@ -300,45 +323,27 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             <option value="">Select Inventory Item</option>
                             {inventoryItemsList.map((item) => (
                                 <option key={item.inventory_item_id} value={item.inventory_item_id}>
-                                    {item.inventory_item_id} - {item.item_type || "Unknown"}
+                                    {/* CORRECTED LINE: Use item.item_name */}
+                                    {(item.item_name || item.inventory_item_id)} - {item.item_type || "Unknown"}
                                 </option>
                             ))}
                         </select>
 
-                        {selectedInventoryItem && (
-                            <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                                <h3 className="font-medium text-gray-700 mb-2">Selected Item Details</h3>
-                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <p><span className="font-medium">Type:</span> {selectedInventoryItem.item_type}</p>
-                                    <p><span className="font-medium">Current Qty:</span> {selectedInventoryItem.current_quantity}</p>
-                                    {selectedInventoryItem.expiry && (
-                                        <p className={new Date(selectedInventoryItem.expiry) < new Date() ? 'text-red-500' : ''}>
-                                            <span className="font-medium">Expiry:</span> {formatDate(selectedInventoryItem.expiry)}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-
-                        {/* Employee ID  */}
                         <label>
                             Employee ID <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
-                            placeholder="Enter Employee ID"
+                            placeholder="Employee ID (auto-filled)"
                             value={employeeId}
-                            onChange={(e) => setEmployeeId(e.target.value)}
+                            readOnly
                             required
+                            className="block w-full border-gray-300 rounded-md p-2 mb-4 bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0 focus:outline-none"
                         />
-
                     </div>
 
-                    {/* Forms Box 2 - Grid */}
                     <div className="grid grid-cols-2 gap-5">
                         <span>
-                            {/*Physical Count  */}
                             <label>
                                 Physical Count <span className="text-red-500">*</span>
                             </label>
@@ -351,8 +356,6 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             />
                         </span>
 
-
-                        {/* Time Period */}
                         <span>
                             <label>
                                 Time Period <span className="text-red-500">*</span>
@@ -370,17 +373,10 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                                 <option value="yearly">Yearly</option>
                             </select>
                         </span>
-
-
-
-
                     </div>
 
-
                     <div className="grid grid-cols-2 space-x-5">
-
                         <span className="justify-start">
-
                             <label>
                                 Status <span className="text-red-500">*</span>
                             </label>
@@ -391,13 +387,9 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                                 <option value="Open">Open</option>
                                 <option value="Closed">Closed</option>
                             </select>
-
                         </span>
 
-
-
                         <span className="justify-start">
-
                             <label>
                                 Warehouse Location <span className="text-red-500">*</span>
                             </label>
@@ -408,19 +400,18 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                                 className="text-gray-400"
                             >
                                 <option value="">Select Warehouse</option>
-                                {localWarehouses.map((warehouse) => (
-                                    <option
-                                        key={warehouse.id}
-                                        value={warehouse.id}
-                                    >
-                                        {warehouse.name}
-                                    </option>
-                                ))}
+                                {localWarehouses
+                                    .filter(warehouse => !(warehouse.name && warehouse.name.startsWith("ARCHIVED_")))
+                                    .map((warehouse) => (
+                                        <option
+                                            key={warehouse.id}
+                                            value={warehouse.id}
+                                        >
+                                            {warehouse.name}
+                                        </option>
+                                    ))}
                             </select>
-
                         </span>
-
-
                     </div>
 
                     <div>
@@ -431,26 +422,20 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             onChange={(e) => setRemarks(e.target.value)}
                             rows="1"
                         />
-
                     </div>
 
-
-
-                    {/* Buttons Container */}
                     <div className="form-actions flex justify-end gap-5">
-                        <button type="button" onClick={handleClear} className="clear-btn">
+                        <button type="button" onClick={handleClear} className="clear-clear-btn">
                             Clear
                         </button>
                         <button type="submit" className="submit-btn">
                             Submit
                         </button>
                     </div>
-
-
                 </form>
             </div>
         </div>
     );
 };
 
-export default InvPcountForm; 
+export default InvPcountForm;

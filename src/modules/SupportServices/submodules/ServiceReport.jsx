@@ -10,6 +10,7 @@ import Table from "../components/ServiceReport/Table"
 import InputField from "../components/ServiceReport/InputField"
 import UpdateReportModal from "../components/ServiceReport/UpdateReportModal"
 import SubmitReportModal from "../components/ServiceReport/SubmitReportModal"
+import ReviewReportModal from "../components/ServiceReport/ReviewReportModal"
 
 import { GET } from "../api/api"
 import { POST } from "../api/api"
@@ -28,7 +29,9 @@ const ServiceReport = ({employee_id}) => {
   const [filterPeriod, setFilterPeriod] = useState("All Time")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [showFilterByOptions, setShowFilterByOptions] = useState(false)
-  const [filterBy, setFilterBy] = useState("Filter by")
+  const [filterBy, setFilterBy] = useState(
+    employee_id === 'HR-EMP-2025-ed0c07' ? "submitted" : "all"
+  );
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTicketStatus, setSelectedTicketStatus] = useState(null);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
@@ -38,23 +41,24 @@ const ServiceReport = ({employee_id}) => {
   // Modal states
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedReport, setSelectedReport] = useState(null)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorModalMessage, setErrorModalMessage] = useState("")
 
   const fetchReports = async () => {
     try {
-      // this filters out reports so that only the service reports assigned to the one currently logged in will show:
-      // const data = await GET(`report/reports/technician/HR-EMP-2025-8d9f9b/`);
-      const data = await GET(`report/reports/technician/${employee_id}/`);
-
-      // all reports:
-      //const data = await GET("report/");
+      const endpoint = employee_id === 'HR-EMP-2025-ed0c07'
+        ? "report/"
+        : `report/reports/technician/${employee_id}/`;
+  
+      const data = await GET(endpoint);
       setReports(data);
     } catch (error) {
-      console.error("Error fetching reports:", error)
+      console.error("Error fetching reports:", error);
     }
-  }
+  };
+  
 
   useEffect(() => {
     fetchReports();
@@ -85,7 +89,16 @@ const ServiceReport = ({employee_id}) => {
 
   // Handle update report
   const handleUpdate = () => {
+    if (selectedReport.report_status === "Reviewed") {
+      setErrorModalMessage("Cannot edit an already reviewed report.");
+      setShowErrorModal(true);
+      return;
+    }
     setShowUpdateModal(true)
+  }
+
+  const handleReview = () => {
+    setShowReviewModal(true)
   }
 
   // Handle submit report
@@ -114,6 +127,7 @@ const ServiceReport = ({employee_id}) => {
     try {
       await PATCH(`report/${reportId}/`, reportData);
       setShowUpdateModal(false);
+      setShowReviewModal(false)
       fetchReports();
     } catch (error) {
       let firstError = "An unknown error occurred.";
@@ -368,17 +382,32 @@ const ServiceReport = ({employee_id}) => {
               Close Ticket
             </button>
             <div className="right-buttons">
-              <button 
-                type="button" 
-                className={`update-button ${selectedReport ? "clickable" : "disabled"}`}
-                onClick={handleUpdate} 
-                disabled={!selectedReport}
-              >
-                Update
-              </button>
-              <button className="add-button" onClick={handleSubmit}>
-                Submit Report
-              </button>
+              {employee_id === 'HR-EMP-2025-ed0c07' ? (
+                <>
+                  <button 
+                    type="button" 
+                    className={`update-button ${selectedReport ? "clickable" : "disabled"}`}
+                    onClick={handleReview}
+                    disabled={!selectedReport}
+                  >
+                    Review Report
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    type="button" 
+                    className={`update-button ${selectedReport ? "clickable" : "disabled"}`}
+                    onClick={handleUpdate} 
+                    disabled={!selectedReport}
+                  >
+                    Edit
+                  </button>
+                  <button className="add-button" onClick={handleSubmit}>
+                    Submit Report
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -397,6 +426,14 @@ const ServiceReport = ({employee_id}) => {
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={handleSubmitReport}
+        technician={employee_id}
+      />
+
+      <ReviewReportModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onUpdate={handleUpdateReport}
+        report={selectedReport}
         technician={employee_id}
       />
 

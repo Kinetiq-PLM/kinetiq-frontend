@@ -11,6 +11,10 @@ const Payroll = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [toast, setToast] = useState(null);
+  // Add new state variables for edit functionality
+  const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPayroll, setEditingPayroll] = useState(null);
 
   const showToast = (message, success = true) => {
     setToast({ message, success });
@@ -28,6 +32,44 @@ const Payroll = () => {
     } finally {
       setLoading(false);
     }
+  };
+  // Add a function to handle opening edit modal
+  const handleEditPayroll = (payroll) => {
+    setEditingPayroll({
+      ...payroll,
+      pay_period_start: payroll.pay_period_start,
+      pay_period_end: payroll.pay_period_end
+    });
+    setShowEditModal(true);
+    setDotsMenuOpen(null);
+  };
+   // Add function to handle payroll edit form submission
+   const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.patch(
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/${editingPayroll.payroll_id}/`,
+        {
+          pay_period_start: editingPayroll.pay_period_start,
+          pay_period_end: editingPayroll.pay_period_end
+        }
+      );
+      setShowEditModal(false);
+      showToast("Payroll updated successfully");
+      fetchPayroll(); // Refresh data
+    } catch (err) {
+      console.error("Update payroll error:", err);
+      showToast("Failed to update payroll", false);
+    }
+  };
+
+  // Add function to handle edit form field changes
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingPayroll(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   useEffect(() => {
@@ -128,10 +170,11 @@ const Payroll = () => {
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Updated At</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {paginated.map((pay) => (
+                {paginated.map((pay, index) => (
                   <tr key={pay.payroll_id}>
                     <td>{pay.payroll_id}</td>
                     <td>{pay.employee_id}</td>
@@ -163,16 +206,30 @@ const Payroll = () => {
                       {getPaymentTag(pay.net_pay)}
                     </td>
                     <td>
-                      {pay.status === "processing" ? (
-                        <span>-</span>
-                      ) : (
-                        <span className={`hr-tag ${pay.status.toLowerCase()}`}>
-                          {pay.status}
-                        </span>
-                      )}
+                      <span className={`hr-tag ${pay.status.toLowerCase()}`}>
+                        {pay.status}
+                      </span>
                     </td>
                     <td>{pay.created_at}</td>
                     <td>{pay.updated_at}</td>
+                    <td className="hr-payroll-actions">
+                      <div
+                        className="hr-payroll-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="hr-payroll-dropdown">
+                            <div
+                              className="hr-payroll-dropdown-item"
+                              onClick={() => handleEditPayroll(pay)}
+                            >
+                              Edit
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -320,6 +377,63 @@ const Payroll = () => {
           </div>
         </div>
       </div>
+      {/* Add Edit Modal */}
+      {showEditModal && editingPayroll && (
+        <div className="hr-payroll-modal-overlay">
+          <div className="hr-payroll-modal">
+            <h3>Edit Payroll</h3>
+            <form onSubmit={handleEditSubmit} className="hr-payroll-modal-form">
+              <div className="form-group">
+                <label>Payroll ID</label>
+                <input
+                  type="text"
+                  value={editingPayroll.payroll_id || ""}
+                  disabled
+                />
+              </div>
+              <div className="form-group">
+                <label>Employee ID</label>
+                <input
+                  type="text"
+                  value={editingPayroll.employee_id || ""}
+                  disabled
+                />
+              </div>
+              <div className="form-group">
+                <label>Pay Period Start</label>
+                <input
+                  type="date"
+                  name="pay_period_start"
+                  value={editingPayroll.pay_period_start || ""}
+                  onChange={handleEditChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Pay Period End</label>
+                <input
+                  type="date"
+                  name="pay_period_end"
+                  value={editingPayroll.pay_period_end || ""}
+                  onChange={handleEditChange}
+                  required
+                />
+              </div>
+
+              <div className="hr-payroll-modal-buttons">
+                <button type="submit" className="submit-btn">Save</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       {toast && (
         <div
           className="hr-payroll-toast"

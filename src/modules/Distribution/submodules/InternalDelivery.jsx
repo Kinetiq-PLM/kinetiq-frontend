@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../styles/InternalDelivery.css";
 import TabNavigation from "../components/delivery/TabNavigation.jsx";
 import DeliveryTable from "../components/delivery/DeliveryTable.jsx";
+// Import icons
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 const InternalDelivery = () => {
   // State for tab management
@@ -80,7 +82,7 @@ const InternalDelivery = () => {
         {/* Search and Filters */}
         <div className="filters-row">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               className="search-input"
@@ -90,20 +92,20 @@ const InternalDelivery = () => {
             />
           </div>
           
-          <div className="filter-container">
-            <span className="filter-label">Status:</span>
-            <select
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              className="status-filter"
-            >
-              <option value="All">All</option>
-              <option value="Created">Created</option>
-              <option value="Approved">Approved</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+          <div className="filters-group">
+            <div className="filter-container">
+              <span className="filter-label">Status:</span>
+              <select
+                value={statusFilter}
+                onChange={handleStatusFilterChange}
+                className="filter-select"
+              >
+                <option value="All">All</option>
+                <option value="Created">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
           </div>
         </div>
         

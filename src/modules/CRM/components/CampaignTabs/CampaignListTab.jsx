@@ -10,7 +10,8 @@ import NewCampaignModal from "../NewCampaignModal";
 
 import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
 
-export default function CampaignListTab() {
+export default function CampaignListTab({ employee_id }) {
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -65,6 +66,32 @@ export default function CampaignListTab() {
 
     return true;
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          [
+            "REG-2504-fd99",
+            "CTR-2504-d25f",
+            "REG-2504-8f19",
+            "REG-2504-aaf5",
+            "REG-2504-fd68",
+            "SEA-2504-8d37",
+            "SEA-2504-cc4a",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (campaignQuery.status === "success") {
@@ -131,6 +158,7 @@ export default function CampaignListTab() {
               onClick={() => setIsNewCampaignOpen(true)}
               type="primary"
               className="w-full sm:w-[200px] py-2"
+              disabled={btnDisabled || isLoading}
             >
               New Campaign
             </Button>

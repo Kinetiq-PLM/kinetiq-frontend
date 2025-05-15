@@ -3,7 +3,7 @@ import "../styles/PurchaseAPInvoice.css";
 import axios from "axios";
 import PurchaseAPInvoiceForm from "./PurchaseAPInvoiceForm";
 
-const PurchaseAPInvoiceBody = () => {
+const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
     const [invoices, setInvoices] = useState([]);
     const [filteredInvoices, setFilteredInvoices] = useState([]);
     const [selectedInvoice, setSelectedInvoice] = useState(null); // Selected invoice
@@ -12,7 +12,7 @@ const PurchaseAPInvoiceBody = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [showStatusFilter, setShowStatusFilter] = useState(false);
-    const [purchaseOrders, setPurchaseOrders] = useState({}); // Map of content_id to purchase_id
+    const [purchaseOrders, setPurchaseOrders] = useState({}); // Map of document_id to purchase_id
 
     const timeOptions = [
         "Last 30 days",
@@ -24,10 +24,10 @@ const PurchaseAPInvoiceBody = () => {
 
     const statusOptions = [
         "All",
-        "Rejected",
-        "Completed",
-        "Approved",
-        "Pending"
+        "Overdue",
+        "Paid",
+        "Received",
+        "Forwarded"
     ];
 
     useEffect(() => {
@@ -49,12 +49,13 @@ const PurchaseAPInvoiceBody = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch purchase orders using content_id from external-module
+        // Fetch purchase orders using document_id from external-module
         const fetchPurchaseOrders = async () => {
             try {
                 const externalModulesResponse = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/"
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/document-header/"
                 );
+
                 const purchaseOrdersResponse = await axios.get(
                     "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/"
                 );
@@ -65,7 +66,7 @@ const PurchaseAPInvoiceBody = () => {
                         (order) => order.purchase_id === module.purchase_id
                     );
                     if (purchaseOrder) {
-                        purchaseOrderMap[module.content_id] = purchaseOrder.purchase_id;
+                        purchaseOrderMap[module.document_id] = purchaseOrder.purchase_id;
                     }
                 });
 
@@ -97,7 +98,14 @@ const PurchaseAPInvoiceBody = () => {
 
         // 2. Apply status filter
         if (selectedStatus !== "All") {
-            result = result.filter(invoice => invoice.status === selectedStatus);
+            if (selectedStatus === "Overdue") {
+                const today = new Date();
+                result = result.filter(invoice => 
+                    invoice.due_date && new Date(invoice.due_date) < today
+                );
+            } else {
+                result = result.filter(invoice => invoice.status === selectedStatus);
+            }
         }
 
         // 3. Apply search filter
@@ -105,7 +113,7 @@ const PurchaseAPInvoiceBody = () => {
             const term = searchTerm.toLowerCase();
             result = result.filter(invoice => 
                 (invoice.invoice_id && invoice.invoice_id.toString().toLowerCase().includes(term)) ||
-                (invoice.content_id && purchaseOrders[invoice.content_id]?.toString().toLowerCase().includes(term)) ||
+                (invoice.document_id && purchaseOrders[invoice.document_id]?.toString().toLowerCase().includes(term)) ||
                 (invoice.document_date && invoice.document_date.toString().toLowerCase().includes(term)) ||
                 (invoice.status && invoice.status.toLowerCase().includes(term))
             );
@@ -129,13 +137,19 @@ const PurchaseAPInvoiceBody = () => {
     };
 
     const handleInvoiceClick = (invoice) => {
-        setSelectedInvoice(invoice); // Set the selected invoice
+        console.log("Selected Invoice:", invoice);
+        setSelectedInvoice(invoice);
     };
 
-    // Add back button handler to toggle dashboard
+    // Back button handler to toggle dashboard
     const handleBackToDashboard = () => {
-        const event = new CustomEvent('purchasing-back-to-dashboard');
-        window.dispatchEvent(event);
+        if (onBackToDashboard) {
+            onBackToDashboard();
+        } else {
+            // Fallback to the old method if prop is not provided
+            const event = new CustomEvent('purchasing-back-to-dashboard');
+            window.dispatchEvent(event);
+        }
     };
 
     return (
@@ -218,7 +232,7 @@ const PurchaseAPInvoiceBody = () => {
                                             onClick={() => handleInvoiceClick(invoice)}
                                         >
                                             <div>{invoice.invoice_id}</div>
-                                            <div>{purchaseOrders[invoice.content_id] || "N/A"}</div>
+                                            <div>{purchaseOrders[invoice.document_id] || "N/A"}</div>
                                             <div>
                                                 <span className={`status-${invoice.status?.toLowerCase()}`}>{invoice.status}</span>
                                             </div>

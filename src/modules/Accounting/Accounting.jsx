@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import Button from "./components/button/Button";
 
+
 // Professional color palette
 const COLORS = [
   "#3b82f6",
@@ -29,10 +30,13 @@ const COLORS = [
   "#6366f1",
 ];
 
+
 const AccountingDashboard = () => {
+  // Use States 
   const [chartSeries, setChartSeries] = useState([]);
-  const [pieData, setPieData] = useState([]);
   const [trendData, setTrendData] = useState([]);
+  const [pieData, setPieData] = useState([]);
+  const [data, setData] = useState([]);
   const [summary, setSummary] = useState({
     debit: 0,
     credit: 0,
@@ -40,13 +44,14 @@ const AccountingDashboard = () => {
     receivable: 0,
     balance: 0,
   });
-  const [data, setData] = useState([]);
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
     title: "",
     message: "",
   });
+
+
 
   // API endpoint
   const API_URL =
@@ -55,70 +60,97 @@ const AccountingDashboard = () => {
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
   const CHART_OF_ACCOUNTS_ENDPOINT = `${API_URL}/api/chart-of-accounts/`;
 
+
+  
+  // Computes the Netbalance
+  const computeNetBalances = (entries) => {
+    const accountSums = {};
+  
+    entries.forEach(({ accountName, debit, credit }) => {
+      if (!accountSums[accountName]) 
+      {
+        accountSums[accountName] = { debit: 0, credit: 0 };
+      }
+  
+      accountSums[accountName].debit += parseFloat(debit) || 0;
+      accountSums[accountName].credit += parseFloat(credit) || 0;
+    });
+  
+    return Object.entries(accountSums).map(([name, { debit, credit }]) => ({
+        accountName: name,
+        debit: debit.toFixed(2),
+        credit: credit.toFixed(2),
+        net: (debit - credit).toFixed(2),
+      })
+    );
+  };
+  
+
+
+  // Fetches data
   const fetchData = async () => {
     try {
-      // Fetch General Ledger data
       const glResponse = await axios.get(GENERAL_LEDGER_ENDPOINT);
       const glData = glResponse.data;
-
+  
       const grouped = {};
       let totalDebit = 0;
       let totalCredit = 0;
-      let accountsPayableTotal = 0;
-      let accountsReceivableTotal = 0;
-
+  
+      const netBalanceEntries = [];
+  
       glData.forEach((entry) => {
         const accountName = entry.account_name || "Unknown";
         const debit = parseFloat(entry.debit_amount || 0);
         const credit = parseFloat(entry.credit_amount || 0);
-
-        // Grouping for bar chart
+  
         if (!grouped[accountName]) {
           grouped[accountName] = { debit: 0, credit: 0 };
         }
         grouped[accountName].debit += debit;
         grouped[accountName].credit += credit;
-
-        // Totals
+  
+        netBalanceEntries.push({ accountName, debit, credit });
+  
         totalDebit += debit;
         totalCredit += credit;
-
-        // Accounts Payable Summary
-        if (
-          accountName === "Accounts Payable"
-        ) {
-          accountsPayableTotal += debit; // Net Payable
-        }
-
-        // Accounts Receivable Summary
-        if (
-          accountName === "Accounts Receivable" || accountName === "Sales Revenue"
-        ) {
-          accountsReceivableTotal += credit; // Net Receivable
-        }
       });
-
-      // Set chart series
+  
+      const netBalances = computeNetBalances(netBalanceEntries);
+  
+      const accountsPayableNet = netBalances
+        .filter(
+          (item) =>
+            item.accountName === "Accounts Payable"
+        )
+        .reduce((sum, item) => sum + parseFloat(item.net), 0);
+  
+      const accountsReceivableNet = netBalances
+        .filter(
+          (item) =>
+            item.accountName === "Accounts Receivable"
+        )
+        .reduce((sum, item) => sum + parseFloat(item.net), 0);
+  
       const labels = Object.keys(grouped);
       const chartData = labels.map((label) => ({
         name: label,
         Debit: parseFloat(grouped[label].debit.toFixed(2)),
         Credit: parseFloat(grouped[label].credit.toFixed(2)),
       }));
-
+  
       setChartSeries(chartData);
       setSummary({
         debit: totalDebit.toFixed(2),
         credit: totalCredit.toFixed(2),
-        payable: accountsPayableTotal.toFixed(2),
-        receivable: accountsReceivableTotal.toFixed(2),
+        payable: accountsPayableNet.toFixed(2),
+        receivable: accountsReceivableNet.toFixed(2),
         balance: (totalDebit - totalCredit).toFixed(2),
       });
-
-      // Fetch Chart of Accounts data
+  
       const coaResponse = await axios.get(CHART_OF_ACCOUNTS_ENDPOINT);
       const coaData = coaResponse.data;
-
+  
       setData(
         coaData.map((acc, index) => ({
           id: index + 1,
@@ -127,32 +159,34 @@ const AccountingDashboard = () => {
           account_type: acc.account_type,
         }))
       );
-
-      const typeCounts = {};
-      coaData.forEach((acc) => {
-        typeCounts[acc.account_type] = (typeCounts[acc.account_type] || 0) + 1;
-      });
-
-      const formattedPie = Object.entries(typeCounts).map(([label, value]) => ({
-        name: label,
-        value,
-      }));
-
+  
+      const formattedPie = [
+        {
+          name: "Accounts Payable",
+          value: parseFloat(accountsPayableNet.toFixed(2)),
+        },
+        {
+          name: "Accounts Receivable",
+          value: parseFloat(accountsReceivableNet.toFixed(2)),
+        },
+      ];
+  
       setPieData(formattedPie);
-
+  
     } catch (error) {
       console.error(
         "Error fetching data:",
         error.response ? error.response.data : error
       );
       setValidation({
-        isOpen: true, // Ensure this is set to true
+        isOpen: true,
         type: "error",
         title: "Fetch Error",
         message: "Failed to load dashboard data. Please check your connection.",
       });
     }
   };
+  
 
   useEffect(() => {
     fetchData();
@@ -165,6 +199,7 @@ const AccountingDashboard = () => {
       minimumFractionDigits: 2,
     }).format(value);
   };
+
 
   return (
     <div className="accounting">
@@ -181,9 +216,6 @@ const AccountingDashboard = () => {
                   Financial overview and analysis
                 </p>
               </div>
-              <div>
-                <Button name="Refresh data" variant="standard2" onclick={fetchData} />
-              </div>
             </div>
           </div>
         </div>
@@ -192,7 +224,7 @@ const AccountingDashboard = () => {
         <div className="container mx-auto px-4 py-8">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            
+
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-500 text-sm font-medium">
@@ -292,7 +324,7 @@ const AccountingDashboard = () => {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-sm:hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8 max-sm:hidden">
             {/* Bar Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -328,51 +360,6 @@ const AccountingDashboard = () => {
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Pie Chart */}
-            <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Chart of Accounts Distribution
-              </h2>
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={120}
-                    innerRadius={60}
-                    fill="#8884d8"
-                    paddingAngle={2}
-                    label={({ name, percent }) =>
-                      `${name} (${(percent * 100).toFixed(0)}%)`
-                    }
-                    labelLine={{
-                      stroke: "#666",
-                      strokeWidth: 1,
-                      strokeDasharray: "2 2",
-                    }}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value, name) => [`${value} accounts`, name]}
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                    }}
-                  />
-                </PieChart>
               </ResponsiveContainer>
             </div>
           </div>

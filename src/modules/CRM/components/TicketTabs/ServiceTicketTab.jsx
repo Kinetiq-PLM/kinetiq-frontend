@@ -4,7 +4,7 @@ import Button from "../../../Sales/components/Button";
 import InputField from "../../../Sales/components/InputField";
 import TextField from "./../TextField";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
-import { POST } from "../../../Sales/api/api";
+import { POST, GET } from "../../../Sales/api/api";
 import { useMutation } from "@tanstack/react-query";
 
 const ServiceTicketTab = ({
@@ -13,9 +13,10 @@ const ServiceTicketTab = ({
   ticketInfo,
   setTicketInfo,
   setTicketID,
+  employee_id,
 }) => {
   const { showAlert } = useAlert();
-
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
 
@@ -36,6 +37,30 @@ const ServiceTicketTab = ({
     },
   });
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          ![
+            "REG-2504-d389",
+            "REG-2504-ba0c",
+            "REG-2504-ed23",
+            "REG-2504-8f19",
+            "REG-2504-81ab",
+            "REG-2504-b330",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
   const handleSubmit = () => {
     if (ticketInfo.priority === "") {
       showAlert({
@@ -100,7 +125,10 @@ const ServiceTicketTab = ({
         type="primary"
         onClick={handleSubmit}
         className={"mt-8"}
-        disabled={subject && description && selectedCustomer ? false : true}
+        disabled={
+          (subject && description && selectedCustomer ? false : true) ||
+          btnDisabled
+        }
       >
         Send To Services
       </Button>

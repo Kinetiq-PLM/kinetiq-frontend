@@ -5,13 +5,18 @@ import { GET, PATCH } from "../api/api";
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
 
 const departmentIds = {
+  "HR-DEPT-2025-034793":"Solutions Customizing",
   "HR-DEPT-2025-105fd9": "Report Generator",
+  "HR-DEPT-2025-1d6c5a":"Externals Relations",
   "HR-DEPT-2025-60cafa": "CRM",
-  "HR-DEPT-2025-7a126": "Financials",
+  "HR-DEPT-2025-618b17":"Internal Affairs",
+  "HR-DEPT-2025-7a1269": "Financials",
   "HR-DEPT-2025-84ee38": "Sales",
   "HR-DEPT-2025-8cc307": "Accounting",
   "HR-DEPT-2025-8f325e": "Inventory",
   "HR-DEPT-2025-8fe431": "Distribution",
+  "HR-DEPT-2025-970c49":"IT Team",
+  "HR-DEPT-2025-ac016c":"Department of Government Efficiency",
   "HR-DEPT-2025-9f99d0": "Support & Services",
   "HR-DEPT-2025-a5da8b": "Operations",
   "HR-DEPT-2025-a73184": "Administration",
@@ -53,6 +58,7 @@ const BodyContent = () => {
   const [isReviewConfirmationVisible, setIsReviewConfirmationVisible] = useState(false);
   const [returnRemarks, setReturnRemarks] = useState({});
   const [returnComments, setReturnComments] = useState({});
+  const [isRequestWarningVisible, setIsRequestWarningVisible] = useState(false);
 
   const closeWarningPopup = () => {
     setIsWarningPopupVisible(false);
@@ -376,6 +382,7 @@ const BodyContent = () => {
         validationDate: sub.validation_date || "",
         validatedBy: sub.validated_by || "",
       }));
+      console.log("Fetched returns:", mappedData);
       setOriginalReturnsData(mappedData);
     } catch (error) {
       console.error("Error fetching returns:", error);
@@ -542,7 +549,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Budget
@@ -664,9 +671,22 @@ const BodyContent = () => {
         )}
         {activeTab === "Budget Request List" && (
           <div className="content-container">
+            {isRequestWarningVisible ? (
+  <div className="warning-popup">
+    <div className="warning-popup-content">
+      <h3>Oops...</h3>
+      <p>Sorry, we're not yet accepting any budget request at the moment.</p>
+      <p>No records to show yet.</p>
+      <button className="close-popup-button" onClick={() => setIsRequestWarningVisible(false)}>
+        OK
+      </button>
+    </div>
+  </div>
+) : (
+  <>
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025-August 2026</div>
+                <div className="summary-date-range">January 2025-January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Approved Amount
@@ -783,15 +803,19 @@ const BodyContent = () => {
                   </tbody>
                 </table>
                 <button className="edit-button" onClick={handleEditClick}>Edit</button>
+              
               </InfoCard>
             </InfoCard>
+            </>
+          )}
           </div>
+          
         )}
         {activeTab === "Returns List" && (
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Returned Amount

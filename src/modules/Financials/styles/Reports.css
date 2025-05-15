@@ -16,6 +16,7 @@
   align-items: center;
   justify-content: flex-start;
   min-width: 40rem;
+  overflow: auto
 }
 
 .reports .tabs {
@@ -29,7 +30,7 @@
   z-index: 50;
   align-self: start;
   margin-left: 15px;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .reports .tabs button {
@@ -97,20 +98,21 @@
     gap: 20px; 
 }
 
-.reports .info-card-cash-flow-base {
-  height: 100hv;
-}
-
-.reports .info-card-cash-flow-base,
-.reports .infocard-cash-flow,
-.reports .cash-flow-invoice-collections {
+.reports .cash-flow-card{
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   grid-column: 1 / 3;
   grid-row: 1 / 3;
-  width: 100%;
+  
 }
 
+.reports .invoice-collections-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  grid-column: 3 / 4;
+  grid-row: 2 / 3;
+  width: 100%;
+}
 .reports .cash-flow-container {
   margin-bottom: 20px;
 }
@@ -176,7 +178,7 @@
 }
 
 .reports .amount {
-  font-size: 1.2em;
+  font-size: 1em;
   font-weight: bold;
   text-align: left;
 }
@@ -209,21 +211,7 @@
   margin: 0 5px;
 }
 
-.reports .receivable-aging-card {
-  grid-column: 3 / 4;
-  grid-row: 1 / 2;
-  width: 100%;
-  height: 350px;
-  padding: 0; 
-  margin-right: 20px; 
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
+
 
 .reports .receivable-aging-chart,
 .reports .payable-aging-chart {
@@ -270,11 +258,11 @@
   color: #000808;
 }
 
-.reports .payable-aging-card {
+.reports .receivable-aging-card {
   grid-column: 3 / 4; 
-  grid-row: 2 / 3; 
+  grid-row: 1 / 3; 
   width: 100%; 
-  height: 350px;
+  height: 450px;
   padding: 20px;
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
@@ -287,12 +275,12 @@
 
 .reports .expense-overview-card {
   background-color: white;
-  grid-column: 1 / -1; 
+  grid-column: 1 / 4; 
   grid-row: 3 / 4; 
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 95%;
+  width: 100%;
   margin-top: 0px; 
   margin-bottom: 30px;
 }
@@ -482,10 +470,11 @@
 }
 
 .reports .period-covered {
-  background-color: #00A8A8;
+  background-color: #47b3b3e1;
   padding: 18px 30px;
   width: 200px;
   border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .reports .february-2023 {
@@ -1022,17 +1011,15 @@
 
 .reports .cash-flow-container,
 .reports .infocard-cash-flow,
-.reports .receivable-aging-card,
-.reports .payable-aging-card,
 .reports .expense-overview-card,
-.reports .cash-flow-invoice-collections{
+.reports .invoice-collections-card{
 width: 400px;
   }
 .reports .payable-aging-chart,
   .reports .receivable-aging-chart{
     padding-left: 0px;
     padding-right: 30px;
-    width: 400px;
+    width: 200px;
   }
 
   .reports .total-payable,

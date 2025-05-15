@@ -13,7 +13,9 @@ const ServTickTable = ({ filteredTickets, onRowClick, selectedTicket }) => {
         </thead>
         <tbody>
           {filteredTickets.length > 0 ? (
-            filteredTickets.map((ticket, index) => (
+             [...filteredTickets]
+             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+             .map((ticket, index) => (
               <tr 
                 key={ticket.ticket_id || `ticket-${index}`} 
                 className={`${

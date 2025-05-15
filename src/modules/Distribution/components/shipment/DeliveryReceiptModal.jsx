@@ -1,50 +1,74 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import DeliveryReceiptPDF from './DeliveryReceiptPDF';
+import * as ReactDOM from 'react-dom/client';
 
-const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
+const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [deliveryReceipt, setDeliveryReceipt] = useState(null);
   const [error, setError] = useState(null);
   const [customerName, setCustomerName] = useState('');
+  const [customerData, setCustomerData] = useState(null);
+  const [allEmployees, setAllEmployees] = useState([]);
+  const [allCarriers, setAllCarriers] = useState([]);
   
   // Form state
   const [signature, setSignature] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
   
+  // PDF generation state
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  
   // Signature state
   const [signatureMode, setSignatureMode] = useState('type'); // 'type' or 'draw'
   const sigCanvas = useRef({}); // Reference for the signature canvas
+  
+  // PDF reference
+  const pdfRef = useRef(null);
 
-  // Fetch delivery receipt on component mount
+  // Fetch all necessary data on component mount
   useEffect(() => {
-    const fetchDeliveryReceipt = async () => {
+    const fetchAllData = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        
+        // Fetch employees
+        const employeesResponse = await fetch('http://127.0.0.1:8000/api/employees/');
+        if (employeesResponse.ok) {
+          const employeesData = await employeesResponse.json();
+          setAllEmployees(employeesData);
+        }
+        
+        // Fetch carriers
+        const carriersResponse = await fetch('http://127.0.0.1:8000/api/carriers/');
+        if (carriersResponse.ok) {
+          const carriersData = await carriersResponse.json();
+          setAllCarriers(carriersData);
+        }
         
         if (!shipment.delivery_receipt_id) {
           throw new Error('No delivery receipt found for this shipment');
         }
         
-        const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
+        // Fetch delivery receipt
+        const deliveryReceiptResponse = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
+        if (!deliveryReceiptResponse.ok) {
+          const errorData = await deliveryReceiptResponse.json();
           throw new Error(errorData.detail || 'Failed to fetch delivery receipt');
         }
         
-        const data = await response.json();
-        setDeliveryReceipt(data);
+        const receiptData = await deliveryReceiptResponse.json();
+        setDeliveryReceipt(receiptData);
         
-        // Initialize form state with existing data
-        if (data.signature) {
-          setSignature(data.signature);
+        if (receiptData.signature) {
+          setSignature(receiptData.signature);
         }
         
-        // Fetch customer name if received_by appears to be a customer ID
-        if (data.received_by && data.received_by.startsWith('SALES-CUST-')) {
-          fetchCustomerName(data.received_by);
+        // Fetch customer details if we have a customer ID
+        if (receiptData.received_by && receiptData.received_by.startsWith('SALES-CUST-')) {
+          fetchCustomerName(receiptData.received_by);
         }
         
         setIsLoading(false);
@@ -54,31 +78,42 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
       }
     };
     
-    fetchDeliveryReceipt();
+    fetchAllData();
   }, [shipment.delivery_receipt_id]);
 
-  // New function to fetch customer name
+  // Function to fetch customer name
   const fetchCustomerName = async (customerId) => {
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/customers/${customerId}/`);
-      
+      const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
       if (!response.ok) {
-        console.error('Failed to fetch customer details');
-        // Extract customer name from ID as fallback
-        if (customerId.startsWith('SALES-CUST-')) {
-          // Just display the ID as fallback
-          setCustomerName(`Customer ${customerId}`);
-        }
+        setCustomerName(`Customer ${customerId}`);
         return;
       }
       
-      const customerData = await response.json();
-      if (customerData && customerData.name) {
-        setCustomerName(customerData.name);
+      const data = await response.json();
+      setCustomerData(data);
+      if (data && data.name) {
+        setCustomerName(data.name);
       }
     } catch (err) {
       console.error('Error fetching customer details:', err);
     }
+  };
+
+  // Get employee name by ID
+  const getEmployeeNameById = (employeeId) => {
+    if (!employeeId) return 'N/A';
+    
+    const employee = allEmployees.find(emp => emp.employee_id === employeeId);
+    return employee ? employee.full_name : employeeId;
+  };
+  
+  // Get carrier employee name (fixes the carrier name issue)
+  const getCarrierName = (carrierId) => {
+    const carrier = allCarriers.find(c => c.carrier_id === carrierId);
+    if (!carrier) return 'N/A';
+    
+    return getEmployeeNameById(carrier.carrier_name);
   };
 
   // Clear the signature canvas
@@ -194,6 +229,78 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
     });
   };
   
+  // Update the handleGeneratePDF function
+  const handleGeneratePDF = () => {
+    setIsPdfGenerating(true);
+    
+    // Map the shipment data correctly, including all available information
+    const deliveryData = {
+      id: deliveryReceipt?.delivery_receipt_id,
+      receipt_id: deliveryReceipt?.delivery_receipt_id,
+      customer_name: customerName || deliveryReceipt?.received_by,
+      contact_number: customerData?.phone_number,
+      delivery_address: shipment?.destination_location,
+      email: customerData?.email,
+      order_id: shipment?.shipment_id,
+      
+      // Map carrier info properly
+      carrier_id: shipment?.carrier_id,
+      carrier_service_type: shipment?.carrier_service_type,
+      
+      // Use proper employee name for carrier
+      carrier_name: getCarrierName(shipment?.carrier_id),
+      packer_id: getEmployeeNameById(shipment?.packing_list_info?.packed_by),
+      
+      // Add shipping and financial information
+      total_amount: deliveryReceipt?.total_amount || shipment?.shipping_cost_info?.total_shipping_cost,
+      tracking_number: shipment?.tracking_number,
+      
+      // Pass full source warehouse array instead of a string
+      source_warehouses: shipment?.source_warehouses || [],
+      source_location: shipment?.source_location,
+      
+      // Add shipping dates
+      shipment_date: shipment?.shipment_date,
+      delivery_date: deliveryReceipt?.delivery_date,
+      
+      // Additional notes
+      notes: deliveryReceipt?.notes || "Thank you for your business!",
+      
+      // Use the items_details array for the items
+      items: shipment?.items_details || []
+    };
+  
+    // Create a temporary div for rendering the PDF component
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+  
+    // Use createRoot API for React 18
+    const root = ReactDOM.createRoot(tempDiv);
+    
+    // Render the component
+    root.render(
+      <DeliveryReceiptPDF deliveryData={deliveryData} />
+    );
+    
+    // Access the DOM after rendering
+    setTimeout(() => {
+      // Find the button in the rendered component and click it
+      const generateButton = tempDiv.querySelector('button');
+      if (generateButton) {
+        generateButton.click();
+      }
+      
+      // Cleanup after PDF generation
+      setTimeout(() => {
+        root.unmount();
+        document.body.removeChild(tempDiv);
+        setIsPdfGenerating(false);
+      }, 2000);
+    }, 500);
+  };
+  
   // Determine if receipt can be updated
   const canBeUpdated = deliveryReceipt && 
                        deliveryReceipt.receipt_status !== 'Received' && 
@@ -267,6 +374,22 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                     </div>
                   )}
                 </div>
+                
+                {/* Add PDF download button */}
+                <div className="pdf-buttons" style={{ marginTop: '15px', textAlign: 'right' }}>
+                  <button 
+                    type="button"
+                    className="save-button"
+                    onClick={handleGeneratePDF}
+                    disabled={isPdfGenerating}
+                    style={{ 
+                      backgroundColor: '#00a8a8',
+                      cursor: isPdfGenerating ? 'wait' : 'pointer'
+                    }}
+                  >
+                    {isPdfGenerating ? 'Generating PDF...' : 'Download Receipt PDF'}
+                  </button>
+                </div>
               </div>
               
               {canBeUpdated ? (
@@ -309,78 +432,78 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                 ) : (
                   // Delivery Signature Form
                   <form onSubmit={handleSubmit}>
-                  <div className="delivery-receipt-section">
-                    <h4>Delivery Confirmation</h4>
-                    
-                    <div className="signature-mode-toggle">
-                      <button 
-                        type="button"
-                        className={`mode-button ${signatureMode === 'type' ? 'active' : ''}`}
-                        onClick={() => setSignatureMode('type')}
-                      >
-                        Type Signature
-                      </button>
-                      <button
-                        type="button"
-                        className={`mode-button ${signatureMode === 'draw' ? 'active' : ''}`}
-                        onClick={() => setSignatureMode('draw')}
-                      >
-                        Draw Signature
-                      </button>
+                    <div className="delivery-receipt-section">
+                      <h4>Delivery Confirmation</h4>
+                      
+                      <div className="signature-mode-toggle">
+                        <button 
+                          type="button"
+                          className={`mode-button ${signatureMode === 'type' ? 'active' : ''}`}
+                          onClick={() => setSignatureMode('type')}
+                        >
+                          Type Signature
+                        </button>
+                        <button
+                          type="button"
+                          className={`mode-button ${signatureMode === 'draw' ? 'active' : ''}`}
+                          onClick={() => setSignatureMode('draw')}
+                        >
+                          Draw Signature
+                        </button>
+                      </div>
+                      
+                      <div className="form-row">
+                        <label className="form-label">Receiver Signature:</label>
+                        {signatureMode === 'type' ? (
+                          <div className="signature-box">
+                            <input
+                              className="signature-input"
+                              value={signature}
+                              onChange={(e) => setSignature(e.target.value)}
+                              placeholder="Type signature or confirmation code here"
+                              // required
+                            />
+                          </div>
+                        ) : (
+                          <div className="signature-canvas-container">
+                            <SignatureCanvas
+                              ref={sigCanvas}
+                              penColor="black"
+                              canvasProps={{
+                                width: 500,
+                                height: 200,
+                                className: 'signature-canvas'
+                              }}
+                            />
+                            <button 
+                              type="button" 
+                              className="clear-signature-button"
+                              onClick={clearSignature}
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="receipt-status-buttons">
+                        <button
+                          type="submit"
+                          className="receipt-status-button receive"
+                          disabled={!isSignatureValid()}
+                        >
+                          Confirm Receipt
+                        </button>
+                        <button
+                          type="button"
+                          className="receipt-status-button reject"
+                          onClick={() => setIsRejecting(true)}
+                        >
+                          Reject Delivery
+                        </button>
+                      </div>
                     </div>
-                    
-                    <div className="form-row">
-                      <label className="form-label">Receiver Signature:</label>
-                      {signatureMode === 'type' ? (
-                        <div className="signature-box">
-                          <input
-                            className="signature-input"
-                            value={signature}
-                            onChange={(e) => setSignature(e.target.value)}
-                            placeholder="Type signature or confirmation code here"
-                            // required
-                          />
-                        </div>
-                      ) : (
-                        <div className="signature-canvas-container">
-                          <SignatureCanvas
-                            ref={sigCanvas}
-                            penColor="black"
-                            canvasProps={{
-                              width: 500,
-                              height: 200,
-                              className: 'signature-canvas'
-                            }}
-                          />
-                          <button 
-                            type="button" 
-                            className="clear-signature-button"
-                            onClick={clearSignature}
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="receipt-status-buttons">
-                      <button
-                        type="submit"
-                        className="receipt-status-button receive"
-                        disabled={!isSignatureValid()}
-                      >
-                        Confirm Receipt
-                      </button>
-                      <button
-                        type="button"
-                        className="receipt-status-button reject"
-                        onClick={() => setIsRejecting(true)}
-                      >
-                        Reject Delivery
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                  </form>
                 )
               ) : (
                 <div className={deliveryReceipt.receipt_status === 'Received' ? 'delivered-message' : 'failed-message'}>
@@ -405,6 +528,8 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
           </button>
         </div>
       </div>
+      
+      {/* The PDF component will be created dynamically when needed */}
     </div>
   );
 };

@@ -92,6 +92,8 @@
   align-items: center;
   margin-bottom: 1rem;
   padding: 0 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 /* Table styles */
@@ -198,6 +200,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 1rem 0px;
 }
 
 .purch-req button.add-item-btn:hover {
@@ -254,9 +257,10 @@
 
 .purch-req .success-message {
   color: #4caf50;
-  text-align: center;
-  margin-top: 1rem;
   font-weight: 500;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
 }
 
 .purch-req .centered-error-message {

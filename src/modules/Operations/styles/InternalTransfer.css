@@ -19,13 +19,14 @@
     justify-content: flex-start;
     min-width: auto; 
     min-height: unset;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
 .InternalTransfer .table-container,
 .InternalTransfer.rework .table-container {
   width: 100%;
-  height: 492px;
+  height: 450px;
   position: relative;
   background: white;
   border-radius: 8px;
@@ -37,14 +38,24 @@
 }
 
 
+
 .InternalTransfer .table-container table {
     width: 100%;
-    height: 100%;
     border-collapse: collapse;
-    display: table;
+    table-layout: fixed;
+    min-width: 600px;
 }
 .InternalTransfer .table-container {
-    overflow: auto; /* Scroll on the container */
+    width: 100%;
+    height: 450px;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 0 1.1rem 0.5rem 1.1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    max-width: 100%;
+    overflow: auto;
 }
 .InternalTransfer .table-container table {
     width: 100%;
@@ -52,26 +63,25 @@
     min-width: 600px;
   }
 .InternalTransfer .table-container thead {
-    width: 100%;
-    top: 0;
-    background: white;
+    background-color: white;
+}
+.InternalTransfer .table-container thead tr {
+    background-color: white;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
 
-  }
 
   .InternalTransfer .table-container tbody {
     display: table-row-group;
   }
 
 .InternalTransfer .table-container thead tr {
-    width: 100%;
-    display: table;
-    table-layout: fixed;
+    background-color: white;
 }
 
 
 .InternalTransfer .table-container tbody tr {
     width: 100%;
-    display: table;
     table-layout: fixed;
 }
 
@@ -83,7 +93,10 @@
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid #dee2e6;
+    position: static;
+    top: auto;
 }
+
 
 .InternalTransfer table td {
     padding: 0.75rem;
@@ -94,12 +107,17 @@
 
 .InternalTransfer .input-container {
     width: 100%;
-    margin-top: 1.5rem;
-    padding: 1rem;
+    margin-top: 2rem;
+    padding: 1rem 4rem; /* Increased horizontal padding */
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: auto; 
+    overflow-y: visible;
+    overflow-x: auto;
+    height: auto;
+    min-height: fit-content;
+    display: flex;
+    flex-direction: column;
   }
   
 
@@ -107,16 +125,16 @@
 .InternalTransfer input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 2px solid #008080;
     background-color: white;
     border-radius: 4px;
     cursor: pointer;
     margin: 0;
     position: relative;
-
     transition: all 0.2s ease;
+    top: 3.4px;
 }
 
 .InternalTransfer input[type="checkbox"]:checked {
@@ -137,31 +155,7 @@
 }
 
 /* FIXED TABLE CELL STYLING */
-.InternalTransfer table th:first-child {
-    width: 50px;
-    padding: 0;
-    position: relative;
-    height: 100%;
-}
-.InternalTransfer table td:first-child {
-    width: 50px;
-    position: relative;
-    height: 100%;
-     
-}
-.InternalTransfer table th:nth-child(2) {
-    width: 15em;
-    padding: 0.75rem;
-    position: relative;
-    height: 100%;
-}
 
-.InternalTransfer table td:nth-child(2) {
-    width: 15em;
-    padding: 0.75rem;
-    position: relative;
-    height: 100%;
-}
 
 .InternalTransfer table td {
     padding: 0.75rem;
@@ -174,13 +168,47 @@
 
 .InternalTransfer table td:first-child {
     width: 50px;
-    padding: 0.5rem;
+    padding: 0.5rem 0.75rem;
     text-align: center;
     vertical-align: middle;
 
 }
 
-.InternalTransfer .input-group {
+
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(1),
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(2),
+.InternalTransfer .input-row:nth-child(1) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(33% - 0.5rem); 
+    min-width: 150px; 
+}
+.InternalTransfer .input-row:nth-child(2){
+    justify-content: flex-start;
+}
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(1),
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(2),
+.InternalTransfer .input-row:nth-child(2) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(33% - 0.5rem); 
+    min-width: 150px; 
+}
+
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(1),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(2),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 0.5rem); 
+    min-width: 150px; 
+}
+.InternalTransfer .input-row:nth-child(2){
+    justify-content: flex-start;
+}
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(1),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(2),
+.InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(3){
     display: flex;
     flex-direction: column;
     width: calc(50% - 0.5rem); 
@@ -240,7 +268,9 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 1rem;
-    width: 100%;
+    width: 95%; /* Reduced width to move button away from right edge */
+    margin-right: 1rem; /* Added right margin */
+    position: relative;
 }
 
 .InternalTransfer .send-to-button {
@@ -390,9 +420,58 @@
 /* Media query for smaller tablets */
 @media (max-width: 768px) {
     .InternalTransfer .body-content-container {
-      padding: 0.75rem; /* Reduced padding */
+      padding: 0.75rem; 
       width: 100%;
       min-width: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .InternalTransfer .input-container {
+      padding: 1.5rem 2.5rem;
+      min-height: 310px;
+    }
+    
+    .InternalTransfer .input-row {
+      gap: 2rem; 
+    }
+    
+    .InternalTransfer .input-row:nth-child(1),
+    .InternalTransfer .input-row:nth-child(2) {
+      margin-bottom: 1.5rem; 
+    }
+    
+
+    .InternalTransfer .button-container {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+      padding-bottom: 0.5rem;
+    }
+    
+   
+    .InternalTransfer .input-container.reworkOrder .input-row {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    
+    .InternalTransfer .input-container.reworkOrder .input-group {
+      width: calc(50% - 1.5rem);
+      min-width: 120px;
+    }
+    
+    /* Ensure first row has Product ID and Rework Reason side by side */
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(1),
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(2) {
+      flex: 0 0 calc(50% - 1.5rem);
+    }
+    
+    /* Ensure second row has Actual Quantity and Rework Quantity side by side */
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(1),
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(2) {
+      flex: 0 0 calc(50% - 1.5rem);
     }
     .InternalTransfer .details-grid {
       padding: 0.75rem; /* Reduced padding */
@@ -448,36 +527,72 @@
     }
   }
 
-  .InternalTransfer table th:nth-child(1),
-.InternalTransfer table td:nth-child(1) {
+.InternalTransfer table th.deliveryTH:nth-child(1),
+.InternalTransfer table td.deliveryTD:nth-child(1) {
     width: 2rem;
 }
 
-.InternalTransfer table th:nth-child(2),
-.InternalTransfer table td:nth-child(2) {
+.InternalTransfer table th.deliveryTH:nth-child(2),
+.InternalTransfer table td.deliveryTD:nth-child(2) {
     width: 15rem;
 }
 
-.InternalTransfer table th:nth-child(3),
-.InternalTransfer table td:nth-child(3) {
+
+.InternalTransfer table th.deliveryTH:nth-child(3),
+.InternalTransfer table td.deliveryTD:nth-child(3) {
     width: 15rem;
 }
 
-.InternalTransfer table th:nth-child(4),
-.InternalTransfer table td:nth-child(4) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(4),
+.InternalTransfer table td.deliveryTD:nth-child(4) {
+    width: 8rem;
 }
 
-.InternalTransfer table th:nth-child(5),
-.InternalTransfer table td:nth-child(5) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(5),
+.InternalTransfer table td.deliveryTD:nth-child(5) {
+    width: 8rem;
 }
 
-.InternalTransfer table th:nth-child(6),
-.InternalTransfer table td:nth-child(6) {
-    width: 10rem;
+.InternalTransfer table th.deliveryTH:nth-child(6),
+.InternalTransfer table td.deliveryTD:nth-child(6) {
+    width: 8rem;
 }
-.InternalTransfer table th:nth-child(7),
-.InternalTransfer table td:nth-child(7) {
-    width: 10rem;
+
+.InternalTransfer table th.deliveryTH:nth-child(7),
+.InternalTransfer table td.deliveryTD:nth-child(7) {
+    width: 15rem;
+}
+.InternalTransfer table th.deliveryTH:nth-child(8),
+.InternalTransfer table td.deliveryTD:nth-child(8) {
+    width: 8rem;
+}
+
+
+/*Rework*/
+.InternalTransfer table th.reworkTH:nth-child(1),
+.InternalTransfer table td.reworkTD:nth-child(1) {
+    width: 2rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(2),
+.InternalTransfer table td.reworkTD:nth-child(2) {
+    width: 15rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(3),
+.InternalTransfer table td.reworkTD:nth-child(3) {
+    width: 15rem;
+}
+.InternalTransfer table th.reworkTH:nth-child(4),
+.InternalTransfer table td.reworkTD:nth-child(4) {
+    width: 15rem;
+}
+
+.InternalTransfer table th.reworkTH:nth-child(5),
+.InternalTransfer table td.reworkTD:nth-child(5) {
+    width: 8rem;
+    
+}
+
+.InternalTransfer table th.reworkTH:nth-child(6),
+.InternalTransfer table td.reworkTD:nth-child(6) {
+    width: 8rem;
 }
