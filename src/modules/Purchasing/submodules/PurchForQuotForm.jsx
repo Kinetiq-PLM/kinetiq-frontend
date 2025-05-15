@@ -415,6 +415,7 @@ const fetchQuotations = async () => {
     );
 
     console.log("New Quotation Created:", createResponse.data);
+    alert("Quotation created successfully!");
     return createResponse.data; // Return the newly created quotation
   } catch (error) {
     console.error("Error in handleAddToList:", error.response?.data || error.message);
