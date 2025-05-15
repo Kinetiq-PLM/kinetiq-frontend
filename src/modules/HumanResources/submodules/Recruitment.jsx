@@ -5,6 +5,20 @@ import "../styles/Recruitment.css";
 
 const S3_BASE_DIRECTORY = "Human_Resource_Management/Candidates/";
 
+// Add this constant near the top of the file, after the imports
+const ALLOWED_HR_INTERVIEWERS = [
+  'HR-EMP-2025-25162d',
+  'HR-EMP-2025-e6d9e0',
+  'HR-EMP-2025-98742b',
+  'HR-EMP-2025-664dd0',
+  'HR-EMP-2025-cd68b8',
+  'HR-EMP-2025-265236',
+  'HR-EMP-2025-b7e57c',
+  'HR-EMP-2025-c874fa',
+  'HR-EMP-2025-ca929d',
+  'HR-EMP-2025-2c6c54'
+];
+
 const Recruitment = () => {
   // Data states for each section
   const [candidates, setCandidates] = useState([]);
@@ -688,6 +702,20 @@ const handleEditInterview = (interview) => {
 
 const handleEditInterviewSubmit = async (e) => {
   e.preventDefault();
+  
+  // Validate the interviewer is in the allowed list
+  if (!ALLOWED_HR_INTERVIEWERS.includes(editingInterview.interviewer)) {
+    showToast("Only authorized HR employees can conduct interviews. Please select a valid interviewer.", false);
+    return;
+  }
+  
+  // Validate rating if provided (must be between 1 and 5)
+  if (editingInterview.rating !== null && editingInterview.rating !== undefined && 
+      (editingInterview.rating < 1 || editingInterview.rating > 5)) {
+    showToast("Rating must be between 1 and 5", false);
+    return;
+  }
+  
   try {
     setLoading(true);
     
@@ -706,6 +734,14 @@ const handleEditInterviewSubmit = async (e) => {
       job_id: combinedData.job,
       interviewer_id: combinedData.interviewer
     };
+    
+    // Only include rating if status is Completed or rating already exists
+    if (apiData.status !== 'Completed' && !editingInterview.rating) {
+      apiData.rating = null;
+    } else if (apiData.rating === null || apiData.rating === undefined || apiData.rating === '') {
+      // If status is Completed but no rating, set default to 1
+      apiData.rating = 1;
+    }
     
     // Remove old field names
     delete apiData.candidate;
@@ -2143,6 +2179,13 @@ const submitCandidateForm = async (e) => {
 // Interview handlers
 const handleInterviewChange = (e) => {
   const { name, value } = e.target;
+  
+  // Add validation for interviewer_id
+  if (name === 'interviewer_id' && value && !ALLOWED_HR_INTERVIEWERS.includes(value)) {
+    showToast("Selected interviewer is not authorized to conduct interviews. Please select an HR employee.", false);
+    return;
+  }
+  
   setNewInterview(prev => ({
     ...prev,
     [name]: value
@@ -2151,6 +2194,13 @@ const handleInterviewChange = (e) => {
 
 const handleInterviewSubmit = async (e) => {
   e.preventDefault();
+  
+  // Validate the interviewer is in the allowed list
+  if (!ALLOWED_HR_INTERVIEWERS.includes(newInterview.interviewer_id)) {
+    showToast("Only authorized HR employees can conduct interviews. Please select a valid interviewer.", false);
+    return;
+  }
+  
   try {
     setLoading(true);
     
@@ -2161,9 +2211,14 @@ const handleInterviewSubmit = async (e) => {
       interview_date: `${newInterview.interview_date}T${newInterview.interview_time || '00:00'}:00`,
       interviewer_id: newInterview.interviewer_id,
       status: newInterview.status || 'Scheduled',
-      feedback: newInterview.notes || "",
-      rating: 0 // Default to 0 for new interviews
+      feedback: newInterview.notes || ""
     };
+    
+    // Only add rating if interview is completed, otherwise leave it null
+    // Rating must be between 1 and 5 per database constraint
+    if (interviewData.status === 'Completed') {
+      interviewData.rating = newInterview.rating || 1; // Default to minimum rating of 1
+    }
     
     console.log("Creating interview with data:", interviewData);
     
@@ -3467,12 +3522,15 @@ const handleEditOnboardingTask = (task) => {
                       required
                     >
                       <option value="">-- Select Interviewer --</option>
-                      {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
-                        </option>
-                      ))}
+                      {employees
+                        .filter(emp => ALLOWED_HR_INTERVIEWERS.includes(emp.employee_id))
+                        .map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name} (HR)
+                          </option>
+                        ))}
                     </select>
+                    <span className="input-help-text">Only HR employees are authorized to conduct interviews</span>
                   </div>
                   
                   <div className="form-group">
@@ -3489,6 +3547,29 @@ const handleEditOnboardingTask = (task) => {
                       <option value="Rescheduled">Rescheduled</option>
                     </select>
                   </div>
+                  
+                  {newInterview.status === 'Completed' && (
+                    <div className="form-group">
+                      <label>Rating (1-5) *</label>
+                      <input 
+                        type="number" 
+                        name="rating" 
+                        value={newInterview.rating || "1"} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (val < 1 || val > 5) {
+                            showToast("Rating must be between 1 and 5", false);
+                            return;
+                          }
+                          setNewInterview({...newInterview, rating: val});
+                        }}
+                        min="1"
+                        max="5"
+                        required
+                      />
+                      <span className="input-help-text">Rating is required for completed interviews and must be between 1-5</span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="form-group full-width">
@@ -3573,16 +3654,25 @@ const handleEditOnboardingTask = (task) => {
               <select
                 name="interviewer"
                 value={editingInterview.interviewer || ""}
-                onChange={(e) => setEditingInterview({...editingInterview, interviewer: e.target.value})}
+                onChange={(e) => {
+                  if (!ALLOWED_HR_INTERVIEWERS.includes(e.target.value)) {
+                    showToast("Selected interviewer is not authorized to conduct interviews. Please select an HR employee.", false);
+                    return;
+                  }
+                  setEditingInterview({...editingInterview, interviewer: e.target.value});
+                }}
                 required
               >
                 <option value="">-- Select Interviewer --</option>
-                {employees.map(emp => (
-                  <option key={emp.employee_id} value={emp.employee_id}>
-                    {emp.first_name} {emp.last_name}
-                  </option>
-                ))}
+                {employees
+                  .filter(emp => ALLOWED_HR_INTERVIEWERS.includes(emp.employee_id))
+                  .map(emp => (
+                    <option key={emp.employee_id} value={emp.employee_id}>
+                      {emp.first_name} {emp.last_name} (HR)
+                    </option>
+                  ))}
               </select>
+              <span className="input-help-text">Only HR employees are authorized to conduct interviews</span>
             </div>
             
             <div className="form-group">
@@ -3611,17 +3701,39 @@ const handleEditOnboardingTask = (task) => {
             />
           </div>
           
-          <div className="form-group">
-            <label>Rating (1-5)</label>
-            <input 
-              type="number" 
-              name="rating" 
-              value={editingInterview.rating || ""} 
-              onChange={(e) => setEditingInterview({...editingInterview, rating: e.target.value})}
-              min="1"
-              max="5"
-            />
-          </div>
+          {editingInterview.status === 'Completed' ? (
+            <div className="form-group">
+              <label>Rating (1-5) *</label>
+              <input 
+                type="number" 
+                name="rating" 
+                value={editingInterview.rating || "1"} 
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val < 1 || val > 5) {
+                    showToast("Rating must be between 1 and 5", false);
+                    return;
+                  }
+                  setEditingInterview({...editingInterview, rating: val});
+                }}
+                min="1"
+                max="5"
+                required
+              />
+              <span className="input-help-text">Rating is required for completed interviews and must be between 1-5</span>
+            </div>
+          ) : (
+            <div className="form-group">
+              <label>Rating</label>
+              <input 
+                type="number" 
+                disabled
+                value="-"
+                readOnly
+              />
+              <span className="input-help-text">Rating can only be set for completed interviews</span>
+            </div>
+          )}
         </div>
         
         <div className="recruitment-modal-buttons">
