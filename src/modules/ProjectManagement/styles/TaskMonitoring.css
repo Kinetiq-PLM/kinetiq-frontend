@@ -14,12 +14,12 @@
   font-family: 'Inter', sans-serif;
 }
 
-.header-section {
+.task-monitoring-container .header-section {
   margin-bottom: 40px;
   font-family: 'Inter', sans-serif;
 }
 
-.dashboard-title {
+.task-monitoring-container .dashboard-title {
   color: #2b2d42;
   font-size: 20px;
   font-weight: 700;
@@ -30,20 +30,20 @@
   font-family: 'Inter', sans-serif;
 }
 
-.dashboard-title i {
+.task-monitoring-container .dashboard-title i {
   margin-right: 15px;
   color: #00A8A8;
   font-size: 28px;
 }
 
-.dashboard-content {
+ .task-monitoring-container .dashboard-content {
   display: grid;
   gap: 35px;
   font-family: 'Inter', sans-serif;
 }
 
 /* Enhanced Navigation */
-.task-nav-container {
+.task-monitoring-container .task-nav-container {
   display: flex;
   margin-bottom: 30px;
   background: white;
@@ -56,7 +56,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.task-nav-button {
+.task-monitoring-container .task-nav-button {
   padding: 14px 28px;
   border: none;
   background: none;
@@ -72,12 +72,12 @@
   font-family: 'Inter', sans-serif;
 }
 
-.task-nav-button:hover {
+.task-monitoring-container .task-nav-button:hover {
   color: #00A8A8;
   background-color: #eef1ff;
 }
 
-.task-nav-button.active {
+.task-monitoring-container .task-nav-button.active {
   color: white;
   background: linear-gradient(135deg, #00A8A8, #008B8B);
   font-weight: 600;
@@ -85,9 +85,9 @@
 }
 
 /* Cards with improved aesthetics */
-.tasks-card, 
-.task-form-card, 
-.task-list-card {
+.task-monitoring-container .tasks-card, 
+.task-monitoring-container .task-form-card, 
+.task-monitoring-container .task-list-card {
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -98,14 +98,14 @@
   font-family: 'Inter', sans-serif;
 }
 
-.tasks-card:hover, 
-.task-form-card:hover, 
-.task-list-card:hover {
+.task-monitoring-container .tasks-card:hover, 
+.task-monitoring-container .task-form-card:hover, 
+.task-monitoring-container .task-list-card:hover {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 
-.card-header {
+.task-monitoring-container .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -115,7 +115,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.card-header h2, .card-header h3 {
+.task-monitoring-container .card-header h2, .task-monitoring-container .card-header h3 {
   color: #2b2d42;
   font-weight: 700;
   display: flex;
@@ -125,13 +125,13 @@
   font-family: 'Inter', sans-serif;
 }
 
-.task-summary {
+.task-monitoring-container .task-summary {
   display: flex;
   gap: 25px;
   font-family: 'Inter', sans-serif;
 }
 
-.summary-item {
+.task-monitoring-container .summary-item {
   display: flex;
   align-items: center;
   font-size: 15px;
@@ -144,29 +144,29 @@
   font-family: 'Inter', sans-serif;
 }
 
-.summary-item:hover {
+.task-monitoring-container .summary-item:hover {
   transform: translateY(-2px);
 }
 
-.summary-item i {
+.task-monitoring-container .summary-item i {
   margin-right: 10px;
   font-size: 16px;
 }
 
-.summary-item .completed {
+.task-monitoring-container .summary-item .completed {
   color: #00A8A8;
 }
 
-.summary-item .in-progress {
+.task-monitoring-container .summary-item .in-progress {
   color: #f8961e;
 }
 
-.summary-item .pending {
+.task-monitoring-container .summary-item .pending {
   color: #00A8A8;
 }
 
 /* Loading and Error States with animations */
-.loading-overlay {
+.task-monitoring-container .loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -181,7 +181,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.loading-spinner {
+.task-monitoring-container .loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -192,13 +192,13 @@
   font-family: 'Inter', sans-serif;
 }
 
-.loading-spinner p {
+.task-monitoring-container .loading-spinner p {
   margin-top: 20px;
   color: #2b2d42;
   font-weight: 600;
 }
 
-.spinner {
+.task-monitoring-container .spinner {
   width: 60px;
   height: 60px;
   border: 4px solid rgba(67, 97, 238, 0.1);
@@ -211,7 +211,7 @@
   to { transform: rotate(360deg); }
 }
 
-.error-alert {
+.task-monitoring-container .error-alert {
   margin-bottom: 25px;
   padding: 16px 20px;
   background-color: #ffe6ed;
@@ -226,12 +226,12 @@
   font-family: 'Inter', sans-serif;
 }
 
-.error-alert i {
+.task-monitoring-container .error-alert i {
   font-size: 20px;
   margin-right: 12px;
 }
 
-.error-alert button {
+.task-monitoring-container .error-alert button {
   background: none;
   border: none;
   color: inherit;
@@ -243,12 +243,12 @@
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.error-alert button:hover {
+.task-monitoring-container .error-alert button:hover {
   opacity: 1;
 }
 
 /* Enhanced Tables */
-.table-responsive {
+.task-monitoring-container .table-responsive {
   overflow-x: auto;
   width: 100%;
   border-radius: 10px;
@@ -257,20 +257,20 @@
   font-family: 'Inter', sans-serif;
 }
 
-.table-responsive::-webkit-scrollbar {
+.task-monitoring-container .table-responsive::-webkit-scrollbar {
   height: 8px;
 }
 
-.table-responsive::-webkit-scrollbar-track {
+.task-monitoring-container .table-responsive::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.table-responsive::-webkit-scrollbar-thumb {
+.task-monitoring-container .table-responsive::-webkit-scrollbar-thumb {
   background-color: #adb5bd;
   border-radius: 20px;
 }
 
-.tasks-table, .task-table {
+.task-monitoring-container .tasks-table, .task-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -278,7 +278,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.tasks-table th, .task-table th {
+ .task-monitoring-container .tasks-table th, .task-table th {
   background-color: #f1f3f5;
   padding: 16px;
   text-align: left;
@@ -293,7 +293,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.tasks-table td, .task-table td {
+.task-monitoring-container .tasks-table td, .task-table td {
   padding: 18px 16px;
   border-bottom: 1px solid #f1f5f9;
   color: #475569;
@@ -301,11 +301,11 @@
   font-family: 'Inter', sans-serif;
 }
 
-.tasks-table tr:hover, .task-table tr:hover {
+.task-monitoring-container .tasks-table tr:hover, .task-table tr:hover {
   background-color: #eef1ff;
 }
 
-.task-id {
+.task-monitoring-container .task-id {
   background-color: #eef1ff;
   color: #00A8A8;
   padding: 6px 10px;
@@ -317,7 +317,7 @@
 }
 
 /* Replaced -webkit-line-clamp with alternative approach */
-.task-description {
+.task-monitoring-container .task-description {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 300px;
@@ -329,7 +329,7 @@
 }
 
 /* Add fade out effect for truncated text */
-.task-description::after {
+.task-monitoring-container .task-description::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -341,7 +341,7 @@
 }
 
 /* Improved Status Badges */
-.status-badge {
+.task-monitoring-container .status-badge {
   display: inline-flex;
   align-items: center;
   padding: 8px 14px;
@@ -354,38 +354,38 @@
   font-family: 'Inter', sans-serif;
 }
 
-.status-badge:hover {
+.task-monitoring-container .status-badge:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.status-badge.completed {
+.task-monitoring-container .status-badge.completed {
   background-color: #e6f9ed;
   color: #00A8A8;
 }
 
-.status-badge.in-progress {
+.task-monitoring-container .status-badge.in-progress {
   background-color: #fff4e6;
   color: #f8961e;
 }
 
-.status-badge.pending {
+.task-monitoring-container .status-badge.pending {
   background-color: #e6f4ff;
   color: #00A8A8;
 }
 
-.status-badge.canceled {
+.task-monitoring-container .status-badge.canceled {
   background-color: #f1f3f5;
   color: #adb5bd;
 }
 
-.status-badge i {
+.task-monitoring-container .status-badge i {
   margin-right: 6px;
   font-size: 12px;
 }
 
 /* Deadline Cell with improved visuals */
-.deadline-cell {
+.task-monitoring-container .deadline-cell {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -393,7 +393,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.deadline-cell.past-deadline {
+.task-monitoring-container .deadline-cell.past-deadline {
   color: #DC3545;
   font-weight: 600;
   background-color: #ffe6ed;
@@ -401,7 +401,7 @@
   border-radius: 6px;
 }
 
-.warning-icon {
+.task-monitoring-container .warning-icon {
   color: #DC3545;
   animation: pulse 2s infinite;
 }
@@ -413,14 +413,14 @@
 }
 
 /* Enhanced Assigned User */
-.assigned-user {
+.task-monitoring-container .assigned-user {
   display: flex;
   align-items: center;
   gap: 12px;
   font-family: 'Inter', sans-serif;
 }
 
-.user-avatar {
+.task-monitoring-container .user-avatar {
   width: 40px;
   height: 40px;
   background: linear-gradient(135deg, #00A8A8, #4cc9f0);
@@ -439,12 +439,12 @@
   font-family: 'Inter', sans-serif;
 }
 
-.user-avatar:hover {
+.task-monitoring-container .user-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
 }
 
-.user-avatar::after {
+.task-monitoring-container .user-avatar::after {
   content: "\f067";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
@@ -465,30 +465,30 @@
   transition: opacity 0.3s ease;
 }
 
-.user-avatar:hover::after {
+.task-monitoring-container .user-avatar:hover::after {
   opacity: 1;
 }
 
-.user-info {
+.task-monitoring-container .user-info {
   display: flex;
   flex-direction: column;
   font-family: 'Inter', sans-serif;
 }
 
-.user-name {
+.task-monitoring-container .user-name {
   font-weight: 600;
   color: #2b2d42;
   font-family: 'Inter', sans-serif;
 }
 
-.user-id {
+.task-monitoring-container .user-id {
   font-size: 12px;
   color: #adb5bd;
   font-family: 'Inter', sans-serif;
 }
 
 /* No Tasks with improved visual */
-.no-tasks {
+.task-monitoring-container .no-tasks {
   text-align: center;
   padding: 50px 30px;
   color: #94a3b8;
@@ -501,14 +501,14 @@
   font-family: 'Inter', sans-serif;
 }
 
-.no-tasks i {
+.task-monitoring-container .no-tasks i {
   font-size: 50px;
   margin-bottom: 20px;
   color: #cbd5e1;
   opacity: 0.8;
 }
 
-.no-tasks h3 {
+.task-monitoring-container .no-tasks h3 {
   margin-bottom: 10px;
   color: #64748b;
   font-weight: 600;
@@ -516,7 +516,7 @@
 }
 
 /* Improved Forms */
-.form-grid {
+.task-monitoring-container .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
@@ -524,13 +524,13 @@
   font-family: 'Inter', sans-serif;
 }
 
-.form-group {
+.task-monitoring-container .form-group {
   margin-bottom: 20px;
   position: relative;
   font-family: 'Inter', sans-serif;
 }
 
-.form-group label {
+.task-monitoring-container .form-group label {
   display: block;
   margin-bottom: 10px;
   font-size: 14px;
@@ -541,7 +541,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-.form-control {
+.task-monitoring-container .form-control {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid #e2e8f0;
@@ -553,26 +553,26 @@
   font-family: 'Inter', sans-serif;
 }
 
-.form-control:focus {
+.task-monitoring-container .form-control:focus {
   border-color: #00A8A8;
   outline: none;
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
   background-color: white;
 }
 
-.form-group.full-width {
+.task-monitoring-container .form-group.full-width {
   grid-column: 1 / -1;
 }
 
-textarea.form-control {
+.task-monitoring-container textarea.form-control {
   min-height: 140px;
   resize: vertical;
 }
 
 /* Enhanced Buttons */
-.primary-button,
-.secondary-button,
-.danger-button {
+.task-monitoring-container .primary-button,
+.task-monitoring-container .secondary-button,
+.task-monitoring-container .danger-button {
   padding: 14px 28px;
   border-radius: 10px;
   font-size: 15px;
@@ -587,62 +587,62 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.primary-button {
+.task-monitoring-container .primary-button {
   background: linear-gradient(135deg, #00A8A8, #008B8B);
   color: white;
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
 }
 
-.primary-button:hover {
+.task-monitoring-container .primary-button:hover {
   background: linear-gradient(135deg, #008B8B, #00A8A8);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
 }
 
-.secondary-button {
+.task-monitoring-container .secondary-button {
   background-color: white;
   color: #00A8A8;
   border: 2px solid #00A8A8;
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
 }
 
-.secondary-button:hover {
+.task-monitoring-container .secondary-button:hover {
   background-color: #eef1ff;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(67, 97, 238, 0.15);
 }
 
-.danger-button {
+.task-monitoring-container .danger-button {
   background-color: white;
   color: #DC3545;
   border: 2px solid #DC3545;
   box-shadow: 0 5px 15px rgba(247, 37, 133, 0.1);
 }
 
-.danger-button:hover {
+.task-monitoring-container .danger-button:hover {
   background-color: #ffe6ed;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(247, 37, 133, 0.15);
 }
 
-.primary-button:disabled,
-.secondary-button:disabled,
-.danger-button:disabled {
+.task-monitoring-container .primary-button:disabled,
+.task-monitoring-container .secondary-button:disabled,
+.task-monitoring-container .danger-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-.primary-button:active,
-.secondary-button:active,
-.danger-button:active {
+.task-monitoring-container .primary-button:active,
+.task-monitoring-container .secondary-button:active,
+.task-monitoring-container .danger-button:active {
   transform: translateY(1px);
   box-shadow: none;
 }
 
 /* Form Actions */
-.form-actions {
+.task-monitoring-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 18px;
@@ -651,14 +651,14 @@ textarea.form-control {
 }
 
 /* Task List Header */
-.header-content {
+.task-monitoring-container .header-content {
   display: flex;
   align-items: center;
   gap: 18px;
   font-family: 'Inter', sans-serif;
 }
 
-.selected-count {
+.task-monitoring-container .selected-count {
   font-size: 14px;
   color: #00A8A8;
   background-color: #eef1ff;
@@ -668,20 +668,20 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.list-actions {
+.task-monitoring-container .list-actions {
   display: flex;
   gap: 15px;
   font-family: 'Inter', sans-serif;
 }
 
 /* Select Column with improved checkbox */
-.select-col {
+.task-monitoring-container .select-col {
   width: 40px;
   text-align: center;
   font-family: 'Inter', sans-serif;
 }
 
-.select-col input[type="checkbox"] {
+.task-monitoring-container .select-col input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -694,12 +694,12 @@ textarea.form-control {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.select-col input[type="checkbox"]:checked {
+.task-monitoring-container .select-col input[type="checkbox"]:checked {
   background-color: #00A8A8;
   border-color: #00A8A8;
 }
 
-.select-col input[type="checkbox"]:checked::after {
+.task-monitoring-container .select-col input[type="checkbox"]:checked::after {
   content: '✓';
   color: white;
   position: absolute;
@@ -710,7 +710,7 @@ textarea.form-control {
 }
 
 /* Selected Row with animation */
-.selected-row {
+.task-monitoring-container .selected-row {
   background-color: #eef1ff !important;
   animation: highlight 0.3s ease;
   font-family: 'Inter', sans-serif;
@@ -722,12 +722,12 @@ textarea.form-control {
 }
 
 /* Description Cell - Replaced -webkit-line-clamp approach */
-.description-cell {
+.task-monitoring-container  .description-cell {
   max-width: 300px;
   font-family: 'Inter', sans-serif;
 }
 
-.description-content {
+.task-monitoring-container .description-content {
   overflow: hidden;
   text-overflow: ellipsis;
   max-height: 3em; /* 2 lines × 1.5 line-height */
@@ -737,7 +737,7 @@ textarea.form-control {
 }
 
 /* Add fade-out effect to show truncation */
-.description-content::after {
+.task-monitoring-container .description-content::after {
   content: "...";
   position: absolute;
   right: 0;
@@ -748,7 +748,7 @@ textarea.form-control {
 }
 
 /* Enhanced Pagination */
-.pagination-controls {
+.task-monitoring-container .pagination-controls {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -759,7 +759,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.pagination-button {
+.task-monitoring-container .pagination-button {
   padding: 12px 20px;
   border-radius: 10px;
   font-size: 14px;
@@ -776,7 +776,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.pagination-button:hover:not(:disabled) {
+.task-monitoring-container .pagination-button:hover:not(:disabled) {
   background-color: #eef1ff;
   border-color: #00A8A8;
   color: #00A8A8;
@@ -784,13 +784,13 @@ textarea.form-control {
   box-shadow: 0 4px 10px rgba(67, 97, 238, 0.1);
 }
 
-.pagination-button:disabled {
+.task-monitoring-container .pagination-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #f8fafc;
 }
 
-.pagination-info {
+.task-monitoring-container .pagination-info {
   font-size: 14px;
   color: #64748b;
   font-weight: 500;
@@ -808,90 +808,90 @@ textarea.form-control {
 }
 
 @media (max-width: 992px) {
-  .task-summary {
+  .task-monitoring-container .task-summary {
     flex-wrap: wrap;
     gap: 15px;
   }
   
-  .tasks-card, 
-  .task-form-card, 
-  .task-list-card {
+  .task-monitoring-container .tasks-card, 
+  .task-monitoring-container .task-form-card, 
+  .task-monitoring-container .task-list-card {
     padding: 25px;
   }
 }
 
 @media (max-width: 768px) {
-  .card-header {
+  .task-monitoring-container .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
   
-  .list-actions {
+  .task-monitoring-container .list-actions {
     width: 100%;
     justify-content: flex-start;
   }
   
-  .form-grid {
+  .task-monitoring-container .form-grid {
     grid-template-columns: 1fr;
   }
   
-  .task-nav-container {
+  .task-monitoring-container .task-nav-container {
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
   }
   
-  .task-nav-button {
+  .task-monitoring-container .task-nav-button {
     padding: 12px 20px;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
   }
   
-  .task-monitoring-container {
+  .task-monitoring-container .task-monitoring-container {
     padding: 20px;
   }
 }
 
 @media (max-width: 576px) {
-  .task-monitoring-container {
+  .task-monitoring-container .task-monitoring-container {
     padding: 15px;
   }
   
-  .form-actions, .list-actions {
+  .task-monitoring-container .form-actions, .list-actions {
     flex-direction: column;
     width: 100%;
     font-family: 'Inter', sans-serif;
   }
   
-  .primary-button,
-  .secondary-button,
-  .danger-button,
-  .pagination-button {
+  .task-monitoring-container .primary-button,
+  .task-monitoring-container .secondary-button,
+  .task-monitoring-container .danger-button,
+  .task-monitoring-container .pagination-button {
     width: 100%;
     font-family: 'Inter', sans-serif;
   }
   
-  .tasks-table th, 
-  .task-table th,
-  .tasks-table td, 
-  .task-table td {
+  .task-monitoring-container .tasks-table th, 
+  .task-monitoring-container .task-table th,
+  .task-monitoring-container .tasks-table td, 
+  .task-monitoring-container .task-table td {
     padding: 12px 10px;
     font-size: 13px;
     font-family: 'Inter', sans-serif;
   }
   
-  .dashboard-title {
+  .task-monitoring-container .dashboard-title {
     font-size: 26px;
   }
   
-  .pagination-controls {
+  .task-monitoring-container .pagination-controls {
     flex-wrap: wrap;
   }
 }
 
 /* Employee Modal Styles */
-.modal-overlay {
+.task-monitoring-container .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -912,7 +912,7 @@ textarea.form-control {
   to { opacity: 1; }
 }
 
-.modal-content {
+.task-monitoring-container .modal-content {
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
@@ -929,7 +929,7 @@ textarea.form-control {
   to { transform: translateY(0); opacity: 1; }
 }
 
-.modal-header {
+.task-monitoring-container .modal-header {
   padding: 20px 25px;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
@@ -938,7 +938,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.modal-header h3 {
+.task-monitoring-container .modal-header h3 {
   margin: 0;
   color: #2b2d42;
   font-weight: 700;
@@ -948,7 +948,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.modal-close {
+.task-monitoring-container .modal-close {
   background: none;
   border: none;
   font-size: 18px;
@@ -964,17 +964,17 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.modal-close:hover {
+.task-monitoring-container .modal-close:hover {
   background-color: #f1f5f9;
   color: #DC3545;
 }
 
-.modal-body {
+.task-monitoring-container .modal-body {
   padding: 25px;
   font-family: 'Inter', sans-serif;
 }
 
-.modal-footer {
+.task-monitoring-container .modal-footer {
   padding: 20px 25px;
   border-top: 1px solid #f1f5f9;
   display: flex;
@@ -982,7 +982,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.modal-loading {
+.task-monitoring-container .modal-loading {
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
@@ -991,14 +991,14 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.modal-loading .spinner {
+.task-monitoring-container .modal-loading .spinner {
   width: 40px;
   height: 40px;
   margin-bottom: 15px;
   font-family: 'Inter', sans-serif;
 }
 
-.no-data {
+.task-monitoring-container .no-data {
   text-align: center;
   color: #64748b;
   padding: 30px 0;
@@ -1006,7 +1006,7 @@ textarea.form-control {
 }
 
 /* Employee Profile */
-.employee-profile {
+.task-monitoring-container .employee-profile {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -1016,7 +1016,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.employee-avatar-large {
+.task-monitoring-container .employee-avatar-large {
   width: 80px;
   height: 80px;
   background: linear-gradient(135deg, #00A8A8, #4cc9f0);
@@ -1032,7 +1032,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.employee-name-section h2 {
+.task-monitoring-container .employee-name-section h2 {
   margin: 0 0 8px 0;
   font-size: 24px;
   font-weight: 700;
@@ -1040,7 +1040,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.employee-status {
+.task-monitoring-container .employee-status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1051,34 +1051,34 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.employee-status.active {
+.task-monitoring-container .employee-status.active {
   background-color: #e6f9ed;
   color: #00A8A8;
 }
 
-.employee-status.on-leave {
+.task-monitoring-container .employee-status.on-leave {
   background-color: #fff4e6;
   color: #f8961e;
 }
 
-.employee-status.deployed {
+.task-monitoring-container .employee-status.deployed {
   background-color: #e6f4ff;
   color: #00A8A8;
 }
 
-.employee-status i {
+.task-monitoring-container .employee-status i {
   font-size: 12px;
 }
 
 /* Employee Details Grid */
-.employee-details-grid {
+.task-monitoring-container .employee-details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   font-family: 'Inter', sans-serif;
 }
 
-.employee-detail-item {
+.task-monitoring-container .employee-detail-item {
   padding: 15px;
   background-color: #f1f3f5;
   border-radius: 10px;
@@ -1086,13 +1086,13 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.employee-detail-item:hover {
+.task-monitoring-container .employee-detail-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   background-color: #eef1ff;
 }
 
-.detail-label {
+.task-monitoring-container .detail-label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1103,7 +1103,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.detail-value {
+.task-monitoring-container .detail-value {
   font-size: 16px;
   font-weight: 600;
   color: #2b2d42;
@@ -1111,7 +1111,7 @@ textarea.form-control {
 }
 
 /* Success Toast Styling */
-.success-toast {
+.task-monitoring-container .success-toast {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -1131,17 +1131,17 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.success-toast div {
+.task-monitoring-container .success-toast div {
   display: flex;
   align-items: center;
 }
 
-.success-toast i {
+.task-monitoring-container .success-toast i {
   margin-right: 10px;
   font-size: 18px;
 }
 
-.success-toast button {
+.task-monitoring-container .success-toast button {
   background: none;
   border: none;
   color: white;
@@ -1153,7 +1153,7 @@ textarea.form-control {
   font-family: 'Inter', sans-serif;
 }
 
-.success-toast button:hover {
+.task-monitoring-container .success-toast button:hover {
   opacity: 1;
 }
 
@@ -1179,7 +1179,7 @@ textarea.form-control {
   }
 }
 
-.success-toast.hiding {
+.task-monitoring-container .success-toast.hiding {
   animation: slideOut 0.3s ease-in forwards;
 }
 

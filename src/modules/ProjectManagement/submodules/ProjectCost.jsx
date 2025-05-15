@@ -54,16 +54,16 @@ const BodyContent = () => {
       // Try the regular API endpoint first
       const response = await axios.get('/api/project-cost/costs/all_projects/');
       console.log("API Response:", response.data);
-      
+
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
         processApiData(response.data);
       } else {
         // If no data or empty array, try the direct SQL approach
         const directResponse = await axios.get('/api/project-cost/direct-costs/');
         console.log("Direct SQL Response:", directResponse.data);
-        
-        if (directResponse.data && directResponse.data.success && 
-            Array.isArray(directResponse.data.data) && directResponse.data.data.length > 0) {
+
+        if (directResponse.data && directResponse.data.success &&
+          Array.isArray(directResponse.data.data) && directResponse.data.data.length > 0) {
           processApiData(directResponse.data.data);
         } else {
           throw new Error("No data available from either API endpoint");
@@ -141,18 +141,18 @@ const BodyContent = () => {
     try {
       // In a real implementation, you would make an API call here
       // For now, we'll generate data from the reportData
-      
+
       // Simulating API call delay
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       // Filter for internal projects only
       const internalProjects = reportData.filter(item => item.projectType === "internal");
-      
+
       if (internalProjects.length === 0) {
         setCostChartData(null);
         return;
       }
-      
+
       // Create chart data
       const chartData = {
         labels: internalProjects.slice(0, 7).map(item => item.newProjectName.substring(0, 20)),
@@ -180,7 +180,7 @@ const BodyContent = () => {
           }
         ]
       };
-      
+
       setCostChartData(chartData);
     } catch (err) {
       console.error("Error fetching cost chart data:", err);
@@ -193,36 +193,36 @@ const BodyContent = () => {
     try {
       // In a real implementation, you would make an API call here
       // For now, we'll generate trend data
-      
+
       // Simulating API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Generate mock trend data
       const internalProjects = reportData.filter(item => item.projectType === "internal");
-      
+
       if (internalProjects.length === 0) {
         setCostTrendData(null);
         return;
       }
-      
+
       // Calculate average costs
       const averageLaborCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newLaborCost), 0) / internalProjects.length;
       const averageUtilityCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newUtilityCost), 0) / internalProjects.length;
       const averageOutsourcedCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newOutsourcedCost), 0) / internalProjects.length;
-      
+
       // Create trend data (simulating monthly data for the past 6 months)
       const months = ['January', 'February', 'March', 'April', 'May', 'June'];
-      
+
       // Create random variations around the average
       const laborTrend = months.map(() => averageLaborCost * (0.85 + Math.random() * 0.3));
       const utilityTrend = months.map(() => averageUtilityCost * (0.85 + Math.random() * 0.3));
       const outsourcedTrend = months.map(() => averageOutsourcedCost * (0.85 + Math.random() * 0.3));
-      
+
       // Calculate total for area chart
-      const totalTrend = months.map((_, index) => 
+      const totalTrend = months.map((_, index) =>
         laborTrend[index] + utilityTrend[index] + outsourcedTrend[index]
       );
-      
+
       const trendData = {
         labels: months,
         datasets: [
@@ -268,7 +268,7 @@ const BodyContent = () => {
           }
         ]
       };
-      
+
       setCostTrendData(trendData);
     } catch (err) {
       console.error("Error fetching cost trend data:", err);
@@ -279,16 +279,16 @@ const BodyContent = () => {
     try {
       // Calculate total costs by category across all internal projects
       const internalProjects = reportData.filter(item => item.projectType === "internal");
-      
+
       if (internalProjects.length === 0) {
         setCostDistributionData(null);
         return;
       }
-      
+
       const totalLaborCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newLaborCost), 0);
       const totalUtilityCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newUtilityCost), 0);
       const totalOutsourcedCost = internalProjects.reduce((sum, item) => sum + parseFloat(item.newOutsourcedCost), 0);
-      
+
       const distributionData = {
         labels: ['Labor Cost', 'Utility Cost', 'Outsourced Cost'],
         datasets: [
@@ -308,7 +308,7 @@ const BodyContent = () => {
           }
         ]
       };
-      
+
       setCostDistributionData(distributionData);
     } catch (err) {
       console.error("Error updating cost distribution data:", err);
@@ -321,7 +321,7 @@ const BodyContent = () => {
       // Determine project type
       let projectType = "unknown";
       let projectName = "Unnamed Project";
-      
+
       if (item.project_id && !item.intrnl_project_id) {
         projectType = "external";
         projectName = `External Project ${item.project_id}`;
@@ -333,20 +333,20 @@ const BodyContent = () => {
         projectType = "internal";
         projectName = `Internal Project ${item.intrnl_project_id}`;
       }
-      
+
       // Parse cost values, ensuring they are numbers
       const laborCost = parseFloat(item.outside_labor_costs) || 0;
       const utilityCost = parseFloat(item.utility_costs) || 0;
       const outsourcedCost = parseFloat(item.outsourced_costs) || 0;
-      
+
       // Calculate total cost by summing the components
       let overallCost = parseFloat(item.overall_project_costs);
-      
+
       // If overall cost is missing or zero, calculate it from components
       if (!overallCost) {
         overallCost = laborCost + utilityCost + outsourcedCost;
       }
-      
+
       return {
         newProjectName: projectName,
         newProjectID: item.project_id || "",
@@ -362,7 +362,7 @@ const BodyContent = () => {
         projectType: projectType
       };
     });
-    
+
     console.log("Formatted data:", formattedData);
     setReportData(formattedData);
     setError(null);
@@ -378,7 +378,7 @@ const BodyContent = () => {
 
   const getStatusClass = (status) => {
     if (!status) return 'pending';
-    
+
     const statusLower = status.toLowerCase();
     if (statusLower.includes('approved') || statusLower.includes('completed')) {
       return 'approved';
@@ -395,7 +395,7 @@ const BodyContent = () => {
     if (item.projectType !== activeTab) {
       return false;
     }
-    
+
     // Then apply search filter
     return (
       item.newProjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -436,7 +436,7 @@ const BodyContent = () => {
         </div>
       );
     }
-    
+
     if (filteredReportData.length === 0) {
       return (
         <div className="empty-state">
@@ -450,7 +450,7 @@ const BodyContent = () => {
         </div>
       );
     }
-    
+
     if (activeTab === "internal") {
       return (
         <table className="data-table">
@@ -466,8 +466,8 @@ const BodyContent = () => {
           </thead>
           <tbody>
             {filteredReportData.map((item, index) => (
-              <tr 
-                key={index} 
+              <tr
+                key={index}
                 className={selectedReports.includes(index) ? "selected" : ""}
                 onClick={() => handleRowClick(item)}
                 style={{ cursor: 'pointer' }}
@@ -510,8 +510,8 @@ const BodyContent = () => {
           </thead>
           <tbody>
             {filteredReportData.map((item, index) => (
-              <tr 
-                key={index} 
+              <tr
+                key={index}
                 className={selectedReports.includes(index) ? "selected" : ""}
                 onClick={() => handleRowClick(item)}
                 style={{ cursor: 'pointer' }}
@@ -545,11 +545,11 @@ const BodyContent = () => {
   // Render charts for internal projects
   const renderInternalProjectCharts = () => {
     if (activeTab !== "internal") return null;
-    
+
     return (
       <div className="charts-container">
         <h2 className="charts-title">Internal Projects Cost Analysis</h2>
-        
+
         <div className="cost-summary-cards">
           <div className="cost-card">
             <div className="cost-card-icon" style={{ backgroundColor: colors.primary }}>
@@ -560,7 +560,7 @@ const BodyContent = () => {
               <p className="cost-card-value">₱{internalTotalCost}</p>
             </div>
           </div>
-          
+
           <div className="cost-card">
             <div className="cost-card-icon" style={{ backgroundColor: colors.secondary }}>
               <i className="fas fa-project-diagram"></i>
@@ -570,7 +570,7 @@ const BodyContent = () => {
               <p className="cost-card-value">{projectCounts.internal}</p>
             </div>
           </div>
-          
+
           <div className="cost-card">
             <div className="cost-card-icon" style={{ backgroundColor: colors.accent }}>
               <i className="fas fa-chart-line"></i>
@@ -583,7 +583,7 @@ const BodyContent = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="charts-grid">
           <div className="chart-card">
             <div className="chart-card-header">
@@ -597,7 +597,7 @@ const BodyContent = () => {
                   <p>Loading chart data...</p>
                 </div>
               ) : costChartData ? (
-                <Bar 
+                <Bar
                   data={costChartData}
                   options={{
                     responsive: true,
@@ -608,7 +608,7 @@ const BodyContent = () => {
                       },
                       tooltip: {
                         callbacks: {
-                          label: function(context) {
+                          label: function (context) {
                             return `${context.dataset.label}: ₱${context.raw.toFixed(2)}`;
                           }
                         }
@@ -642,7 +642,7 @@ const BodyContent = () => {
               )}
             </div>
           </div>
-          
+
           <div className="chart-card">
             <div className="chart-card-header">
               <h3>Cost Distribution</h3>
@@ -650,7 +650,7 @@ const BodyContent = () => {
             </div>
             <div className="chart-card-body">
               {costDistributionData ? (
-                <Pie 
+                <Pie
                   data={costDistributionData}
                   options={{
                     responsive: true,
@@ -661,7 +661,7 @@ const BodyContent = () => {
                       },
                       tooltip: {
                         callbacks: {
-                          label: function(context) {
+                          label: function (context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.raw / total) * 100).toFixed(1);
                             return `${context.label}: ₱${context.raw.toFixed(2)} (${percentage}%)`;
@@ -680,7 +680,7 @@ const BodyContent = () => {
               )}
             </div>
           </div>
-          
+
           <div className="chart-card full-width">
             <div className="chart-card-header">
               <h3>Cost Trends</h3>
@@ -688,7 +688,7 @@ const BodyContent = () => {
             </div>
             <div className="chart-card-body">
               {costTrendData ? (
-                <Line 
+                <Line
                   data={costTrendData}
                   options={{
                     responsive: true,
@@ -699,7 +699,7 @@ const BodyContent = () => {
                       },
                       tooltip: {
                         callbacks: {
-                          label: function(context) {
+                          label: function (context) {
                             return `${context.dataset.label}: ₱${context.raw.toFixed(2)}`;
                           }
                         }
@@ -739,7 +739,7 @@ const BodyContent = () => {
   };
 
   return (
-    <div className="body-content-container">
+    <div className="projman-body-content-container">
       {!selectedProject && (
         <div className="report-list-container">
           <div className="list-header">
@@ -760,16 +760,16 @@ const BodyContent = () => {
 
           <div className="tabs-container">
             <div className="tabs-header">
-              <div 
-                className={`tab ${activeTab === 'internal' ? 'active' : ''}`} 
+              <div
+                className={`tab ${activeTab === 'internal' ? 'active' : ''}`}
                 onClick={() => setActiveTab('internal')}
               >
                 <i className="fas fa-building mr-2"></i>
                 Internal Projects
                 <span className="tab-count">{projectCounts.internal}</span>
               </div>
-              <div 
-                className={`tab ${activeTab === 'external' ? 'active' : ''}`} 
+              <div
+                className={`tab ${activeTab === 'external' ? 'active' : ''}`}
                 onClick={() => setActiveTab('external')}
               >
                 <i className="fas fa-globe mr-2"></i>
@@ -790,10 +790,10 @@ const BodyContent = () => {
               <div className="table-actions">
                 <div className="search-container">
                   <i className="fas fa-search search-icon"></i>
-                  <input 
-                    type="text" 
-                    className="search-input" 
-                    placeholder="Search projects..." 
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -816,8 +816,8 @@ const BodyContent = () => {
               </h1>
               <div className="detail-subtitle">
                 <span className="detail-id">
-                  {selectedProject.projectType === 'internal' ? 
-                    `Internal ID: ${selectedProject.newInternalprojectID}` : 
+                  {selectedProject.projectType === 'internal' ?
+                    `Internal ID: ${selectedProject.newInternalprojectID}` :
                     `Project Resources ID: ${selectedProject.resourceId}`}
                 </span>
                 <span className={`status-badge large-badge ${getStatusClass(selectedProject.newApprovalID)}`}>
@@ -836,7 +836,7 @@ const BodyContent = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="detail-content-grid">
             {selectedProject.projectType === 'internal' ? (
               <>
@@ -865,7 +865,7 @@ const BodyContent = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="detail-card">
                   <div className="detail-card-header">
                     <h3><i className="fas fa-chart-pie mr-2"></i>Cost Breakdown</h3>
@@ -889,16 +889,16 @@ const BodyContent = () => {
                         <p className="detail-value cost-highlight">₱{selectedProject.newOverallProjectCost}</p>
                       </div>
                     </div>
-                    
+
                     <div className="cost-chart-container">
                       <h4 className="chart-title">Cost Distribution</h4>
                       <div className="cost-bars">
                         <div className="cost-bar-item">
                           <div className="cost-bar-label">Labor</div>
                           <div className="cost-bar-container">
-                            <div 
-                              className="cost-bar labor-bar" 
-                              style={{ 
+                            <div
+                              className="cost-bar labor-bar"
+                              style={{
                                 width: calculatePercentage(selectedProject.newLaborCost, selectedProject.newOverallProjectCost),
                                 backgroundColor: colors.primary
                               }}
@@ -909,9 +909,9 @@ const BodyContent = () => {
                         <div className="cost-bar-item">
                           <div className="cost-bar-label">Utility</div>
                           <div className="cost-bar-container">
-                            <div 
-                              className="cost-bar utility-bar" 
-                              style={{ 
+                            <div
+                              className="cost-bar utility-bar"
+                              style={{
                                 width: calculatePercentage(selectedProject.newUtilityCost, selectedProject.newOverallProjectCost),
                                 backgroundColor: colors.secondary
                               }}
@@ -922,9 +922,9 @@ const BodyContent = () => {
                         <div className="cost-bar-item">
                           <div className="cost-bar-label">Outsourced</div>
                           <div className="cost-bar-container">
-                            <div 
-                              className="cost-bar outsourced-bar" 
-                              style={{ 
+                            <div
+                              className="cost-bar outsourced-bar"
+                              style={{
                                 width: calculatePercentage(selectedProject.newOutsourcedCost, selectedProject.newOverallProjectCost),
                                 backgroundColor: colors.accent
                               }}
@@ -934,11 +934,11 @@ const BodyContent = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="project-cost-chart">
                       <h4 className="chart-title">Project Cost Visualization</h4>
                       <div style={{ height: '250px' }}>
-                        <Pie 
+                        <Pie
                           data={{
                             labels: ['Labor Cost', 'Utility Cost', 'Outsourced Cost'],
                             datasets: [{
@@ -969,7 +969,7 @@ const BodyContent = () => {
                               },
                               tooltip: {
                                 callbacks: {
-                                  label: function(context) {
+                                  label: function (context) {
                                     const total = parseFloat(selectedProject.newOverallProjectCost);
                                     const percentage = ((context.raw / total) * 100).toFixed(1);
                                     return `${context.label}: ₱${context.raw.toFixed(2)} (${percentage}%)`;
@@ -1015,7 +1015,7 @@ const BodyContent = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="detail-card">
                   <div className="detail-card-header">
                     <h3><i className="fas fa-chart-pie mr-2"></i>Cost Information</h3>

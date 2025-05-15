@@ -38,7 +38,7 @@ function App() {
   // log out at time out
   useEffect(() => {
     let logoutTimeout;
-  
+
     const resetTimeout = () => {
       if (logoutTimeout) clearTimeout(logoutTimeout);
       logoutTimeout = setTimeout(() => {
@@ -46,14 +46,14 @@ function App() {
         handleLogout();
       }, 30 * 60 * 1000); // 30 minutes
     };
-  
+
     const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
     activityEvents.forEach(event =>
       window.addEventListener(event, resetTimeout)
     );
-  
+
     resetTimeout();
-  
+
     return () => {
       clearTimeout(logoutTimeout);
       activityEvents.forEach(event =>
@@ -465,7 +465,7 @@ function App() {
       "Project Planning": "ProjectPlanning",
       "Project Cost": "Projectcost",
       "Tasks": "TaskMonitoring",
-      "Warranty Monitoring":"Warranties",
+      "Warranty Monitoring": "Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -501,7 +501,7 @@ function App() {
   allowedModules.forEach((permission) => {
     const [main, sub] = permission.split(/\/(.*)/s)
     console.log('perms main: ' + main)
-    console.log('params sub: ' + sub) 
+    console.log('params sub: ' + sub)
     if (!filteredModuleFileNames[main]) {
       filteredModuleFileNames[main] = {};
     }
@@ -509,7 +509,7 @@ function App() {
     if (!sub) {
       console.log('including all submodules of ' + main)
       filteredModuleFileNames[main] = {
-      ...moduleSubmoduleFileNames[main]
+        ...moduleSubmoduleFileNames[main]
       }
     } else {
       filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
@@ -518,15 +518,15 @@ function App() {
 
   console.log('filtered modules...')
   console.log(filteredModuleFileNames)
-/*
-  const filteredModuleFileNames = allowedModules.includes("All")
-    ? moduleFileNames
-    : Object.fromEntries(
-      Object.entries(moduleFileNames).filter(([key]) =>
-        allowedModules.includes(key)
-      )
-    );
-*/
+  /*
+    const filteredModuleFileNames = allowedModules.includes("All")
+      ? moduleFileNames
+      : Object.fromEntries(
+        Object.entries(moduleFileNames).filter(([key]) =>
+          allowedModules.includes(key)
+        )
+      );
+  */
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
@@ -607,7 +607,7 @@ function App() {
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
-                    {filteredModuleFileNames[module.id] &&
+                  {filteredModuleFileNames[module.id] &&
                     Object.keys(filteredModuleFileNames[module.id]).map(
                       (submodule, index) => (
                         <div

@@ -1,20 +1,20 @@
 :root {
-  --primary-color: #087D7D;
-  --primary-hover: #00A8A8;
-  --secondary-color: #E8E8E8;
-  --secondary-hover: #D0D0D0;
-  --text-color: #333;
-  --light-text: #666;
-  --border-color: #ddd;
-  --error-color: #e74c3c;
-  --success-color: #2ecc71;
-  --warning-color: #f39c12;
-  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  --border-radius: 8px;
-  --transition: all 0.3s ease;
+  --projman-primary-color: #087D7D;
+  --projman-primary-hover: #00A8A8;
+  --projman-secondary-color: #E8E8E8;
+  --projman-secondary-hover: #D0D0D0;
+  --projman-text-color: #333;
+  --projman-light-text: #666;
+  --projman-border-color: #ddd;
+  --projman-error-color: #e74c3c;
+  --projman-success-color: #2ecc71;
+  --projman-warning-color: #f39c12;
+  --projman-card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --projman-border-radius: 8px;
+  --projman-transition: all 0.3s ease;
 }
 
-* {
+.project-management-container {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -32,41 +32,41 @@
 }
 
 /* Dashboard View */
-.dashboard-view {
+.project-management-container .dashboard-view {
   max-width: 1800px;
   margin: 0 auto;
 }
 
-.dashboard-header {
+.project-management-container .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.dashboard-title {
+.project-management-container .dashboard-title {
   font-size: 28px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
 }
 
-.new-task-btn {
+.project-management-container .new-task-btn {
   padding: 8px 16px;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.new-task-btn:hover {
-  background-color: var(--primary-hover);
+.project-management-container .new-task-btn:hover {
+  background-color: var(--projman-primary-hover);
 }
 
 /* Dashboard Sections */
-.dashboard-sections {
+.project-management-container .dashboard-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
@@ -75,17 +75,17 @@
   height: 100%;
 }
 
-.dashboard-section {
+.project-management-container .dashboard-section {
   background-color: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--card-shadow);
+  border-radius: var(--projman-border-radius);
+  box-shadow: var(--projman-card-shadow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.dashboard-section-monitoring {
+.project-management-container .dashboard-section-monitoring {
   display: flex;
   flex-direction: row;
   gap: 20px;
@@ -93,89 +93,89 @@
   width: 100%;
 }
 
-.dashboard-column {
+.project-management-container .dashboard-column {
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 20px;
 }
 
-.section-header {
+.project-management-container .section-header {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.section-header h2 {
+.project-management-container .section-header h2 {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
 }
 
-.section-content {
+.project-management-container .section-content {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
 }
 
-.overall-progress-section {
+.project-management-container .overall-progress-section {
   width: 100%
 }
 
-.existing-project-section {
+.project-management-container .existing-project-section {
   width: 70%;
 }
 
-.ongoing-project-section {
+.project-management-container .ongoing-project-section {
   width: 70%;
 }
 
-.delayed-project-section {
+.project-management-container .delayed-project-section {
   width: 70%;
 }
 
-.completed-project-section {
+.project-management-container .completed-project-section {
   width: 70%;
 }
 
-.task-completion-section {
+.project-management-container .task-completion-section {
   width: 100%;
 }
 
 
 /* Tables */
-.data-table {
+.project-management-container .data-table {
   width: 100%;
   height: 100%;
 }
 
-.data-table th, 
-.data-table td {
+.project-management-container .data-table th, 
+.project-management-container .data-table td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
 }
 
-.data-table th {
+.project-management-container .data-table th {
   background-color: #f9f9f9;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
   position: sticky;
   top: 0;
 }
 
-.data-table tr:hover {
+.project-management-container .data-table tr:hover {
   background-color: #f5f5f5;
 }
 
-.data-table tr.has-issue {
+.project-management-container .data-table tr.has-issue {
   background-color: #fff8f8;
 }
 
 /* Status Badges */
-.status-badge {
+.project-management-container .status-badge {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 4px;
@@ -185,114 +185,114 @@
   transition: transform 0.1s ease;
 }
 
-.status-badge:hover {
+.project-management-container .status-badge:hover {
   transform: scale(1.05);
 }
 
-.status-badge.ok {
+.project-management-container .status-badge.ok {
   background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
+  color: var(--projman-success-color);
 }
 
-.status-badge.ok:hover, .status-badge.completed:hover {
+.project-management-container .status-badge.ok:hover, .status-badge.completed:hover {
   background-color: rgba(46, 204, 113, 0.2);
 }
 
-.status-badge.issue {
+.project-management-container .status-badge.issue {
   background-color: rgba(231, 76, 60, 0.1);
-  color: var(--error-color);
+  color: var(--projman-error-color);
 }
 
-.status-badge.pending {
+.project-management-container .status-badge.pending {
   background-color: rgba(243, 156, 18, 0.1);
-  color: var(--warning-color);
+  color: var(--projman-warning-color);
 }
 
-.status-badge.pending:hover {
+.project-management-container .status-badge.pending:hover {
   background-color: rgba(243, 156, 18, 0.2);
 }
 
 /* Tabs */
-.task-tabs, 
-.project-type-tabs {
+.project-management-container .task-tabs, 
+.project-management-container .project-type-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
   margin-bottom: 16px;
 }
 
-.task-tab, 
-.project-tab {
+.project-management-container .task-tab, 
+.project-management-container .project-tab {
   padding: 8px 16px;
   background: none;
   border: none;
   font-size: 14px;
   font-weight: 500;
-  color: var(--light-text);
+  color: var(--projman-light-text);
   cursor: pointer;
   position: relative;
 }
 
-.task-tab.active, 
-.project-tab.active {
-  color: var(--primary-color);
+.project-management-container .task-tab.active, 
+.project-management-container .project-tab.active {
+  color: var(--projman-primary-color);
 }
 
-.task-tab.active::after, 
-.project-tab.active::after {
+.project-management-container .task-tab.active::after, 
+.project-management-container .project-tab.active::after {
   content: '';
   position: absolute;
   bottom: -1px;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
 }
 
 /* Task List */
-.task-list-container {
+.project-management-container .task-list-container {
   max-height: 250px;
   overflow-y: auto;
 }
 
-.task-list-form {
+.project-management-container .task-list-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.task-item {
+.project-management-container .task-item {
   display: flex;
   align-items: center;
   padding: 8px 0;
 }
 
-.task-item input[type="checkbox"] {
+.project-management-container .task-item input[type="checkbox"] {
   margin-right: 10px;
 }
 
-.task-item label {
+.project-management-container .task-item label {
   cursor: pointer;
   font-size: 14px;
 }
 
 /* Buttons */
-.add-project-btn {
+.project-management-container  .add-project-btn {
   padding: 8px 16px;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.add-project-btn:hover {
-  background-color: var(--primary-hover);
+.project-management-container .add-project-btn:hover {
+  background-color: var(--projman-primary-hover);
 }
 
 /* Add Project Modal */
-.add-project-modal {
+.project-management-container .add-project-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -305,9 +305,9 @@
   z-index: 1000;
 }
 
-.modal-content {
+.project-management-container .modal-content {
   background-color: white;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   width: 90%;
   max-width: 1000px;
   max-height: 90vh;
@@ -315,86 +315,86 @@
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
 }
 
-.modal-header {
+.project-management-container .modal-header {
   padding: 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
 }
 
-.modal-header h2 {
+.project-management-container .modal-header h2 {
   font-size: 22px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
   margin-bottom: 16px;
 }
 
-.modal-body {
+.project-management-container .modal-body {
   padding: 20px;
 }
 
-.section-title {
+.project-management-container .section-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
   margin-bottom: 20px;
 }
 
 /* Forms */
-.project-form {
+.project-management-container .project-form {
   display: flex;
   flex-direction: column;
 }
 
-.form-row {
+.project-management-container .form-row {
   display: flex;
   gap: 30px;
   margin-bottom: 20px;
 }
 
-.form-column {
+.project-management-container .form-column {
   flex: 1;
 }
 
-.form-group {
+.project-management-container .form-group {
   margin-bottom: 16px;
 }
 
-.form-label {
+.project-management-container .form-label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--projman-text-color);
 }
 
-.form-input, 
-.form-textarea {
+.project-management-container .form-input, 
+.project-management-container .form-textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  border: 1px solid var(--projman-border-color);
+  border-radius: var(--projman-border-radius);
   font-size: 14px;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.form-input:focus, 
-.form-textarea:focus {
-  border-color: var(--primary-color);
+.project-management-container .form-input:focus, 
+.project-management-container .form-textarea:focus {
+  border-color: var(--projman-primary-color);
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.2);
 }
 
-.form-textarea {
+.project-management-container .form-textarea {
   min-height: 150px;
   resize: vertical;
 }
 
 /* Search Components */
-.search-container {
+.project-management-container .search-container {
   position: relative;
   width: 100%;
 }
 
-.search-results {
+.project-management-container .search-results {
   position: absolute;
   top: 100%;
   left: 0;
@@ -402,103 +402,103 @@
   max-height: 200px;
   overflow-y: auto;
   background-color: white;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--projman-border-color);
   border-top: none;
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  border-radius: 0 0 var(--projman-border-radius) var(--projman-border-radius);
   z-index: 10;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.search-result-item {
+.project-management-container .search-result-item {
   padding: 10px 12px;
   font-size: 14px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.search-result-item:hover {
+.project-management-container .search-result-item:hover {
   background-color: #f5f5f5;
 }
 
 /* Form Actions */
-.form-actions {
+.project-management-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
 }
 
-.cancel-btn, 
-.save-btn {
+.project-management-container .cancel-btn, 
+.project-management-container .save-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.cancel-btn {
-  background-color: var(--secondary-color);
-  color: var(--text-color);
+.project-management-container .cancel-btn {
+  background-color: var(--projman-secondary-color);
+  color: var(--projman-text-color);
 }
 
-.cancel-btn:hover {
-  background-color: var(--secondary-hover);
+.project-management-container .cancel-btn:hover {
+  background-color: var(--projman-secondary-hover);
 }
 
-.save-btn {
-  background-color: var(--primary-color);
+.project-management-container .save-btn {
+  background-color: var(--projman-primary-color);
   color: white;
 }
 
-.save-btn:hover {
-  background-color: var(--primary-hover);
+.project-management-container .save-btn:hover {
+  background-color: var(--projman-primary-hover);
 }
 
 /* Status Messages */
-.loading-cell, 
-.no-data-cell, 
-.error-cell {
+.project-management-container .loading-cell, 
+.project-management-container .no-data-cell, 
+.project-management-container .error-cell {
   padding: 20px;
   text-align: center;
-  color: var(--light-text);
+  color: var(--projman-light-text);
 }
 
-.loading-cell {
-  color: var(--text-color);
+.project-management-container .loading-cell {
+  color: var(--projman-text-color);
 }
 
-.error-cell {
-  color: var(--error-color);
+.project-management-container .error-cell {
+  color: var(--projman-error-color);
 }
 
 /* Project Summary Section */
-.project-summary-section {
+.project-management-container .project-summary-section {
   grid-column: 1 / -1;
   height: auto;
 }
 
 /* Overdue and Today's Tasks Sections */
-.overdue-tasks-section .section-content,
-.todays-tasks-section .section-content,
-.overall-progress-section .section-content {
+.project-management-container .overdue-tasks-section .section-content,
+.project-management-container .todays-tasks-section .section-content,
+.project-management-container .overall-progress-section .section-content {
   height: 300px;
   max-height: none;
 }
 
 /* Clickable row styling */
-.clickable-row {
+.project-management-container .clickable-row {
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
 }
 
-.clickable-row:hover {
+.project-management-container .clickable-row:hover {
   background-color: rgba(8, 125, 125, 0.05) !important;
 }
 
 /* Project Details Modal */
-.project-details-modal {
+.project-management-container .project-details-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -511,9 +511,9 @@
   z-index: 1000;
 }
 
-.project-details-modal .modal-content {
+.project-management-container .project-details-modal .modal-content {
   background-color: white;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   width: 90%;
   max-width: 700px;
   max-height: 90vh;
@@ -521,136 +521,136 @@
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
 }
 
-.project-details-modal .modal-header {
+.project-management-container .project-details-modal .modal-header {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.project-details-modal .modal-header h2 {
+.project-management-container .project-details-modal .modal-header h2 {
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--projman-text-color);
   margin: 0;
 }
 
-.close-button {
+.project-management-container .close-button {
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: var(--light-text);
-  transition: var(--transition);
+  color: var(--projman-light-text);
+  transition: var(--projman-transition);
 }
 
-.close-button:hover {
-  color: var(--text-color);
+.project-management-container .close-button:hover {
+  color: var(--projman-text-color);
 }
 
-.project-details-modal .modal-body {
+.project-management-container .project-details-modal .modal-body {
   padding: 20px;
 }
 
-.project-details-modal .modal-footer {
+.project-management-container .project-details-modal .modal-footer {
   padding: 16px 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--projman-border-color);
   display: flex;
   justify-content: flex-end;
 }
 
 /* Project Details Container */
-.project-details-container {
+.project-management-container .project-details-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.detail-section {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+.project-management-container .detail-section {
+  border: 1px solid var(--projman-border-color);
+  border-radius: var(--projman-border-radius);
   overflow: hidden;
 }
 
-.detail-section h3 {
+.project-management-container .detail-section h3 {
   font-size: 16px;
   font-weight: 600;
   padding: 12px 16px;
   background-color: #f5f5f5;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
   margin: 0;
 }
 
-.project-details-grid {
+.project-management-container .project-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   padding: 16px;
 }
 
-.detail-item {
+.project-management-container .detail-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.detail-item.full-width {
+.project-management-container .detail-item.full-width {
   grid-column: 1 / -1;
 }
 
-.detail-label {
+.project-management-container .detail-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--light-text);
+  color: var(--projman-light-text);
 }
 
-.detail-value {
+.project-management-container .detail-value {
   font-size: 15px;
-  color: var(--text-color);
+  color: var(--projman-text-color);
 }
 
-.issue-text {
-  color: var(--error-color);
+.project-management-container .issue-text {
+  color: var(--projman-error-color);
 }
 
-.loading-details, 
-.error-details, 
-.no-details {
+.project-management-container .loading-details, 
+.project-management-container .error-details, 
+.project-management-container .no-details {
   padding: 20px;
   text-align: center;
   font-size: 15px;
 }
 
-.error-details {
-  color: var(--error-color);
+.project-management-container .error-details {
+  color: var(--projman-error-color);
 }
 
 /* Details Table */
-.details-table {
+.project-management-container .details-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.details-table th,
-.details-table td {
+.project-management-container .details-table th,
+.project-management-container .details-table td {
   padding: 10px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman-border-color);
 }
 
-.details-table th {
+.project-management-container .details-table th {
   background-color: #f9f9f9;
   font-weight: 600;
   font-size: 14px;
 }
 
-.details-table tr:last-child td {
+.project-management-container .details-table tr:last-child td {
   border-bottom: none;
 }
 
 /* Enhanced Chart Styling */
-.chart-wrapper {
+.project-management-container .chart-wrapper {
   position: relative;
   width: 100%;
   max-width: 200px;
@@ -660,7 +660,7 @@
   border-radius: 12px;
 }
 
-.chart-wrapper2 {
+.project-management-container .chart-wrapper2 {
   position: relative;
   height: 400px;
   padding: 15px;
@@ -670,7 +670,7 @@
   transition: all 0.3s ease;
 }
 
-.doughnut-wrapper {
+.project-management-container .doughnut-wrapper {
   position: relative;
   width: 100%;
   padding-bottom: 20px;
@@ -681,12 +681,12 @@
   transition: transform 0.3s ease;
 }
 
-.doughnut-wrapper:hover {
+.project-management-container .doughnut-wrapper:hover {
   transform: scale(1.02);
 }
 
 /* Enhanced Progress Text */
-.progress-text {
+.project-management-container .progress-text {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -696,7 +696,7 @@
   transition: all 0.3s ease;
 }
 
-.progress-percentage {
+.project-management-container .progress-percentage {
   font-size: clamp(24px, 5vw, 32px);
   font-weight: 700;
   color: #1a1a1a;
@@ -704,12 +704,12 @@
   transition: all 0.2s ease;
 }
 
-.progress-percentage:hover {
+.project-management-container .progress-percentage:hover {
   transform: scale(1.05);
-  color: var(--primary-color);
+  color: var(--projman-primary-color);
 }
 
-.progress-label {
+.project-management-container .progress-label {
   font-size: clamp(12px, 2vw, 14px);
   color: #555;
   margin-top: 5px;
@@ -719,7 +719,7 @@
 }
 
 /* Enhanced Stats Container */
-.stats-container {
+.project-management-container .stats-container {
   display: flex;
   width: 100%;
   border-top: 1px solid rgba(238, 238, 238, 0.7);
@@ -730,42 +730,42 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
-.stat-box {
+.project-management-container .stat-box {
   flex: 1;
   text-align: center;
   padding: 10px;
   transition: all 0.3s ease;
 }
 
-.stat-box:hover {
+.project-management-container .stat-box:hover {
   background-color: rgba(8, 125, 125, 0.05);
   border-radius: 8px;
 }
 
-.stat-value {
+.project-management-container .stat-value {
   font-size: 24px;
   font-weight: 700;
   color: #333;
   transition: all 0.2s ease;
 }
 
-.stat-value:hover {
-  color: var(--primary-color);
+.project-management-container .stat-value:hover {
+  color: var(--projman-primary-color);
 }
 
-.stat-label {
+.project-management-container .stat-label {
   font-size: 14px;
   color: #666;
   margin-top: 4px;
   transition: all 0.2s ease;
 }
 
-.divider {
+.project-management-container .divider {
   width: 1px;
   background: linear-gradient(to bottom, rgba(238,238,238,0.1), rgba(238,238,238,0.8), rgba(238,238,238,0.1));
 }
 
-.improvement-text {
+.project-management-container .improvement-text {
   font-size: 12px;
   color: #666;
   margin-top: 15px;
@@ -777,17 +777,17 @@
   transition: all 0.3s ease;
 }
 
-.improvement-text:hover {
+.project-management-container .improvement-text:hover {
   background-color: rgba(8, 125, 125, 0.05);
 }
 
-.improvement-text strong {
-  color: var(--primary-color);
+.project-management-container .improvement-text strong {
+  color: var(--projman-primary-color);
   font-weight: 700;
 }
 
 /* Enhanced center stat for Existing Projects */
-.center-stat {
+.project-management-container .center-stat {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -797,25 +797,25 @@
   transition: all 0.3s ease;
 }
 
-.center-stat:hover {
+.project-management-container .center-stat:hover {
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(8, 125, 125, 0.05) 100%);
 }
 
-.big-stat {
+.project-management-container .big-stat {
   font-size: 3.5rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--projman-primary-color);
   text-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: all 0.3s ease;
 }
 
-.big-stat:hover {
+.project-management-container .big-stat:hover {
   transform: scale(1.05);
   text-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
 
 /* Enhanced Line Chart */
-.task-completion-section .chart-wrapper2 {
+.project-management-container .task-completion-section .chart-wrapper2 {
   padding: 20px;
   background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(248,248,248,0.3));
   box-shadow: 0 3px 10px rgba(0,0,0,0.05);
@@ -824,7 +824,7 @@
 }
 
 /* Chart Containers - keeping original structure but enhancing */
-.chart-container {
+.project-management-container .chart-container {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
@@ -838,7 +838,7 @@
   transition: all 0.3s ease;
 }
 
-.doughnut-card {
+.project-management-container .doughnut-card {
   background-color: white;
   border-radius: 16px;
   padding: clamp(15px, 3vw, 20px);
@@ -851,21 +851,21 @@
 }
 
 /* Tasks container in project details */
-.tasks-container {
+.project-management-container .tasks-container {
   margin-top: 10px;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  border: 1px solid var(--projman-border-color);
+  border-radius: var(--projman-border-radius);
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
 }
 
 /* Employee Avatar */
-.employee-avatar {
+.project-management-container .employee-avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   display: flex;
   align-items: center;
@@ -873,34 +873,34 @@
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.employee-avatar:hover {
-  background-color: var(--primary-hover);
+.project-management-container .employee-avatar:hover {
+  background-color: var(--projman-primary-hover);
   transform: scale(1.1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Today's Tasks Table Styling */
-.todays-tasks-section .data-table {
+.project-management-container .todays-tasks-section .data-table {
   border-collapse: separate;
   border-spacing: 0 8px;
 }
 
-.todays-tasks-section .data-table tr {
+.project-management-container .todays-tasks-section .data-table tr {
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.todays-tasks-section .data-table td {
+.project-management-container .todays-tasks-section .data-table td {
   padding: 12px 16px;
   border: none;
   vertical-align: middle;
 }
 
-.todays-tasks-section .data-table th {
+.project-management-container .todays-tasks-section .data-table th {
   background-color: transparent;
   border-bottom: 1px solid #eee;
   padding: 12px 16px;
@@ -909,7 +909,7 @@
 }
 
 /* Employee Details Modal */
-.employee-details-modal {
+.project-management-container .employee-details-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -922,31 +922,31 @@
   z-index: 1100;
 }
 
-.employee-details-modal .modal-content {
+.project-management-container .employee-details-modal .modal-content {
   width: 500px;
   max-width: 90%;
   border-radius: 12px;
 }
 
-.employee-details-container {
+.project-management-container .employee-details-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
 }
 
-.employee-avatar-large {
+.project-management-container .employee-avatar-large {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.avatar-circle {
+.project-management-container .avatar-circle {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   display: flex;
   align-items: center;
@@ -958,34 +958,34 @@
   transition: all 0.3s ease;
 }
 
-.avatar-circle:hover {
+.project-management-container .avatar-circle:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(8, 125, 125, 0.3);
 }
 
-.employee-avatar-large h3 {
+.project-management-container .employee-avatar-large h3 {
   margin: 8px 0;
   font-size: 20px;
   font-weight: 600;
 }
 
-.employee-status-badge {
+.project-management-container .employee-status-badge {
   background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
+  color: var(--projman-success-color);
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
 }
 
-.employee-info-grid {
+.project-management-container .employee-info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   width: 100%;
 }
 
-.info-item {
+.project-management-container .info-item {
   background-color: #f8f8f8;
   padding: 16px;
   border-radius: 8px;
@@ -993,43 +993,43 @@
   border: 1px solid rgba(0,0,0,0.03);
 }
 
-.info-item:hover {
+.project-management-container .info-item:hover {
   background-color: #f2f2f2;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.info-label {
+.project-management-container .info-label {
   color: #666;
   font-size: 14px;
   margin-bottom: 4px;
 }
 
-.info-value {
+.project-management-container .info-value {
   font-size: 16px;
   font-weight: 500;
   color: #333;
 }
 
-.primary-btn {
-  background-color: var(--primary-color);
+.project-management-container .primary-btn {
+  background-color: var(--projman-primary-color);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--projman-border-radius);
   padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
   box-shadow: 0 3px 8px rgba(8, 125, 125, 0.2);
 }
 
-.primary-btn:hover {
-  background-color: var(--primary-hover);
+.project-management-container .primary-btn:hover {
+  background-color: var(--projman-primary-hover);
   box-shadow: 0 4px 12px rgba(8, 125, 125, 0.3);
   transform: translateY(-2px);
 }
 
 /* Pagination Controls */
-.pagination-controls {
+.project-management-container .pagination-controls {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -1037,78 +1037,78 @@
   gap: 10px;
 }
 
-.pagination-btn {
+.project-management-container .pagination-btn {
   padding: 6px 12px;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   padding: 6px 12px;
-  background-color: var(--primary-color);
+  background-color: var(--projman-primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman-transition);
   box-shadow: 0 2px 6px rgba(8, 125, 125, 0.2);
 }
 
-.pagination-btn:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+.project-management-container .pagination-btn:hover:not(:disabled) {
+  background-color: var(--projman-primary-hover);
   transform: translateY(-2px);
   box-shadow: 0 3px 8px rgba(8, 125, 125, 0.3);
 }
 
-.pagination-btn:disabled {
+.project-management-container .pagination-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-.pagination-info {
+.project-management-container .pagination-info {
   font-size: 14px;
-  color: var(--light-text);
+  color: var(--projman-light-text);
   padding: 0 8px;
 }
 
 /* Enhanced Employee Display */
-.employee-display {
+.project-management-container .employee-display {
   display: flex;
   align-items: center;
   gap: 10px;
   position: relative;
 }
 
-.employee-info {
+.project-management-container .employee-info {
   display: flex;
   flex-direction: column;
 }
 
-.employee-name {
+.project-management-container .employee-name {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--projman-text-color);
 }
 
-.employee-id {
+.project-management-container .employee-id {
   font-size: 0.75rem;
-  color: var(--light-text);
+  color: var(--projman-light-text);
 }
 
-.employee-compact {
+.project-management-container .employee-compact {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.employee-expanded {
+.project-management-container .employee-expanded {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.employee-toggle {
+.project-management-container .employee-toggle {
   background: none;
   border: none;
-  color: var(--primary-color);
+  color: var(--projman-primary-color);
   font-size: 12px;
   cursor: pointer;
   padding: 2px 8px;
@@ -1117,13 +1117,13 @@
   align-self: flex-end;
 }
 
-.employee-toggle:hover {
+.project-management-container .employee-toggle:hover {
   background-color: rgba(8, 125, 125, 0.05);
   text-decoration: underline;
 }
 
 /* Reminder Card */
-.reminder-card {
+.project-management-container .reminder-card {
   background: white;
   border-radius: 24px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
@@ -1135,7 +1135,7 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.reminder-header {
+.project-management-container .reminder-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1143,7 +1143,7 @@
   margin-bottom: 24px;
 }
 
-.reminder-header h2 {
+.project-management-container .reminder-header h2 {
   font-size: 26px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
@@ -1152,7 +1152,7 @@
   letter-spacing: -0.5px;
 }
 
-.add-button {
+.project-management-container .add-button {
   background: white;
   border: 2px solid #2cc5bd;
   border-radius: 50%;
@@ -1169,14 +1169,14 @@
   font-weight: 500;
 }
 
-.add-button:hover {
+.project-management-container .add-button:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 8px 18px rgba(44, 197, 189, 0.3);
   background-color: #2cc5bd;
   color: white;
 }
 
-.tabs-container {
+.project-management-container .tabs-container {
   display: flex;
   margin-bottom: 24px;
   border-bottom: 1px solid #f0f0f0;
@@ -1184,7 +1184,7 @@
   gap: 12px;
 }
 
-.tab {
+.project-management-container .tab {
   display: flex;
   align-items: center;
   padding: 12px 18px;
@@ -1197,7 +1197,7 @@
   overflow: hidden;
 }
 
-.tab.active {
+.project-management-container .tab.active {
   background: #ffffff;
   color: black;
   font-family: 'Inter',sans-serif;
@@ -1205,7 +1205,7 @@
   font-weight: 600;
 }
 
-.tab.active::after {
+.project-management-container .tab.active::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -1216,7 +1216,7 @@
   border-radius: 3px 3px 0 0;
 }
 
-.tab-icon {
+.project-management-container .tab-icon {
   margin-right: 10px;
   font-size: 16px;
   display: flex;
@@ -1231,19 +1231,19 @@
   transition: all 0.3s ease;
 }
 
-.tab.active .tab-icon {
+.project-management-container .tab.active .tab-icon {
   transform: scale(1.1);
   box-shadow: 0 3px 8px rgba(44, 197, 189, 0.3);
 }
 
-.tab-text {
+.project-management-container .tab-text {
   font-weight: 500;
   font-size: 18px;
   font-family: 'Inter',sans-serif;
   letter-spacing: 0.2px;
 }
 
-.reminder-list {
+.project-management-container .reminder-list {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -1253,25 +1253,25 @@
   padding-bottom: 10px;
 }
 
-.reminder-list::-webkit-scrollbar {
+.project-management-container .reminder-list::-webkit-scrollbar {
   width: 8px;
 }
 
-.reminder-list::-webkit-scrollbar-track {
+.project-management-container .reminder-list::-webkit-scrollbar-track {
   background: #f5f5f5;
   border-radius: 10px;
 }
 
-.reminder-list::-webkit-scrollbar-thumb {
+.project-management-container .reminder-list::-webkit-scrollbar-thumb {
   background: #cdcdcd;
   border-radius: 10px;
 }
 
-.reminder-list::-webkit-scrollbar-thumb:hover {
+.project-management-container .reminder-list::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
 
-.reminder-item {
+.project-management-container .reminder-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -1284,17 +1284,17 @@
   border-left: 4px solid #2cc5bd;
 }
 
-.reminder-item:hover {
+.project-management-container .reminder-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-.reminder-content {
+.project-management-container .reminder-content {
   flex: 1;
   padding-right: 15px;
 }
 
-.reminder-content h3 {
+.project-management-container .reminder-content h3 {
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 10px;
@@ -1302,21 +1302,21 @@
   line-height: 1.4;
 }
 
-.reminder-content p {
+.project-management-container .reminder-content p {
   font-size: 14px;
   color: #555;
   line-height: 1.6;
   margin-bottom: 8px;
 }
 
-.reminder-actions {
+.project-management-container .reminder-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
 }
 
-.status-indicator-dashboard {
+.project-management-container .status-indicator-dashboard {
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -1330,19 +1330,19 @@
   cursor: pointer;
 }
 
-.status-indicator-dashboard:hover {
+.project-management-container .status-indicator-dashboard:hover {
   border-color: #00A8A8;
   transform: scale(1.1);
   box-shadow: 0 3px 10px rgba(0, 168, 168, 0.2);
 }
 
-.status-indicator-dashboard.completed {
+.project-management-container .status-indicator-dashboard.completed {
   background: #00A8A8;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(44, 197, 189, 0.4);
 }
 
-.reminder-form {
+.project-management-container .reminder-form {
   position: relative;
   background-color: #ffffff;
   border-radius: 16px;
@@ -1354,11 +1354,11 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.reminder-form-container {
+.project-management-container .reminder-form-container {
   padding: 24px;
 }
 
-.form-header {
+.project-management-container .form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1367,7 +1367,7 @@
   padding-bottom: 16px;
 }
 
-.form-header h3 {
+.project-management-container .form-header h3 {
   margin: 0;
   color: #222;
   font-weight: 600;
@@ -1375,11 +1375,11 @@
   letter-spacing: -0.3px;
 }
 
-.form-group {
+.project-management-container .form-group {
   margin-bottom: 22px;
 }
 
-.form-group label {
+.project-management-container .form-group label {
   display: block;
   margin-bottom: 10px;
   font-weight: 500;
@@ -1387,7 +1387,7 @@
   font-size: 15px;
 }
 
-.form-control {
+.project-management-container .form-control {
   width: 100%;
   padding: 14px;
   border: 1px solid #ddd;
@@ -1397,21 +1397,21 @@
   background-color: #fafafa;
 }
 
-.form-control:focus {
+.project-management-container .form-control:focus {
   border-color: #2cc5bd;
   box-shadow: 0 0 0 3px rgba(44, 197, 189, 0.2);
   outline: none;
   background-color: #fff;
 }
 
-.form-buttons {
+.project-management-container .form-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 14px;
   margin-top: 28px;
 }
 
-.btn {
+.project-management-container .btn {
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 500;
@@ -1422,27 +1422,27 @@
   letter-spacing: 0.3px;
 }
 
-.btn:active {
+.project-management-container .btn:active {
   transform: translateY(2px);
 }
 
-.btn-primary {
+.project-management-container .btn-primary {
   background-color: #00A8A8;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 168, 168, 0.3);
 }
 
-.btn-primary:hover {
+.project-management-container .btn-primary:hover {
   background-color: #087D7D;
   box-shadow: 0 6px 16px rgba(0, 168, 168, 0.4);
 }
 
-.btn-secondary {
+.project-management-container .btn-secondary {
   background-color: #f0f0f0;
   color: #333;
 }
 
-.btn-secondary:hover {
+.project-management-container .btn-secondary:hover {
   background-color: #e0e0e0;
   color: #111;
 }
@@ -1458,12 +1458,12 @@
   }
 }
 
-.header-title-group {
+.project-management-container .header-title-group {
   display: flex;
   align-items: baseline;
 }
 
-.section-subtitle {
+.project-management-container .section-subtitle {
   font-size: 14px;
   color: #666;
   margin-left: 10px;
@@ -1472,101 +1472,101 @@
 
 /* Responsive Improvements */
 @media (max-width: 1400px) {
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 350px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 3rem;
   }
 }
 
 @media (max-width: 1200px) {
-  .dashboard-sections {
+  .project-management-container .dashboard-sections {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     height: auto;
   }
   
-  .project-summary-section {
+  .project-management-container .project-summary-section {
     grid-column: 1 / -1;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 320px;
   }
   
-  .stats-container {
+  .project-management-container .stats-container {
     flex-direction: row;
   }
 }
 
 @media (max-width: 992px) {
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 180px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 300px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 2.8rem;
   }
 }
 
 @media (max-width: 768px) {
-  .dashboard-sections {
+  .project-management-container .dashboard-sections {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     height: auto;
   }
   
-  .project-summary-section {
+  .project-management-container .project-summary-section {
     grid-column: 1;
   }
   
-  .dashboard-section {
+  .project-management-container .dashboard-section {
     height: 300px;
   }
   
-  .dashboard-header {
+  .project-management-container .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
   
-  .section-content {
+  .project-management-container .section-content {
     max-height: none;
     overflow-y: visible;
   }
   
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 160px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 280px;
     padding: 12px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 2.5rem;
   }
   
-  .progress-percentage {
+  .project-management-container .progress-percentage {
     font-size: clamp(20px, 4vw, 28px);
   }
   
-  .stat-value {
+  .project-management-container .stat-value {
     font-size: 20px;
   }
   
-  .employee-info-grid {
+  .project-management-container .employee-info-grid {
     grid-template-columns: 1fr;
   }
   
-  .avatar-circle {
+  .project-management-container .avatar-circle {
     width: 60px;
     height: 60px;
     font-size: 22px;
@@ -1574,152 +1574,152 @@
 }
 
 @media (max-width: 700px) {
-  .project-details-grid {
+  .project-management-container .project-details-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 576px) {
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 140px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 250px;
     padding: 10px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 2.2rem;
   }
   
-  .improvement-text {
+  .project-management-container .improvement-text {
     font-size: 11px;
     padding: 6px 10px;
   }
   
-  .progress-percentage {
+  .project-management-container .progress-percentage {
     font-size: clamp(18px, 4vw, 24px);
   }
   
-  .progress-label {
+  .project-management-container .progress-label {
     font-size: clamp(10px, 2vw, 12px);
   }
   
-  .stat-value {
+  .project-management-container .stat-value {
     font-size: 18px;
   }
   
-  .stat-label {
+  .project-management-container .stat-label {
     font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .dashboard-title {
+  .project-management-container .dashboard-title {
     font-size: 22px;
   }
   
-  .modal-content {
+  .project-management-container .modal-content {
     width: 95%;
   }
   
-  .form-actions {
+  .project-management-container .form-actions {
     flex-direction: column;
   }
   
-  .cancel-btn, 
-  .save-btn {
+  .project-management-container .cancel-btn, 
+  .project-management-container .save-btn {
     width: 100%;
   }
   
-  .chart-container {
+  .project-management-container .chart-container {
     padding: 10px;
   }
   
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 120px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 220px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 2rem;
   }
   
-  .reminder-card {
+  .project-management-container .reminder-card {
     max-width: 100%;
     border-radius: 18px;
     padding: 20px;
   }
   
-  .reminder-header h2 {
+  .project-management-container .reminder-header h2 {
     font-size: 22px;
   }
   
-  .add-button {
+  .project-management-container .add-button {
     width: 36px;
     height: 36px;
   }
   
-  .reminder-item {
+  .project-management-container .reminder-item {
     padding: 16px;
   }
   
-  .reminder-content h3 {
+  .project-management-container .reminder-content h3 {
     font-size: 16px;
   }
   
-  .reminder-content p {
+  .project-management-container .reminder-content p {
     font-size: 13px;
   }
   
-  .status-indicator-dashboard {
+  .project-management-container .status-indicator-dashboard {
     width: 24px;
     height: 24px;
   }
 }
 
 @media (max-width: 380px) {
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 100px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 200px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 1.8rem;
   }
 }
 
 @media (max-width: 350px) {
-  .reminder-card {
+  .project-management-container .reminder-card {
     padding: 16px;
   }
   
-  .tab {
+  .project-management-container .tab {
     padding: 8px 12px;
   }
   
-  .reminder-content h3 {
+  .project-management-container .reminder-content h3 {
     font-size: 15px;
   }
   
-  .reminder-content p {
+  .project-management-container .reminder-content p {
     font-size: 12px;
   }
 }
 
 @media (max-width: 320px) {
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 90px;
   }
   
-  .doughnut-card {
+  .project-management-container .doughnut-card {
     max-width: 120px;
     padding: 10px;
   }
@@ -1727,43 +1727,43 @@
 
 /* High-resolution screens */
 @media (min-width: 1921px) {
-  .dashboard-view {
+  .project-management-container .dashboard-view {
     max-width: 3200px;
   }
   
-  .dashboard-sections {
+  .project-management-container .dashboard-sections {
     grid-template-columns: 1fr 1fr;
   }
   
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 240px;
   }
   
-  .chart-wrapper2 {
+  .project-management-container .chart-wrapper2 {
     height: 500px;
   }
   
-  .big-stat {
+  .project-management-container .big-stat {
     font-size: 4rem;
   }
   
-  .progress-percentage {
+  .project-management-container .progress-percentage {
     font-size: 38px;
   }
   
-  .progress-label {
+  .project-management-container .progress-label {
     font-size: 16px;
   }
   
-  .stat-value {
+  .project-management-container .stat-value {
     font-size: 28px;
   }
   
-  .stat-label {
+  .project-management-container .stat-label {
     font-size: 16px;
   }
   
-  .improvement-text {
+  .project-management-container .improvement-text {
     font-size: 14px;
     padding: 10px 14px;
   }
@@ -1771,37 +1771,37 @@
 
 /* Ultra-wide screens */
 @media (min-width: 2560px) {
-  .chart-wrapper {
+  .project-management-container .chart-wrapper {
     max-width: 280px;
   }
   
-  .chart-wrapper2 {
+ .project-management-container  .chart-wrapper2 {
     height: 600px;
   }
   
-  .big-stat {
+ .project-management-container  .big-stat {
     font-size: 4.5rem;
   }
 }
 
-.reminder-detail {
+.project-management-container .reminder-detail {
     display: flex;
     margin: 5px 0;
     font-size: 0.9rem;
 }
 
-.detail-label {
+.project-management-container .detail-label {
     font-weight: bold;
     margin-right: 8px;
     min-width: 80px;
 }
 
-.detail-value {
+.project-management-container .detail-value {
     color: #444;
 }
 
 /* Improved Reminder Card Styles */
-.reminder-content {
+.project-management-container .reminder-content {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -1814,26 +1814,26 @@
   overflow: hidden;
 }
 
-.reminder-header {
+.project-management-container .reminder-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.reminder-header h2 {
+.project-management-container .reminder-header h2 {
   font-size: 18px;
   margin: 0;
   color: #333;
 }
 
-.tabs-container {
+.project-management-container .tabs-container {
   display: flex;
   border-bottom: 1px solid #eee;
   margin-bottom: 15px;
 }
 
-.tab {
+.project-management-container .tab {
   display: flex;
   align-items: center;
   padding: 10px 15px;
@@ -1842,11 +1842,11 @@
   margin-right: 10px;
 }
 
-.tab.active {
+.project-management-container .tab.active {
   color: #14A2A0;
 }
 
-.tab.active::after {
+.project-management-container .tab.active::after {
   content: '';
   position: absolute;
   bottom: -1px;
@@ -1856,7 +1856,7 @@
   background-color: #14A2A0;
 }
 
-.tab-circle {
+.project-management-container .tab-circle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1867,23 +1867,23 @@
   background-color: #F5F5F5;
 }
 
-.tab-circle.today {
+.project-management-container .tab-circle.today {
   background-color: #E6F7F7;
   color: #14A2A0;
 }
 
-.tab-circle.overdue {
+.project-management-container .tab-circle.overdue {
   background-color: #FFE6E6;
   color: #FF4D4D;
 }
 
-.reminder-list {
+.project-management-container .reminder-list {
   overflow-y: auto;
   flex-grow: 1;
   padding-right: 5px;
 }
 
-.reminder-item {
+.project-management-container .reminder-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -1894,51 +1894,51 @@
   margin-bottom: 15px;
 }
 
-.reminder-content {
+.project-management-container .reminder-content {
   flex-grow: 1;
   margin-right: 15px;
 }
 
-.task-title {
+.project-management-container .task-title {
   font-size: 16px;
   margin: 0 0 10px 0;
   color: #333;
 }
 
-.overdue-days {
+.project-management-container .overdue-days {
   color: #FF4D4D;
   font-weight: bold;
 }
 
-.task-description {
+.project-management-container .task-description {
   margin: 5px 0 10px;
   color: #555;
   font-size: 14px;
 }
 
-.reminder-detail {
+.project-management-container .reminder-detail {
   display: flex;
   font-size: 13px;
   margin-bottom: 6px;
   color: #666;
 }
 
-.detail-label {
+.project-management-container .detail-label {
   font-weight: 600;
   width: 80px;
   color: #555;
 }
 
-.detail-value {
+.project-management-container .detail-value {
   flex-grow: 1;
 }
 
-.task-status-circle {
+.project-management-container .task-status-circle {
   display: flex;
   align-items: center;
 }
 
-.status-circle {
+.project-management-container .status-circle {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -1952,50 +1952,50 @@
   font-weight: bold;
 }
 
-.status-circle.completed {
+.project-management-container .status-circle.completed {
   background-color: #14A2A0;
   border-color: #14A2A0;
 }
 
-.status-circle.overdue {
+.project-management-container .status-circle.overdue {
   background-color: white;
   border-color: #FF4D4D;
 }
 
-.loading-message,
-.error-message,
-.empty-message {
+.project-management-container .loading-message,
+.project-management-container .error-message,
+.project-management-container .empty-message {
   padding: 20px;
   text-align: center;
   color: #666;
   font-style: italic;
 }
 
-.error-message {
+.project-management-container .error-message {
   color: #FF4D4D;
 }
 
 /* Make sure the reminder card is responsive */
 @media (max-width: 768px) {
-  .reminder-card {
+  .project-management-container .reminder-card {
       min-height: 350px;
   }
   
-  .reminder-item {
+  .project-management-container .reminder-item {
       padding: 10px;
   }
   
-  .task-title {
+  .project-management-container .task-title {
       font-size: 14px;
   }
   
-  .reminder-detail {
+  .project-management-container .reminder-detail {
       font-size: 12px;
   }
 }
 
 /* Add this to your CSS file */
-.dashboard-section.reminder-section {
+.project-management-container .dashboard-section.reminder-section {
   padding: 0;
   overflow: visible;
   height: auto;
@@ -2003,7 +2003,7 @@
   background: transparent;
 }
 
-.reminder-card {
+.project-management-container .reminder-card {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2016,14 +2016,14 @@
   width: 100%;
 }
 
-.tabs-container {
+.project-management-container .tabs-container {
   display: flex;
   margin-bottom: 15px;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
 }
 
-.tab {
+.project-management-container .tab {
   display: flex;
   align-items: center;
   padding: 10px 15px;
@@ -2034,13 +2034,13 @@
   box-shadow: none;
 }
 
-.tab.active {
+.project-management-container .tab.active {
   background: transparent;
   color: #14A2A0;
   box-shadow: none;
 }
 
-.tab-circle {
+.project-management-container .tab-circle {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -2050,22 +2050,22 @@
   margin-right: 8px;
 }
 
-.tab-circle.today {
+.project-management-container .tab-circle.today {
   background-color: #E6F7F7;
   color: #14A2A0;
 }
 
-.tab-circle.overdue {
+.project-management-container .tab-circle.overdue {
   background-color: #FFE6E6;
   color: #FF4D4D;
 }
 
-.reminder-list {
+.project-management-container .reminder-list {
   overflow-y: auto;
   flex-grow: 1;
 }
 
-.reminder-item {
+.project-management-container .reminder-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -2077,46 +2077,46 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.reminder-content {
+.project-management-container .reminder-content {
   flex-grow: 1;
   margin-right: 15px;
 }
 
-.task-title {
+.project-management-container .task-title {
   font-size: 16px;
   margin: 0 0 10px 0;
   color: #333;
 }
 
-.task-description {
+.project-management-container .task-description {
   margin: 5px 0 10px;
   color: #555;
   font-size: 14px;
 }
 
-.reminder-detail {
+.project-management-container .reminder-detail {
   display: flex;
   font-size: 13px;
   margin-bottom: 6px;
   color: #666;
 }
 
-.detail-label {
+.project-management-container .detail-label {
   font-weight: 600;
   width: 80px;
   color: #555;
 }
 
-.detail-value {
+.project-management-container .detail-value {
   flex-grow: 1;
 }
 
-.task-status-circle {
+.project-management-container .task-status-circle {
   display: flex;
   align-items: center;
 }
 
-.status-circle {
+.project-management-container .status-circle {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -2130,58 +2130,58 @@
   font-weight: bold;
 }
 
-.status-circle.completed {
+.project-management-container .status-circle.completed {
   background-color: #14A2A0;
   border-color: #14A2A0;
 }
 
-.status-circle.overdue {
+.project-management-container .status-circle.overdue {
   background-color: white;
   border-color: #FF4D4D;
 }
 
 /* Adjust grid layout to match the design */
 @media (min-width: 992px) {
-  .dashboard-sections {
+  .project-management-container .dashboard-sections {
       grid-template-columns: 1fr 1fr;
       grid-template-rows: auto auto auto auto;
       gap: 20px;
   }
   
-  .dashboard-section.overall-progress-section {
+  .project-management-container .dashboard-section.overall-progress-section {
       grid-column: 1;
       grid-row: 1;
   }
   
-  .dashboard-column {
+  .project-management-container .dashboard-column {
       grid-column: 2;
       grid-row: 1 / 3;
   }
   
-  .dashboard-section.reminder-section {
+  .project-management-container .dashboard-section.reminder-section {
       grid-column: 1;
       grid-row: 2;
   }
   
-  .dashboard-section.task-completion-section {
+  .project-management-container .dashboard-section.task-completion-section {
       grid-column: 1 / 3;
       grid-row: 3;
   }
   
-  .dashboard-section.project-summary-section {
+ .project-management-container  .dashboard-section.project-summary-section {
       grid-column: 1 / 3;
       grid-row: 4;
   }
 }
 
 /* Add these styles to fix the Reminder card alignment */
-.reminder-card-container {
+.project-management-container .reminder-card-container {
   grid-column: 1;
   grid-row: 2;
   height: auto;
 }
 
-.reminder-card {
+.project-management-container .reminder-card {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2195,12 +2195,12 @@
 
 /* Make sure the dashboard sections grid is properly defined */
 /* Add these styles for the reminder card container */
-.reminder-card-container {
+.project-management-container .reminder-card-container {
   grid-column: 1;
   grid-row: 2;
 }
 
-.reminder-card {
+.project-management-container .reminder-card {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2213,7 +2213,7 @@
 }
 
 /* Make sure dashboard sections grid is defined correctly */
-.dashboard-sections {
+.project-management-container .dashboard-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto auto;
@@ -2221,28 +2221,28 @@
   margin-bottom: 20px;
 }
 
-.dashboard-section.overall-progress-section {
+.project-management-container .dashboard-section.overall-progress-section {
   grid-column: 1;
   grid-row: 1;
 }
 
-.dashboard-column {
+.project-management-container .dashboard-column {
   grid-column: 2;
   grid-row: 1 / 3;
 }
 
-.dashboard-section.task-completion-section {
+.project-management-container .dashboard-section.task-completion-section {
   grid-column: 1 / 3;
   grid-row: 3;
 }
 
-.dashboard-section.project-summary-section {
+.project-management-container .dashboard-section.project-summary-section {
   grid-column: 1 / 3;
   grid-row: 4;
 }
 
 /* Tab styling updates */
-.tab {
+.project-management-container .tab {
   display: flex;
   align-items: center;
   padding: 10px 15px;
@@ -2253,13 +2253,13 @@
   box-shadow: none;
 }
 
-.tab.active {
+.project-management-container .tab.active {
   background: transparent;
   color: #14A2A0;
   box-shadow: none;
 }
 
-.tab-circle {
+.project-management-container .tab-circle {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -2269,40 +2269,40 @@
   margin-right: 8px;
 }
 
-.tab-circle.today {
+.project-management-container .tab-circle.today {
   background-color: #E6F7F7;
   color: #14A2A0;
 }
 
-.tab-circle.overdue {
+.project-management-container .tab-circle.overdue {
   background-color: #FFE6E6;
   color: #FF4D4D;
 }
 
 /* Add these styles for the new dashboard layout */
-.dashboard-wrapper {
+.project-management-container .dashboard-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.dashboard-row {
+.project-management-container .dashboard-row {
   display: flex;
   gap: 20px;
   width: 100%;
 }
 
-.dashboard-row > * {
+.project-management-container .dashboard-row > * {
   flex: 1;
 }
 
 /* Reminder section specific styles */
-.dashboard-section.reminder-section {
+.project-management-container .dashboard-section.reminder-section {
   display: flex;
   flex-direction: column;
 }
 
-.reminder-content {
+.project-management-container .reminder-content {
   padding: 15px;
   flex: 1;
   display: flex;
@@ -2310,13 +2310,13 @@
   overflow: hidden;
 }
 
-.reminder-tabs {
+.project-management-container .reminder-tabs {
   display: flex;
   border-bottom: 1px solid #eee;
   margin-bottom: 15px;
 }
 
-.reminder-tab {
+.project-management-container .reminder-tab {
   display: flex;
   align-items: center;
   padding: 8px 15px;
@@ -2325,11 +2325,11 @@
   position: relative;
 }
 
-.reminder-tab.active {
+.project-management-container .reminder-tab.active {
   color: #14A2A0;
 }
 
-.reminder-tab.active::after {
+.project-management-container .reminder-tab.active::after {
   content: '';
   position: absolute;
   bottom: -1px;
@@ -2339,7 +2339,7 @@
   background-color: #14A2A0;
 }
 
-.tab-icon {
+.project-management-container .tab-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2349,17 +2349,17 @@
   margin-right: 8px;
 }
 
-.tab-icon.today {
+.project-management-container .tab-icon.today {
   background-color: #E6F7F7;
   color: #14A2A0;
 }
 
-.tab-icon.overdue {
+.project-management-container .tab-icon.overdue {
   background-color: #FFE6E6;
   color: #FF4D4D;
 }
 
-.reminder-items {
+.project-management-container .reminder-items {
   flex: 1;
   overflow-y: auto;
   display: flex;
@@ -2367,7 +2367,7 @@
   gap: 10px;
 }
 
-.reminder-item {
+.project-management-container .reminder-item {
   display: flex;
   padding: 12px;
   border-left: 3px solid #14A2A0;
@@ -2375,46 +2375,46 @@
   border-radius: 0 4px 4px 0;
 }
 
-.reminder-item-content {
+.project-management-container .reminder-item-content {
   flex: 1;
 }
 
-.reminder-item-content h3 {
+.project-management-container .reminder-item-content h3 {
   margin: 0 0 8px 0;
   font-size: 15px;
   font-weight: 600;
 }
 
-.reminder-item-content p {
+.project-management-container .reminder-item-content p {
   margin: 0 0 8px 0;
   font-size: 14px;
   color: #555;
 }
 
-.overdue-text {
+.project-management-container .overdue-text {
   color: #FF4D4D;
   font-weight: 600;
 }
 
-.reminder-detail {
+.project-management-container .reminder-detail {
   display: flex;
   font-size: 13px;
   margin-bottom: 4px;
 }
 
-.detail-label {
+.project-management-container .detail-label {
   font-weight: 600;
   width: 80px;
   color: #555;
 }
 
-.reminder-status {
+.project-management-container .reminder-status {
   display: flex;
   align-items: center;
   margin-left: 10px;
 }
 
-.status-circle {
+.project-management-container .status-circle {
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -2428,25 +2428,25 @@
   font-weight: bold;
 }
 
-.status-circle.completed {
+.project-management-container .status-circle.completed {
   background-color: #14A2A0;
   border-color: #14A2A0;
 }
 
-.status-circle.overdue {
+.project-management-container .status-circle.overdue {
   border-color: #FF4D4D;
 }
 
-.loading-message,
-.error-message,
-.empty-message {
+.project-management-container .loading-message,
+.project-management-container .error-message,
+.project-management-container .empty-message {
   padding: 15px;
   text-align: center;
   color: #666;
   font-style: italic;
 }
 
-.error-message {
+.project-management-container .error-message {
   color: #FF4D4D;
 }
 

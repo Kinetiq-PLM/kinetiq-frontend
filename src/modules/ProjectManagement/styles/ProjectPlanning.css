@@ -1,27 +1,27 @@
 /* ProjectPlanning.css - Enhanced UI */
 :root {
-  --primary-color: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #bfdbfe;
-  --accent-color: #0ea5e9;
-  --accent-dark: #0284c7;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --bg-light: #ffffff;
-  --bg-off-white: #f8fafc;
-  --bg-gray: #f1f5f9;
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --transition: all 0.2s ease-in-out;
+  --projman--primary-color: #2563eb;
+  --projman--primary-dark: #1d4ed8;
+  --projman--projman--primary-light: #bfdbfe;
+  --projman--accent-color: #0ea5e9;
+  --projman--accent-dark: #0284c7;
+  --projman--success-color: #10b981;
+  --projman--warning-color: #f59e0b;
+  --projman--error-color: #ef4444;
+  --projman--text-primary: #1e293b;
+  --projman--text-secondary: #475569;
+  --projman---text-tertiary: #94a3b8;
+  --projman--bg-light: #ffffff;
+  --projman--bg-off-white: #f8fafc;
+  --projman--bg-gray: #f1f5f9;
+  --projman--border-color: #e2e8f0;
+  --projman--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --projman--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --projman--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --projman--radius-sm: 4px;
+  --projman--radius-md: 8px;
+  --projman--radius-lg: 12px;
+  --projman--transition: all 0.2s ease-in-out;
 }
 
 .project-planning-container {
@@ -29,11 +29,11 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  background-color: var(--projman--bg-light);
+  border-radius: var(--projman--radius-md);
+  box-shadow: var(--projman--shadow-md);
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
 }
 
 .project-planning-header {
@@ -42,7 +42,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman--border-color);
   flex-wrap: wrap;
   gap: 20px;
 }
@@ -50,7 +50,7 @@
 .project-planning-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -64,10 +64,10 @@
 .create-plan-button,
 .back-to-dashboard-button {
   padding: 10px 18px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--projman--radius-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -77,8 +77,8 @@
 }
 
 .gantt-chart-button {
-  background-color: var(--bg-gray);
-  color: var(--text-primary);
+  background-color: var(--projman--bg-gray);
+  color: var(--projman--text-primary);
 }
 
 .gantt-chart-button:hover {
@@ -88,14 +88,14 @@
 
 .create-plan-button,
 .back-to-dashboard-button {
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
   color: white;
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
 .create-plan-button:hover,
 .back-to-dashboard-button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--projman--primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
 }
@@ -103,7 +103,7 @@
 /* Message Styling */
 .message {
   padding: 16px;
-  border-radius: var(--radius-md);
+  border-radius: var(--projman--radius-md);
   margin-bottom: 24px;
   font-size: 0.95rem;
   display: flex;
@@ -133,7 +133,7 @@
   cursor: pointer;
   color: inherit;
   opacity: 0.7;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .message-close:hover {
@@ -142,39 +142,39 @@
 
 .message.success {
   background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-  border-left: 4px solid var(--success-color);
+  color: var(--projman--success-color);
+  border-left: 4px solid var(--projman--success-color);
 }
 
 .message.error {
   background-color: rgba(239, 68, 68, 0.1);
-  color: var(--error-color);
-  border-left: 4px solid var(--error-color);
+  color: var(--projman--error-color);
+  border-left: 4px solid var(--projman--error-color);
 }
 
 .message.warning {
   background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-  border-left: 4px solid var(--warning-color);
+  color: var(--projman--warning-color);
+  border-left: 4px solid var(--projman--warning-color);
 }
 
 /* Form Styling */
 .project-planning-form-container,
 .project-form-container {
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
+  background-color: var(--projman--bg-light);
+  border-radius: var(--projman--radius-md);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--projman--shadow-sm);
   margin-bottom: 24px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--projman--border-color);
 }
 
 .form-title {
   font-size: 1.3rem;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   margin: 0 0 24px 0;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman--border-color);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -182,7 +182,7 @@
 }
 
 .form-icon {
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
 }
 
 .project-form {
@@ -205,7 +205,7 @@
 
 .form-label {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   font-weight: 500;
   margin-bottom: 4px;
 }
@@ -214,19 +214,19 @@
 .form-select, 
 .form-textarea {
   padding: 12px 14px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
   font-size: 0.95rem;
-  background-color: var(--bg-light);
-  transition: var(--transition);
-  color: var(--text-primary);
+  background-color: var(--projman--bg-light);
+  transition: var(--projman--transition);
+  color: var(--projman--text-primary);
 }
 
 .form-input:focus, 
 .form-select:focus, 
 .form-textarea:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--projman--primary-color);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
@@ -241,16 +241,16 @@
   justify-content: flex-end;
   gap: 16px;
   padding-top: 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--projman--border-color);
   margin-top: 16px;
 }
 
 .form-button {
   padding: 12px 24px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--projman--radius-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
   border: none;
   outline: none;
   font-size: 0.95rem;
@@ -261,22 +261,22 @@
 
 .next-button,
 .save-button {
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
   color: white;
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
 .next-button:hover,
 .save-button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--projman--primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
 }
 
 .edit-button,
 .cancel-button {
-  background-color: var(--bg-gray);
-  color: var(--text-primary);
+  background-color: var(--projman--bg-gray);
+  color: var(--projman--text-primary);
 }
 
 .edit-button:hover,
@@ -287,10 +287,10 @@
 
 /* Dashboard Styling */
 .project-planning-dashboard {
-  background-color: var(--bg-off-white);
-  border-radius: var(--radius-md);
+  background-color: var(--projman--bg-off-white);
+  border-radius: var(--projman--radius-md);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--projman--shadow-sm);
 }
 
 .dashboard-overview {
@@ -301,20 +301,20 @@
 }
 
 .stats-card {
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
+  background-color: var(--projman--bg-light);
+  border-radius: var(--projman--radius-md);
   padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
+  box-shadow: var(--projman--shadow-sm);
+  border: 1px solid var(--projman--border-color);
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .stats-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--projman--shadow-md);
 }
 
 .stats-icon {
@@ -330,17 +330,17 @@
 
 .stats-card.total-projects .stats-icon {
   background-color: rgba(37, 99, 235, 0.1);
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
 }
 
 .stats-card.in-progress .stats-icon {
   background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
+  color: var(--projman--warning-color);
 }
 
 .stats-card.completed .stats-icon {
   background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
+  color: var(--projman--success-color);
 }
 
 .stats-content {
@@ -350,20 +350,20 @@
 .stats-content h4 {
   margin: 0 0 4px 0;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   font-weight: 500;
 }
 
 .stats-value {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   margin-bottom: 4px;
 }
 
 .stats-details {
   font-size: 0.8rem;
-  color: var(--text-tertiary);
+  color: var(--projman---text-tertiary);
   display: flex;
   gap: 8px;
 }
@@ -372,14 +372,14 @@
   font-size: 1.4rem;
   margin-top: 0;
   margin-bottom: 24px;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   font-weight: 600;
 }
 
 .dashboard-tabs {
   display: flex;
   margin-bottom: 28px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman--border-color);
   gap: 8px;
 }
 
@@ -389,9 +389,9 @@
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   position: relative;
-  transition: var(--transition);
+  transition: var(--projman--transition);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -403,7 +403,7 @@
 }
 
 .dashboard-tab.active {
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
   font-weight: 600;
 }
 
@@ -414,15 +414,15 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
 }
 
 .dashboard-tab:hover:not(.active) {
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
 }
 
 .dashboard-tab:hover:not(.active)::after {
-  background-color: var(--border-color);
+  background-color: var(--projman--border-color);
 }
 
 .dashboard-cards {
@@ -433,13 +433,13 @@
 }
 
 .dashboard-card {
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
+  background-color: var(--projman--bg-light);
+  border-radius: var(--projman--radius-md);
   padding: 24px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--projman--shadow-sm);
   cursor: pointer;
-  transition: var(--transition);
-  border: 1px solid var(--border-color);
+  transition: var(--projman--transition);
+  border: 1px solid var(--projman--border-color);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -454,15 +454,15 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
   opacity: 0;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .dashboard-card:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-light);
+  box-shadow: var(--projman--shadow-md);
+  border-color: var(--projman--projman--primary-light);
 }
 
 .dashboard-card:hover::before {
@@ -474,7 +474,7 @@
   height: 40px;
   border-radius: 8px;
   background-color: rgba(37, 99, 235, 0.1);
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -489,25 +489,25 @@
 .dashboard-card h3 {
   margin-top: 0;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   font-size: 1.1rem;
   font-weight: 600;
 }
 
 .dashboard-card p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 /* Project Lists Styles */
 .project-lists-section {
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
+  background-color: var(--projman--bg-light);
+  border-radius: var(--projman--radius-md);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
+  box-shadow: var(--projman--shadow-sm);
+  border: 1px solid var(--projman--border-color);
   margin-top: 30px;
 }
 
@@ -520,7 +520,7 @@
 
 .section-title {
   margin: 0;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   font-size: 1.3rem;
   font-weight: 600;
 }
@@ -539,13 +539,13 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: var(--bg-gray);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  background-color: var(--projman--bg-gray);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .filter-button:hover {
@@ -557,10 +557,10 @@
   top: 100%;
   right: 0;
   margin-top: 4px;
-  background-color: var(--bg-light);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-md);
+  background-color: var(--projman--bg-light);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
+  box-shadow: var(--projman--shadow-md);
   z-index: 100;
   min-width: 180px;
   display: none;
@@ -578,18 +578,18 @@
   border: none;
   background: none;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .filter-option:hover {
-  background-color: var(--bg-gray);
+  background-color: var(--projman--bg-gray);
 }
 
 .filter-option.active {
   background-color: rgba(37, 99, 235, 0.1);
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
   font-weight: 500;
 }
 
@@ -606,7 +606,7 @@
 
 .list-header h3 {
   margin: 0;
-  color: var(--text-primary);
+  color: var(--projman--text-primary);
   font-size: 1.1rem;
   font-weight: 600;
   display: flex;
@@ -615,26 +615,26 @@
 }
 
 .list-icon {
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
 }
 
 .create-button {
   padding: 8px 16px;
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
   color: white;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--projman--radius-sm);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .create-button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--projman--primary-dark);
   transform: translateY(-1px);
 }
 
@@ -648,10 +648,10 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--projman--shadow-sm);
   margin-bottom: 16px;
 }
 
@@ -659,21 +659,21 @@
 .project-table td {
   padding: 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--projman--border-color);
   vertical-align: middle;
 }
 
 .project-table th {
-  background-color: var(--bg-gray);
+  background-color: var(--projman--bg-gray);
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 1px 0 var(--border-color);
+  box-shadow: 0 1px 0 var(--projman--border-color);
 }
 
 .project-table tr:last-child td {
@@ -681,7 +681,7 @@
 }
 
 .project-table tbody tr {
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .project-table tbody tr:hover {
@@ -700,22 +700,22 @@
 
 .project-table td .status-badge.active {
   background-color: rgba(16, 185, 129, 0.15);
-  color: var(--success-color);
+  color: var(--projman--success-color);
 }
 
 .project-table td .status-badge.pending {
   background-color: rgba(245, 158, 11, 0.15);
-  color: var(--warning-color);
+  color: var(--projman--warning-color);
 }
 
 .project-table td .status-badge.completed {
   background-color: rgba(37, 99, 235, 0.15);
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
 }
 
 .project-table td .status-badge.canceled {
   background-color: rgba(239, 68, 68, 0.15);
-  color: var(--error-color);
+  color: var(--projman--error-color);
 }
 
 .project-table .actions-cell {
@@ -726,42 +726,42 @@
 .project-table .table-action-button {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   padding: 6px 8px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--projman--radius-sm);
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
   margin-left: 4px;
 }
 
 .project-table .table-action-button:hover {
-  background-color: var(--bg-gray);
+  background-color: var(--projman--bg-gray);
 }
 
 .project-table .table-action-button.view:hover {
-  color: var(--accent-color);
+  color: var(--projman--accent-color);
 }
 
 .project-table .table-action-button.edit:hover {
-  color: var(--primary-color);
+  color: var(--projman--primary-color);
 }
 
 .project-table .table-action-button.delete:hover {
-  color: var(--error-color);
+  color: var(--projman--error-color);
 }
 
 .project-table .date-cell {
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   font-size: 0.85rem;
 }
 
 .no-data {
   text-align: center;
-  color: var(--text-tertiary);
+  color: var(--projman---text-tertiary);
   padding: 32px !important;
   font-style: italic;
-  background-color: var(--bg-off-white);
-  border-radius: var(--radius-sm);
+  background-color: var(--projman--bg-off-white);
+  border-radius: var(--projman--radius-sm);
 }
 
 /* Pagination styles */
@@ -771,12 +771,12 @@
   align-items: center;
   margin-top: 16px;
   padding: 12px 0;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--projman--border-color);
 }
 
 .pagination-info {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
 }
 
 .pagination-buttons {
@@ -785,19 +785,19 @@
 }
 
 .pagination-button {
-  background-color: var(--bg-light);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  background-color: var(--projman--bg-light);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
   padding: 8px 12px;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: var(--transition);
-  color: var(--text-primary);
+  transition: var(--projman--transition);
+  color: var(--projman--text-primary);
 }
 
 .pagination-button:hover:not(:disabled) {
-  background-color: var(--bg-gray);
-  border-color: var(--text-tertiary);
+  background-color: var(--projman--bg-gray);
+  border-color: var(--projman---text-tertiary);
 }
 
 .pagination-button:disabled {
@@ -831,7 +831,7 @@
   }
   
   .dashboard-tabs::-webkit-scrollbar-thumb {
-    background-color: var(--border-color);
+    background-color: var(--projman--border-color);
     border-radius: 4px;
   }
   
@@ -914,7 +914,7 @@
 
 .filter-label {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
 }
 
 .filter-buttons {
@@ -924,23 +924,23 @@
 
 .filter-button {
   padding: 6px 12px;
-  background-color: var(--bg-gray);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  background-color: var(--projman--bg-gray);
+  border: 1px solid var(--projman--border-color);
+  border-radius: var(--projman--radius-sm);
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--projman--text-secondary);
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--projman--transition);
 }
 
 .filter-button:hover {
-  background-color: var(--bg-light);
+  background-color: var(--projman--bg-light);
 }
 
 .filter-button.active {
-  background-color: var(--primary-color);
+  background-color: var(--projman--primary-color);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--projman--primary-color);
 }
 
 .equipment-items-container {
