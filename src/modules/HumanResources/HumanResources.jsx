@@ -133,7 +133,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
   const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
 
   // Add state for managing report visibility
-  const [activeReport, setActiveReport] = useState(null);
+  const [activeReport, setActiveReport] = useState('department');
 
   // Add state for managing report period
   const [activePeriod, setActivePeriod] = useState('monthly'); // default to monthly
