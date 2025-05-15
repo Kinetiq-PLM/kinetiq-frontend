@@ -73,7 +73,7 @@ const WorkforceAllocation = () => {
       try {
         // Fetch employees and departments
         const [employeesRes, deptsRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
         ]);
         
@@ -418,7 +418,7 @@ const handleAddAllocation = async (e) => {
       
       // Update to include proper headers and ensure data is formatted correctly
       const response = await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employeeId}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${employeeId}/`,
         { status: status },
         {
           headers: {

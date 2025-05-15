@@ -533,8 +533,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/archived/")
       ]);
       console.log("Fetched employee data:", activeRes.data);
       setEmployees(activeRes.data);
@@ -940,7 +940,7 @@ useEffect(() => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/", employeeData);
+      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -1022,7 +1022,7 @@ useEffect(() => {
       };
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${editingEmployee.employee_id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -1039,7 +1039,7 @@ useEffect(() => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       
       // Immediately update state to reflect changes
@@ -1064,7 +1064,7 @@ useEffect(() => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       
@@ -1094,7 +1094,7 @@ useEffect(() => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -2448,7 +2448,7 @@ const handleResignationSubmit = async (e) => {
       setCurrentEmployee(employee);
       
       // Fetch the employee to get the latest document data
-      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employee.employee_id}/`);
+      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${employee.employee_id}/`);
       const employeeData = response.data;
       
       console.log("Employee documents data:", employeeData.documents);
@@ -2528,7 +2528,7 @@ const handleResignationSubmit = async (e) => {
       });
       
       // Step 4: Fetch current documents for the employee
-      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`);
+      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`);
       
       // Step 5: Parse existing documents or create a new structure
       let documents = { required: {}, optional: {} };
@@ -2559,7 +2559,7 @@ const handleResignationSubmit = async (e) => {
       
       // Step 7: Update the employee's documents in your backend
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`, 
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`, 
         { documents: JSON.stringify(documents) }
       );
       

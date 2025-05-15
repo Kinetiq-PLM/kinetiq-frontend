@@ -137,7 +137,7 @@ const fetchOvertimeRequests = async () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/");
       // Ensure we're setting an array, even if the response is unexpected
       const responseData = Array.isArray(res.data) ? res.data : [];
       console.log("Employees data:", responseData);

@@ -203,7 +203,7 @@ useEffect(() => {
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/")
         ]);
         setDepartments(ensureArray(deptsRes.data));
         setPositions(ensureArray(positionsRes.data));

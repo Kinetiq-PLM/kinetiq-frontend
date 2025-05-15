@@ -79,7 +79,7 @@ const LeaveRequests = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/");
       setEmployees(res.data);
     } catch (err) {
       console.error("Failed to fetch employees:", err);
