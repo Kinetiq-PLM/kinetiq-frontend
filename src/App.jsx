@@ -367,10 +367,9 @@ function App() {
   const moduleSubmoduleFileNames = {
     Management: {
       "Dashboard": "ManagementDashboard",
-      "Project Approval": "ManagementApprovals"
-    },
+      "Project Approval": "ManagementApprovals",
       "Approvals": "ManagementApprovals",
-     },
+    },
     Administration: {
       "User": "User",
       "Item Masterlist": "ItemMasterlist",
