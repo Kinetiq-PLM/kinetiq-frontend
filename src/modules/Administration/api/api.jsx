@@ -1,7 +1,7 @@
 // src/modules/Administration/api/api.jsx
 import axios from 'axios';
-//const API_BASE_URL = 'http://127.0.0.1:8000/api';
-const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
+// const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -206,27 +206,29 @@ export const policiesAPI = {
     }
   },
 
-  // Fixed uploadPolicyDocument API function
-  uploadPolicyDocument: async (id, file) => {
+  // NEW: Get presigned URL for direct frontend upload
+  getUploadUrl: async (id, filename, contentType) => {
     try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      // Log the file being uploaded for debugging
-      console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}`);
-      
-      const response = await api.post(`/policies/${id}/upload_document/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          // Don't set the boundary - let the browser set it automatically
+      const response = await api.get(`/policies/${id}/get_upload_url/`, {
+        params: {
+          filename,
+          contentType
         }
       });
-      
       return response.data;
     } catch (error) {
-      console.error(`Error uploading document to policy ${id}:`, error);
-      console.error("Response data:", error.response?.data);
+      console.error(`Error getting upload URL for policy ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // NEW: Update policy with document URL after successful upload
+  updateDocumentUrl: async (id, fileUrl) => {
+    try {
+      const response = await api.post(`/policies/${id}/update_document_url/`, { fileUrl });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating document URL for policy ${id}:`, error);
       throw error;
     }
   },

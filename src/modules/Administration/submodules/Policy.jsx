@@ -240,37 +240,65 @@ const handlePolicyFormSubmit = async (values) => {
   }
 };
 
-  // Fixed handleUploadFormSubmit function
-  const handleUploadFormSubmit = async () => {
-    try {
-      if (!uploadFile) {
-        message.error("Please select a file to upload");
-        return;
-      }
-      
-      // Log the file details for debugging
-      console.log("Uploading file:", {
-        name: uploadFile.name,
-        size: uploadFile.size,
-        type: uploadFile.type
-      });
-      
-      // Call the API to upload the document
-      await policiesAPI.uploadPolicyDocument(selectedRecord.policy_id, uploadFile);
-      
-      message.success("Document uploaded successfully");
-      setUploadModalVisible(false);
-      fetchPolicies();
-    } catch (error) {
-      // Display more detailed error message
-      const errorMessage = error.response?.data?.error || 
-                          error.response?.data?.detail || 
-                          error.message || 
-                          "Unknown error";
-      message.error(`Failed to upload document: ${errorMessage}`);
-      console.error("Upload error details:", error);
+const handleUploadFormSubmit = async () => {
+  try {
+    if (!uploadFile) {
+      message.error("Please select a file to upload");
+      return;
     }
-  };
+    
+    // Log the file details for debugging
+    console.log("Uploading file:", {
+      name: uploadFile.name,
+      size: uploadFile.size,
+      type: uploadFile.type
+    });
+    
+    
+    const presignData = await policiesAPI.getUploadUrl(
+      selectedRecord.policy_id, 
+      uploadFile.name, 
+      uploadFile.type || 'application/octet-stream'
+    );
+    
+    
+    const { uploadUrl, fileUrl } = presignData;
+    
+    
+    const uploadingMsg = message.loading('Uploading file to storage...', 0);
+    
+    // Upload the file directly to S3 using the presigned URL
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': uploadFile.type || 'application/octet-stream'
+      },
+      body: uploadFile
+    });
+    
+    
+    uploadingMsg();
+    
+    if (!uploadResponse.ok) {
+      throw new Error(`S3 upload failed: ${uploadResponse.statusText}`);
+    }
+    
+    
+    await policiesAPI.updateDocumentUrl(selectedRecord.policy_id, fileUrl);
+    
+    message.success("Document uploaded successfully");
+    setUploadModalVisible(false);
+    fetchPolicies();
+  } catch (error) {
+    // Display more detailed error message
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.detail || 
+                        error.message || 
+                        "Unknown error";
+    message.error(`Failed to upload document: ${errorMessage}`);
+    console.error("Upload error details:", error);
+  }
+};
 
   const handleArchivePolicy = async (policyId) => {
     try {
