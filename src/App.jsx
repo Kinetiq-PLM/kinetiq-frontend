@@ -451,7 +451,11 @@ function App() {
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
       //"Quality Control": "QualityControl",
-      "Cost of Production": "CostOfProduction"
+      "Cost of Production": "CostOfProduction",
+      "Equipment": "Equipment",
+      "Labor": "Labor",
+      "Cost of Production": "CostOfProduction",
+      "Rework Cost": "ReworkCost",
     },
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",

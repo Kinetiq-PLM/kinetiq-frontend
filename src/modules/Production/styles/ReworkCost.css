@@ -1,0 +1,345 @@
+.rwprod {
+  display: flex;
+  background-color: #ffffff;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.rwprodcolumn {
+  display: flex;
+  padding: 3px;
+  padding-left: 15px;
+  gap: 15px;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+}
+
+.rw-expanded{
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  padding-right: 15px;
+}
+
+.rwprodheader-section {
+justify-content: space-between;
+align-items: center;
+margin-bottom: 30px;
+width: 100%;
+background-color: rgb(255, 255, 255);
+
+h1 {
+  font-family: Inter;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  padding-top: 10px;
+}
+
+}  
+.rwsearch-wrapper{
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+ 
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.rwsearch-bar {
+  padding: 8px 10px 8px 40px;
+  font-size: 15px;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  line-height: 24px;
+  border: 1px solid #ffffff;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  flex-grow: 1;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.rwsearch-bar:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+.cprwsearch-bar:hover {
+  border-radius: 10px;
+  border: 1.5px solid #A4A4A4;
+  background: #F5F5F5;
+}
+
+@media (max-width: 768px) {
+  .rwsearch-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .rwsearch-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.rwprotable {
+  height: 410px; /* Set a fixed height for the table */
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling for smaller screens */
+  overflow-y: auto; /* Enable vertical scrolling for smaller screens */
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  margin-top: 20px;
+}
+
+.rwprotable table {
+  width: 100%;
+  border-collapse: collapse; /* Remove gaps between table cells */
+  table-layout: fixed; /* Ensure consistent column widths */
+}
+
+.rwprotable th,
+.rwprotable td {
+  padding: 12px; /* Add consistent padding */
+  text-align: center; /* Center-align text */
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; /* Ensure consistent font size */
+  color: #333;
+  border-bottom: 1px solid #ddd; /* Add a border for separation */
+  white-space: normal;
+  word-break: break-word; /* Prevent text wrapping */
+}
+
+.rwprotable th {
+  background-color: #ffffff; /* Add a subtle background color for headers */
+  font-weight: 600; /* Make headers bold */
+  position: sticky; /* Keep headers visible when scrolling vertically */
+  top: 0;
+  z-index: 0;
+}
+
+.rwprotable td {
+  font-weight: 400; /* Normal font weight for table cells */
+}
+
+.rwprotable-scroll {
+    max-height: 400px; /* or whatever height you want */
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Custom scrollbar for the scrollable div */
+.rwprotable-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.rwprotable-scroll::-webkit-scrollbar-track {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.rwprotable-scroll::-webkit-scrollbar-thumb {
+    background: #5caaaa;
+    border-radius: 10px;
+}
+
+.rwprotable-scroll::-webkit-scrollbar-thumb:hover {
+    background: #007878;
+}
+
+.rw-rework-required select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 100px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.rw-rework-required select:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+.rw-rework-required select:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+/* New classes for selected value color */
+.rw-rework-required.rw-yes select {
+  background-color: #d0f4ff;
+  color: #093e8c;
+  border-color: #d0f4ff;
+}
+
+.rw-rework-required.rw-no select {
+  background-color: #b0f6b0;
+  color: #2da800;
+  border-color: #b0f6b0;
+}
+
+
+.rework-actual-quantity input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 40%;
+  box-sizing: border-box;
+}
+
+.rework-actual-quantity input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 40%;
+}
+
+.rework-actual-quantity input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.rework-additional-cost input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 70%;
+  box-sizing: border-box;
+}
+
+.rework-additional-cost input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 70%;
+}
+
+.rework-additional-cost input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.rework-additional-misc input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 70%;
+  box-sizing: border-box;
+}
+
+.rework-additional-misc input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 70%;
+}
+
+.rework-additional-misc input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.rework-notes-textarea {
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  width: 100%; /* Ensure it takes the full width of the container */
+  max-width: 300px; /* Set a maximum width */
+  min-width: 140px; /* Set a minimum width */
+  height: auto; /* Allow height to adjust automatically */
+  min-height: 86px; /* Set a minimum height */
+  box-sizing: border-box; /* Include padding and border in width/height */
+  resize: none; /* Disable manual resizing */
+  overflow-wrap: break-word; /* Ensure long words break properly */
+  white-space: pre-wrap; /* Preserve whitespace and wrap text */
+}
+
+.rework-notes-textarea:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  width: 100%; /* Maintain full width on focus */
+}
+
+.rework-notes-textarea:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+/* Style for the scrollbar in rework-notes (rework-notes-textarea) */
+.rework-notes-textarea::-webkit-scrollbar {
+  width: 8px; /* Set the width of the scrollbar */
+}
+
+.rework-notes-textarea::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light background for the scrollbar track */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.rework-notes-textarea::-webkit-scrollbar-thumb {
+  background: #00a8a8; /* Set the scrollbar thumb color */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.production-id-cell h1 {
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
