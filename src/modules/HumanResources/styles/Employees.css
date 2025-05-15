@@ -10,7 +10,7 @@
 .hr-employee-body-content-container {
   width: 100%;
   height: 100%; /* or auto, depending on your layout */
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -317,41 +317,102 @@
 .hr-tag.active {
   background-color: #e6ffe6;
   color: #008000;
+  border: 1px solid #b3e6b3;
 }
 .hr-tag.inactive {
   background-color: #ffe6e6;
   color: #cc0000;
+  border: 1px solid #ffb3b3;
 }
 .hr-tag.terminated {
   background-color: #e2e3e5;
   color: #41464b;
+  border: 1px solid #bbbdc0;
 }
 
 /* Employment Type Tags */
 .hr-tag.regular {
   background-color: #e6f3ff;
   color: #0066cc;
+  border: 1px solid #91d5ff;
 }
 
 .hr-tag.contractual {
   background-color: #fff3e6;
   color: #cc6600;
+  border: 1px solid #ffd591;
 }
 
 .hr-tag.seasonal {
   background-color: #ffb6f0;
   color: #3d0033;
+  border: 1px solid #ff80e5;
 }
 
 /* Yes/No Tags (for Is Supervisor and Is Active) */
 .hr-tag.yes {
   background-color: #e6ffe6;
   color: #008000;
+  border: 1px solid #b3e6b3;
 }
 
 .hr-tag.no {
   background-color: #ffe6e6;
   color: #cc0000;
+  border: 1px solid #ffb3b3;
+}
+
+/* Resignation Status Tags */
+.hr-tag.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.approved {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.rejected {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.hr-tag.not-started {
+  background-color: #fff3cd;
+  color: #766021;
+  border: 1px solid #ab8718; /* Darker shade of the text color */
+}
+
+.hr-tag.in-progress {
+  background-color: #cfe2ff;
+  color: #1d519e;
+  border: 1px solid #175ac5; /* Darker shade of the text color */
+}
+
+.hr-tag.completed {
+  background-color: #d1e7dd;
+  color: #147045;
+  border: 1px solid #1bb16d; /* Darker shade of the text color */
+}
+
+/* Clearance Status Pills for Resignation */
+.hr-tag.cleared {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #0a3b25; /* Darker shade of the text color */
+}
+
+.hr-tag.pending-clearance {
+  background-color: #fff3cd;
+  color: #664d03;
+  border: 1px solid #4d3a02; /* Darker shade of the text color */
+}
+
+.hr-tag.rejected-clearance {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #65181f; /* Darker shade of the text color */
 }
 
 /* ---------------------------------------------------------
@@ -634,6 +695,12 @@
   margin-bottom: 1.5rem;
 }
 
+.hr-two-col .hr-employee-modal-buttons {
+  grid-column: 1 / -1; /* Make buttons span all columns */
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
 /* Make buttons span full width */
 .hr-two-col-buttons {
   grid-column: 1 / -1; /* Span all columns */
@@ -644,13 +711,67 @@
 }
 
 /* ---------------------------------------------------------
+   BULK ACTIONS
+   --------------------------------------------------------- */
+/* Bulk Actions Container for Resignations */
+.hr-employee-bulk-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.hr-employee-bulk-action-btn {
+  background-color: teal;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hr-employee-bulk-action-btn:hover {
+  background-color: #008080cc;
+}
+
+/* ---------------------------------------------------------
+   FORM HELP TEXT
+   --------------------------------------------------------- */
+/* Form Help Text */
+.input-help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------
+   RESUME INFORMATION
+   --------------------------------------------------------- */
+/* Resume Information Container */
+.resume-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.current-resume {
+  display: flex;
+  align-items: center;
+  background-color: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* ---------------------------------------------------------
    RESPONSIVE DESIGN
    --------------------------------------------------------- */
 
 /* Base responsive adjustments */
 .hr-employee-body-content-container {
   width: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   padding: 1rem;
 }
 
@@ -1094,3 +1215,149 @@
     box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.25);
     outline: none;
   }
+
+/* Add at the end of the file */
+.hr-view-document-btn {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 0.25rem;
+  color: #1890ff;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.hr-view-document-btn:hover {
+  background-color: #bae7ff;
+  border-color: #69c0ff;
+  color: #0050b3;
+}
+
+.hr-no-document {
+  color: #888;
+}
+
+/* ---------------------------------------------------------
+   DOCUMENT MANAGEMENT STYLES
+   --------------------------------------------------------- */
+/* Updated Document Action Styles */
+.hr-document-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hr-view-btn {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.hr-view-btn:hover {
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+.hr-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background-color: #e6fffb;
+  color: #006d75;
+  border: 1px solid #87e8de;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.hr-upload-btn:hover {
+  background-color: #006d75;
+  color: white;
+  border-color: #006d75;
+}
+
+.hr-documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.hr-documents-table th,
+.hr-documents-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.hr-documents-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.hr-view-document-btn {
+  padding: 4px 8px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.hr-view-document-btn:hover {
+  background-color: #0069d9;
+  text-decoration: none;
+  color: white;
+}
+
+.hr-no-documents {
+  color: #888;
+  font-style: italic;
+  font-size: 0.8rem;
+}
+.upload-icon {
+  font-size: 0.9rem;
+}
+.hr-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+}
+
+.hr-spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

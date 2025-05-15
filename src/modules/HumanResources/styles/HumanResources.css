@@ -11,7 +11,7 @@
 .hr .hr-body-content-container {
   width: 100%;
   height: 100%;
-  max-width: 1600px; /* Add max-width to match other modules */
+  /* max-width: 1600px; Add max-width to match other modules */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -36,6 +36,68 @@
   margin: 0;
   margin-bottom: 1rem;
   font-size: 1.5rem;
+}
+
+/* Advanced HR Dashboard Header */
+.hr-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.hr-dashboard-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hr-dashboard-title h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.hr-dashboard-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #00a9ac 0%, #007a7c 100%);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 169, 172, 0.2);
+}
+
+.hr-dashboard-icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.hr-dashboard-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.hr-date-selector {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #495057;
+  background-color: #fff;
+}
+
+.hr-region-selector {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  min-width: 120px;
+  background-color: #fff;
 }
 
 /* Layout - Mobile first (stacked) */
@@ -70,7 +132,7 @@
 
 /* Add these styles to better size the internal calendar components */
 .hr-calendar-grid {
-  flex: 1;
+  /* flex: 1; */
   min-height: 0; /* Allows the grid to shrink if needed */
 }
 
@@ -98,6 +160,20 @@
 .hr-layout > h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
+}
+
+/* Calendar container adjustments - move calendar up */
+.hr-calendar-container {
+  width: 550px;
+  display: flex;
+  flex-direction: column;
+  margin-top: -0.75rem; /* Added negative margin to move calendar up */
+}
+
+/* Improve section header spacing in calendar container */
+.hr-calendar-container .hr-section-header {
+  padding-top: 0.75rem;
+  margin-bottom: 0.5rem; /* Reduced margin to compact layout */
 }
 
 /* Summary container - Mobile first */
@@ -433,11 +509,800 @@
   text-decoration: underline;
 }
 
-/* Calendar container adjustments */
-.hr-calendar-container {
-  width: 550px;
+/* Chart container styles */
+.hr-chart-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 280px; /* Ensure minimum height */
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.hr-metrics-chart-container {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #cdcdcd;
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced metrics section styling */
+.hr-metrics-section {
+  background: #fff;
+  padding: 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+  border: 1px solid #eaeaea;
+}
+
+/* Metrics Grid Layout */
+.hr-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+  margin-top: 1.75rem;
+}
+
+/* Increase chart card size for better visibility */
+.hr-chart-card {
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 380px; /* Increased height from 320px to 380px */
+  border: 1px solid #eaeaea;
+  transition: all 0.3s ease;
+  border-left-width: 5px; /* Make the border more prominent */
+}
+
+.hr-chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Employee Attendance chart - primary teal color */
+.hr-chart-card:nth-of-type(1) {
+  border-left-color: #00a9ac;
+}
+
+/* Recruitment Pipeline chart - accent3 purple color */
+.hr-chart-card:nth-of-type(2) {
+  border-left-color: #8884d8;
+}
+
+/* Performance Distribution chart - secondary green color */
+.hr-chart-card:nth-of-type(3) {
+  border-left-color: #66bc6d;
+}
+
+/* Leave Trends chart - info blue color */
+.hr-chart-card:nth-of-type(4) {
+  border-left-color: #0088FE;
+}
+
+/* Department Distribution chart - accent1 orange color */
+.hr-chart-card:nth-of-type(5) {
+  border-left-color: #fb923c;
+}
+
+/* Payroll Breakdown chart - similar to primary but slightly different */
+.hr-chart-card:nth-of-type(6) {
+  border-left-color: #00b0b5;
+}
+
+/* Employee Turnover chart - warning red color */
+.hr-chart-card:nth-of-type(7) {
+  border-left-color: #fb3c3c;
+}
+
+/* Workforce Allocation chart */
+.hr-chart-card:nth-of-type(8) {
+  border-left-color: #dec47d;
+}
+
+/* Training Completion chart */
+.hr-chart-card:nth-of-type(9) {
+  border-left-color: #8884d8;
+}
+
+/* Job Posting Analysis chart */
+.hr-chart-card:nth-of-type(10) {
+  border-left-color: #00a9ac;
+}
+
+.hr-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.hr-chart-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.hr-chart-content {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hr-metrics-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.hr-last-updated {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* Employment types container */
+.hr-employment-types-container {
+  margin-top: 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.hr-section-title {
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 0.5rem;
+}
+
+.hr-employment-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hr-employment-details .hr-detail-box {
+  flex: 1;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+.hr-employment-details .hr-detail-box:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+/* Key metrics cards with improved styling */
+.hr-key-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hr-metric-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid transparent;
+  border: 1px solid #eaeaea; /* Added complete border */
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-left-width: 5px; /* Make the border more prominent */
+}
+
+.hr-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.hr-metric-card.primary {
+  border-left-color: #00a9ac;
+}
+
+.hr-metric-card.warning {
+  border-left-color: #fb3c3c;
+}
+
+.hr-metric-card.success {
+  border-left-color: #66bc6d;
+}
+
+.hr-metric-card.info {
+  border-left-color: #0088FE;
+}
+
+.hr-metric-card.accent1 {
+  border-left-color: #fb923c;
+}
+
+.hr-metric-card.accent3 {
+  border-left-color: #8884d8;
+}
+
+.hr-metric-card::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #00a9ac;
+  animation: pulse 2s infinite;
+}
+
+.hr-metric-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.hr-metric-title {
+  color: #687C7B;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.hr-metric-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hr-metric-card.primary .hr-metric-icon {
+  background-color: rgba(0, 169, 172, 0.1);
+  color: #00a9ac; /* Matches primary border color */
+}
+
+.hr-metric-card.warning .hr-metric-icon {
+  background-color: rgba(251, 60, 60, 0.1); /* Changed to match red */
+  color: #fb3c3c; /* Changed to match red border color instead of orange */
+}
+
+.hr-metric-card.success .hr-metric-icon {
+  background-color: rgba(102, 188, 109, 0.1);
+  color: #66bc6d; /* Matches success border color */
+}
+
+.hr-metric-card.info .hr-metric-icon {
+  background-color: rgba(0, 136, 254, 0.1);
+  color: #0088FE; /* Matches info border color */
+}
+
+.hr-metric-card.accent1 .hr-metric-icon {
+  background-color: rgba(251, 146, 60, 0.1); /* Added for orange */
+  color: #fb923c; /* Matched with accent1 border color (orange) */
+}
+
+.hr-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: #333;
+}
+
+.hr-metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.875rem;
+}
+
+.hr-trend-up {
+  color: #66bc6d;
+}
+
+.hr-trend-down {
+  color: #ff6b6b;
+}
+
+/* Advanced two-column layout */
+.hr-main-grid {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.hr-column-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hr-column-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Employee Breakdown Panel */
+.hr-employee-breakdown {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #cdcdcd; 
+}
+
+.hr-employee-breakdown.interactive {
+  cursor: pointer;
+}
+
+.hr-employee-breakdown.interactive:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 169, 172, 0.05);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hr-employee-breakdown.interactive:hover:before {
+  opacity: 1;
+}
+
+.hr-employee-breakdown.interactive:hover .hr-chart-action {
+  background: rgba(0, 169, 172, 0.2);
+  transform: translateX(3px);
+}
+
+.hr-employee-breakdown.interactive:hover .hr-overlay-hint {
+  transform: translateY(0);
+}
+
+.hr-breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.hr-breakdown-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.hr-employee-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hr-employee-type-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hr-employee-type-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.hr-employee-type-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hr-employee-type-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.hr-employee-type-color.regular {
+  background-color: #00a9ac;
+}
+
+.hr-employee-type-color.contractual {
+  background-color: #fb923c;
+}
+
+.hr-employee-type-color.seasonal {
+  background-color: #66bc6d;
+}
+
+.hr-employee-type-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.hr-employee-type-count {
+  font-weight: 600;
+  color: #333;
+}
+
+.hr-donut-chart {
+  height: 180px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hr-overlay-hint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 169, 172, 0.9);
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.85rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+/* Department KPIs with modern styling and consistent border */
+.hr-department-kpis {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #cdcdcd; /* Added consistent border to match other sections */
+}
+
+.hr-metrics-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.hr-metrics-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: #687C7B;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.hr-metrics-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.hr-metrics-table tr:last-child td {
+  border-bottom: none;
+}
+
+.hr-dept-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.hr-progress-bar {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.hr-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #00a9ac 0%, #66bc6d 100%);
+}
+
+.hr-progress-label {
+  text-align: right;
+  font-size: 0.875rem;
+  color: #687C7B;
+  font-weight: 500;
+}
+
+/* Interactive elements styling */
+.hr-chart-card.interactive,
+.hr-employee-breakdown.interactive,
+.hr-table-container.interactive {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.hr-chart-card.interactive:before,
+.hr-employee-breakdown.interactive:before,
+.hr-table-container.interactive:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 169, 172, 0.05);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hr-chart-card.interactive:hover:before,
+.hr-employee-breakdown.interactive:hover:before,
+.hr-table-container.interactive:hover:before {
+  opacity: 1;
+}
+
+.hr-chart-action {
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 169, 172, 0.1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00a9ac;
+  transition: all 0.3s ease;
+}
+
+.hr-chart-card.interactive:hover .hr-chart-action,
+.hr-employee-breakdown.interactive:hover .hr-chart-action {
+  background: rgba(0, 169, 172, 0.2);
+  transform: translateX(3px);
+}
+
+.hr-table-container.interactive {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.hr-table-container.interactive:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.hr-table-container.interactive:hover .hr-overlay-hint {
+  transform: translateY(0);
+}
+
+.hr-chart-card.interactive:after,
+.hr-employee-breakdown.interactive:after,
+.hr-table-container.interactive:after {
+  content: "Click to view details";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hr-chart-card.interactive:hover:after,
+.hr-employee-breakdown.interactive:hover:after,
+.hr-table-container.interactive:hover:after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Pulse animation for action indicators */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 169, 172, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 169, 172, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 169, 172, 0);
+  }
+}
+
+/* Remove default underline on view-all buttons and improve clickability */
+.hr-view-all-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: rgba(0, 169, 172, 0.1);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.hr-view-all-btn:hover {
+  background-color: rgba(0, 169, 172, 0.2);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+/* Interactive table rows */
+.interactive-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.interactive-row:hover {
+  background-color: rgba(0, 169, 172, 0.05) !important;
+}
+
+.interactive-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background-color: #00a9ac;
+  transition: width 0.2s ease;
+}
+
+.interactive-row:hover::after {
+  width: 3px;
+}
+
+/* Time Period Selector Styling */
+.hr-metrics-period-selector {
+  display: flex;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.hr-period-btn {
+  border: none;
+  background: none;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #687C7B;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hr-period-btn:hover {
+  background-color: rgba(0, 169, 172, 0.1);
+  color: #00a9ac;
+}
+
+.hr-period-btn.active {
+  background-color: #00a9ac;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 169, 172, 0.2);
+}
+
+/* Ensure reports display properly with periods */
+.hr-report-container.monthly,
+.hr-report-container.quarterly,
+.hr-report-container.yearly {
+  transition: opacity 0.3s ease;
+}
+
+/* Enhanced scrollbar styling for report containers */
+.hr-report-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 rgba(0, 0, 0, 0.05);
+}
+
+.hr-report-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-report-container::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+.hr-report-container::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.hr-report-container::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Department and superiors lists scrollbar styling */
+.hr-report-chart-full div[style*="overflowY: auto"] {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 rgba(0, 0, 0, 0.05);
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1400px) {
+  .hr-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hr-key-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .hr-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .hr-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hr-chart-card {
+    height: 350px;
+  }
+
+  .hr-key-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hr-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hr-chart-card {
+    height: auto;
+    min-height: 320px;
+  }
+
+  .hr-key-metrics {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Tablet breakpoint (768px) */
@@ -448,7 +1313,8 @@
 
   .hr-dashboard h2 {
     font-size: 1.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
   }
 
   .hr-summary-details {
@@ -487,7 +1353,7 @@
 @media (min-width: 1200px) {
   .hr .hr-body-content-container {
     padding: 1rem;
-    max-width: 1600px;
+    /* max-width: 1600px; */
   }
 
   .hr-layout {
@@ -512,5 +1378,247 @@
   }
 }
 
-/* Tag styles and other styles remain unchanged */
-/* Keeping existing scrollbar styles, section headers, and status tags */
+/* Summary Reports Section Styles */
+.hr-summary-reports-section {
+  background: #fff;
+  padding: 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+  border: 1px solid #eaeaea;
+}
+
+.hr-reports-selector {
+  display: flex;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f7f9fa;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  /* Improved scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 169, 172, 0.3) rgba(0, 0, 0, 0.05);
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* For Webkit browsers (Chrome, Safari, Edge) */
+.hr-reports-selector::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; /* Thinner scrollbar for horizontal */
+}
+
+.hr-reports-selector::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 169, 172, 0.3);
+  border-radius: 10px;
+}
+
+.hr-reports-selector::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.hr-report-tab {
+  padding: 0.75rem 1.25rem;
+  background: none;
+  border: none;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border-radius: 6px;
+  margin-right: 0.25rem;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.hr-report-tab:hover {
+  color: #00a9ac;
+  background-color: rgba(0, 169, 172, 0.08);
+}
+
+.hr-report-tab.active {
+  color: #00a9ac;
+  background-color: rgba(0, 169, 172, 0.12);
+  box-shadow: 0 2px 4px rgba(0, 169, 172, 0.15);
+}
+
+.hr-report-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 2px;
+  background-color: #00a9ac;
+}
+
+/* Change back to column layout with wrap */
+.hr-report-container {
+  display: flex;
+  flex-direction: column; /* Change from row to column */
+  flex-wrap: wrap; /* Allow wrapping */
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+  overflow-x: hidden; /* Hide horizontal scrolling */
+  padding-bottom: 1rem;
+  align-items: stretch;
+  min-height: 300px;
+}
+
+/* Make summary cards display in a row at the top */
+.hr-report-summary-cards {
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  justify-content: space-between;
+}
+
+/* Adjust summary card styling */
+.hr-report-summary-card {
+  flex: 1; /* Makes each card take equal width */
+  min-width: 0; /* Allows cards to shrink if needed */
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Charts container to ensure charts are stacked below cards */
+.hr-report-charts-container {
+  width: 100%; /* Take full width */
+}
+
+/* Card styling for reports */
+.hr-report-summary-card {
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeaea;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+/* Animation for report summary cards on hover */
+.hr-report-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.hr-report-summary-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #687C7B;
+  font-weight: 500;
+}
+
+/* Report value styling */
+.hr-report-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: #00a9ac;
+}
+
+.hr-report-chart-small {
+  flex: 1;
+  margin-top: 0.5rem;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Empty chart states */
+.hr-empty-chart {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.hr-empty-chart-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hr-empty-chart p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.hr-empty-chart-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  font-size: 0.8rem;
+  font-style: italic;
+  background-color: #f9fafb;
+  border-radius: 4px;
+}
+
+/* New styles for 2-column charts layout */
+.hr-report-charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.hr-report-chart {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid #eaeaea;
+  height: 350px;
+}
+
+/* New single column chart layout */
+.hr-report-charts-single-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.hr-report-chart-full {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid #eaeaea;
+  min-height: 450px; /* Ensure enough space */
+}
+
+/* Improved department chart labels */
+.hr-chart-label {
+  font-size: 12px;
+  font-weight: 500;
+  fill: #333;
+  pointer-events: none;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 992px) {
+  .hr-report-charts-container {
+    grid-template-columns: 1fr;
+  }
+}

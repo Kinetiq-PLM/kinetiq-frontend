@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Employees.css";
 import { FiSearch } from "react-icons/fi";
-
+import { FiUpload } from 'react-icons/fi';
 const Employees = () => {
   /*************************************
    * States for Employees
@@ -11,6 +11,7 @@ const Employees = () => {
   const [archivedEmployees, setArchivedEmployees] = useState([]);
   const [selectedArchivedEmployees, setSelectedArchivedEmployees] = useState([]);
   const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
+  const [deptSuperiorNames, setDeptSuperiorNames] = useState({});
 
   // Add/Edit modals for Employees
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
@@ -22,7 +23,6 @@ const Employees = () => {
 
   // The new employee to add
   const [newEmployee, setNewEmployee] = useState({
-    user_id: "", // Auto-generated
     dept_id: "",
     dept_name: "",
     position_id: "",
@@ -66,6 +66,28 @@ const Employees = () => {
   // The position currently being edited
   const [editingPosition, setEditingPosition] = useState(null);
 
+  // State for resignations
+  const [resignations, setResignations] = useState([]);
+  const [showAddResignationModal, setShowAddResignationModal] = useState(false);
+  const [showEditResignationModal, setShowEditResignationModal] = useState(false);
+  const [editingResignation, setEditingResignation] = useState(null);
+    // State for resignation document management
+  const [currentResignation, setCurrentResignation] = useState(null);
+  const [viewingResignationDocs, setViewingResignationDocs] = useState(null);
+  const [showResignationDocumentsModal, setShowResignationDocumentsModal] = useState(false);
+  const [showUploadResignationDocModal, setShowUploadResignationDocModal] = useState(false);
+  const [uploadingResignationFile, setUploadingResignationFile] = useState(null);
+  const [resignationDocType, setResignationDocType] = useState('');
+  // Default state for new resignation
+  const [newResignation, setNewResignation] = useState({
+    employee_id: "",
+    notice_period_days: "",
+    hr_approver_id: "",
+    approval_status: "Pending",
+    clearance_status: "Not Started",
+    reason: "" // Add reason field
+  });
+
   /*************************************
    * Shared UI States
    *************************************/
@@ -79,7 +101,14 @@ const Employees = () => {
   const [toast, setToast] = useState(null);
   // for 3-dot menus in the table
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
-
+  // Add these after other state variables
+  const [showUploadDocumentModal, setShowUploadDocumentModal] = useState(false);
+  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [viewingDocuments, setViewingDocuments] = useState(null);
+  const [uploadingDocumentType, setUploadingDocumentType] = useState('');
+  const [uploadingFile, setUploadingFile] = useState(null);
+  const [uploadingStatus, setUploadingStatus] = useState('idle');
   // Helper to show toast messages
   const showToast = (message, success = true) => {
     setToast({ message, success });
@@ -485,19 +514,39 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/archived/")
       ]);
+      console.log("Fetched employee data:", activeRes.data);
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
     } catch (err) {
       console.error("Full error response:", err.response);
       const errorDetail = err.response?.data?.detail || 
-                         JSON.stringify(err.response?.data || {});
+                        JSON.stringify(err.response?.data || {});
       showToast(`Error: ${errorDetail}`, false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDeptSuperiorName = (employee) => {
+    if (!employee) return "—";
+    
+    // First check if dept_superior_name is directly available in the employee object
+    if (employee.dept_superior_name) {
+      return employee.dept_superior_name;
+    }
+    
+    // Fall back to existing lookup logic if the direct property isn't available
+    if (!employee.dept_id) return "—";
+    
+    const superior = departmentSuperiors.find(sup => 
+      sup.dept_id === employee.dept_id && 
+      (employee.dept_superior_id ? sup.dept_superior_id === employee.dept_superior_id : true)
+    );
+    
+    return superior ? superior.superior_name || "—" : "—";
   };
 
   const fetchDepartmentSuperiors = async () => {
@@ -566,6 +615,39 @@ const Employees = () => {
     fetchDepartmentSuperiors(); 
   }, []);
 
+useEffect(() => {
+  const fetchResignations = async () => {
+    try {
+      setLoading(true); // Set loading state when starting to fetch
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      
+      // Ensure employee names are present in the data
+      const enrichedResignations = resignationsRes.data.map(resignation => {
+        if (!resignation.employee_name && resignation.employee_id) {
+          // Find employee by ID to get their name
+          const employee = employees.find(emp => emp.employee_id === resignation.employee_id);
+          if (employee) {
+            return {
+              ...resignation,
+              employee_name: `${employee.first_name} ${employee.last_name}`
+            };
+          }
+        }
+        return resignation;
+      });
+      
+      setResignations(enrichedResignations);
+    } catch (err) {
+      console.error("Error fetching resignations:", err);
+      showToast("Failed to fetch resignations", false);
+    } finally {
+      setLoading(false); // Always ensure loading state is set to false
+    }
+  };
+
+  fetchResignations();
+}, [employees]); // Add employees as dependency to ensure names can be populated
+
   /***************************************************************************
    * Searching + Debounce
    ***************************************************************************/
@@ -626,6 +708,133 @@ const Employees = () => {
     return { paginated, totalPages, totalCount: filtered.length };
   };
 
+  const renderPagination = (totalPages) => (
+    <div className="hr-employee-pagination">
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
+      <div className="hr-employee-pagination-numbers">
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="hr-employee-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="hr-employee-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
+      </div>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
+      <select
+        className="hr-employee-pagination-size"
+        value={itemsPerPage}
+        onChange={(e) => {
+          setItemsPerPage(parseInt(e.target.value));
+          setCurrentPage(1);
+        }}
+      >
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={20}>20</option>
+      </select>
+    </div>
+  );
+
   /***************************************************************************
    * 3) Employees CRUD: Add, Edit, Archive, Unarchive
    ***************************************************************************/
@@ -633,7 +842,6 @@ const Employees = () => {
   // a) Add
   const handleAddEmployee = () => {
     setNewEmployee({
-      user_id: "", // Auto-generated
       dept_id: "",
       dept_name: "",
       position_id: "",
@@ -696,7 +904,6 @@ const Employees = () => {
     try {
       const employeeData = {
         // user_id: newEmployee.user_id || `TEMP-USER-${Date.now().toString(36)}`,
-        user_id: newEmployee.user_id || "",
         dept_id: newEmployee.dept_id,
         dept_name: newEmployee.dept_name || "",
         position_id: newEmployee.position_id,
@@ -714,7 +921,7 @@ const Employees = () => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/", employeeData);
+      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -732,7 +939,6 @@ const Employees = () => {
     // We fill editingEmployee with all the fields from the DB:
     setEditingEmployee({
       employee_id: emp.employee_id,
-      user_id: emp.user_id || "",
       dept_id: emp.dept_id || "",
       first_name: emp.first_name || "",
       last_name: emp.last_name || "",
@@ -797,7 +1003,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${editingEmployee.employee_id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -814,7 +1020,7 @@ const Employees = () => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       
       // Immediately update state to reflect changes
@@ -839,7 +1045,7 @@ const Employees = () => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       
@@ -869,7 +1075,7 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -1338,6 +1544,401 @@ const Employees = () => {
   };
 
   /***************************************************************************
+   * 5) Resignations CRUD: Add, Edit, View
+   ***************************************************************************/
+// Resignation document handling functions
+const handleViewResignationDocuments = async (resignation) => {
+  try {
+    setCurrentResignation(resignation);
+    
+    // Fetch the resignation to get the latest document data
+    const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${resignation.resignation_id}/`);
+    const resignationData = response.data;
+    
+    // Initialize with proper structure
+    let documents = { required: {}, optional: {} };
+    
+    if (resignationData.documents) {
+      try {
+        // Handle string or object format
+        documents = typeof resignationData.documents === 'string' 
+          ? JSON.parse(resignationData.documents) 
+          : resignationData.documents;
+        
+        // Ensure the structure has required properties
+        documents.required = documents.required || {};
+        documents.optional = documents.optional || {};
+      } catch (e) {
+        console.error("Error parsing documents:", e);
+        showToast("Error parsing document data", false);
+      }
+    }
+    
+    // Handle legacy document_url field
+    if (resignationData.document_url && !documents.required.resignation_letter) {
+      documents.required.resignation_letter = {
+        path: resignationData.document_url,
+        verified: false,
+        verified_by: null
+      };
+    }
+    
+    setViewingResignationDocs(documents);
+    setShowResignationDocumentsModal(true);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error fetching resignation documents:", err);
+    showToast("Failed to load resignation documents", false);
+  }
+};
+
+const handleUploadResignationDocument = (resignation) => {
+  setCurrentResignation(resignation);
+  setResignationDocType('');
+  setUploadingResignationFile(null);
+  setShowUploadResignationDocModal(true);
+  setDotsMenuOpen(null);
+};
+
+const handleResignationUploadSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!currentResignation || !uploadingResignationFile || !resignationDocType) {
+    showToast("Please select a file and document type", false);
+    return;
+  }
+  
+  try {
+    setUploadingStatus('uploading');
+    
+    // Define S3 directory based on resignation ID and document type
+    const S3_BASE_DIRECTORY = `Human_Resource_Management/Resignations/${currentResignation.resignation_id}/`;
+    const directory = `${S3_BASE_DIRECTORY}${resignationDocType}`;
+    
+    // Step 1: Get the upload URL from the API
+    const getUrlResponse = await axios.post('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
+      filename: uploadingResignationFile.name,
+      directory: directory,
+      contentType: uploadingResignationFile.type
+    });
+    
+    // Step 2: Extract the upload URL and public file URL
+    const { uploadUrl, fileUrl } = getUrlResponse.data;
+    
+    // Step 3: Upload the file to the provided URL with proper content type
+    await axios.put(uploadUrl, uploadingResignationFile, {
+      headers: {
+        'Content-Type': uploadingResignationFile.type
+      }
+    });
+    
+    // Step 4: Fetch current documents for the resignation
+    const resignationResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${currentResignation.resignation_id}/`);
+    
+    // Step 5: Parse existing documents or create a new structure
+    let documents = { required: {}, optional: {} };
+    
+    if (resignationResponse.data.documents) {
+      try {
+        documents = typeof resignationResponse.data.documents === 'string' 
+          ? JSON.parse(resignationResponse.data.documents) 
+          : resignationResponse.data.documents;
+          
+        documents.required = documents.required || {};
+        documents.optional = documents.optional || {};
+      } catch (e) {
+        console.error("Error parsing documents:", e);
+      }
+    }
+    
+    // Step 6: Update the documents structure with the new file
+    documents.required[resignationDocType] = {
+      verified: false,
+      path: fileUrl,
+      verified_by: null
+    };
+    
+    // Step 7: Update the resignation's documents in your backend
+    await axios.patch(
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${currentResignation.resignation_id}/`, 
+      { documents: JSON.stringify(documents) }
+    );
+    
+    // Update local state immediately
+    setResignations(prevResignations => 
+      prevResignations.map(res => {
+        if (res.resignation_id === currentResignation.resignation_id) {
+          return {
+            ...res,
+            documents: JSON.stringify(documents)
+          };
+        }
+        return res;
+      })
+    );
+    
+    showToast("Document uploaded successfully", true);
+    
+    // Reset form and close modal
+    setUploadingResignationFile(null);
+    setResignationDocType('');
+    setShowUploadResignationDocModal(false);
+    
+    // Refresh data after a short delay
+    setTimeout(() => {
+      const fetchResignations = async () => {
+        try {
+          const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+          setResignations(resignationsRes.data);
+        } catch (err) {
+          console.error("Error fetching resignations:", err);
+        }
+      };
+      fetchResignations();
+    }, 500);
+    
+  } catch (err) {
+    console.error("Error uploading document:", err);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to upload document";
+    showToast(errorMessage, false);
+  } finally {
+    setUploadingStatus('idle');
+  }
+};
+  // Handle form input changes
+  const handleResignationChange = (e) => {
+    const { name, value } = e.target;
+    setNewResignation(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+// In the handleResignationSubmit function (around line 1690)
+const handleResignationSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    // Validate required fields
+    if (!newResignation.employee_id || !newResignation.notice_period_days) {
+      showToast("Please fill all required fields", false);
+      return;
+    }
+    
+    // Find the employee to get their name
+    const selectedEmployee = employees.find(emp => emp.employee_id === newResignation.employee_id);
+    const employeeName = selectedEmployee ? 
+      `${selectedEmployee.first_name} ${selectedEmployee.last_name}` : '';
+    
+    // Send resignation data to the API with employee_name
+    await axios.post(
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
+      {
+        ...newResignation,
+        employee_name: employeeName,
+        reason: newResignation.reason || '' // Ensure reason field exists
+      }
+    );
+    
+    showToast("Resignation created successfully", true);
+    setShowAddResignationModal(false);
+    
+    // Refresh resignations
+    const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+    setResignations(resignationsRes.data);
+  } catch (err) {
+    console.error("Error creating resignation:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to create resignation";
+    showToast(errorMessage, false);
+  }
+};
+
+  // Handle edit resignation modal
+  const handleEditResignation = (resignation) => {
+    setEditingResignation({
+      ...resignation
+    });
+    setShowEditResignationModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  // Handle resignation edit submission
+  const handleEditResignationSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.patch(
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        editingResignation
+      );
+      
+      showToast("Resignation updated successfully", true);
+      setShowEditResignationModal(false);
+      
+      // Refresh resignations
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      setResignations(resignationsRes.data);
+    } catch (err) {
+      console.error("Error updating resignation:", err.response?.data || err);
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to update resignation";
+      showToast(errorMessage, false);
+    }
+  };
+
+  // Handle view resignation details
+  const handleViewResignationDetails = (resignation) => {
+    console.log("Viewing resignation details:", resignation);
+    setDotsMenuOpen(null);
+  };
+
+  // 3) Resignations Table
+  const renderResignationsTable = (rawData) => {
+    try {
+      // Check if rawData is valid
+      if (!Array.isArray(rawData)) {
+        console.error("Invalid resignations data:", rawData);
+        return <div className="hr-employee-no-results">Error loading resignations data. Please refresh.</div>;
+      }
+      
+      const { paginated, totalPages } = filterAndPaginate(rawData);
+      
+      if (loading) return <div className="hr-employee-no-results">Loading resignations...</div>;
+      if (!paginated.length) return <div className="hr-employee-no-results">No resignations found.</div>;
+      
+      return (
+        <>
+          <div className="hr-employee-table-wrapper">
+            <div className="hr-employee-table-scrollable">
+              <table className="hr-employee-table">
+                <thead>
+                  <tr>
+                    <th>Resignation ID</th>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Submission Date</th>
+                    <th>Notice Period (Days)</th>
+                    <th>Clearance Status</th>
+                    <th>Reason</th>
+                    <th>Documents</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((resignation, index) => (
+                    <tr key={resignation.resignation_id || index}>
+                      <td>{resignation?.resignation_id || "-"}</td>
+                      <td>{resignation?.employee_id || "-"}</td>
+                      <td>{resignation?.employee_name || "-"}</td>
+                      <td>{resignation?.submission_date || "-"}</td>
+                      <td>{resignation?.notice_period_days || "-"}</td>
+                      <td>
+                        {resignation?.clearance_status ? (
+                          <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
+                            {resignation.clearance_status}
+                          </span>
+                        ) : "-"}
+                      </td>
+                      <td>{resignation?.reason || "-"}</td>
+                      <td>
+                      <div className="hr-document-actions">
+                      {(() => {
+                        try {
+                          // Parse documents only once if it's a string
+                          let hasDocuments = false;
+                          
+                          // Check for both document_url and structured documents
+                          if (resignation.document_url) {
+                            hasDocuments = true;
+                          } else if (resignation.documents) {
+                            const docs = typeof resignation.documents === 'string' 
+                              ? JSON.parse(resignation.documents) 
+                              : resignation.documents;
+                            
+                            // Check both required and optional sections
+                            if (docs) {
+                              const requiredDocs = docs.required || {};
+                              const optionalDocs = docs.optional || {};
+                              hasDocuments = Object.keys(requiredDocs).length > 0 || Object.keys(optionalDocs).length > 0;
+                            }
+                          }
+                          
+                          if (hasDocuments) {
+                            return (
+                              <button className="hr-view-btn" onClick={() => handleViewResignationDocuments(resignation)}>
+                                View Files
+                              </button>
+                            );
+                          }
+                          return <span className="hr-no-documents">No files</span>;
+                        } catch (e) {
+                          console.error("Error parsing documents:", e);
+                          return <span className="hr-no-documents">Error loading documents</span>;
+                        }
+                      })()}
+                        
+                        <button 
+                          className="hr-upload-btn"
+                          onClick={() => handleUploadResignationDocument(resignation)}
+                        >
+                          <FiUpload className="upload-icon" /> Upload Document
+                        </button>
+                      </div>
+                    </td>
+                      <td>{resignation?.created_at || "-"}</td>
+                      <td>{resignation?.updated_at || "-"}</td>
+                      <td className="hr-employee-actions">
+                        <div
+                          className="hr-employee-dots"
+                          onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                        >
+                          ⋮
+                          {dotsMenuOpen === index && (
+                            <div className="hr-employee-dropdown">
+                              <div
+                                className="hr-employee-dropdown-item"
+                                onClick={() => handleEditResignation(resignation)}
+                              >
+                                Edit
+                              </div>
+                              <div
+                                className="hr-employee-dropdown-item"
+                                onClick={() => handleViewResignationDetails(resignation)}
+                              >
+                                View Details
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {renderPagination(totalPages)}
+        </>
+      );
+    } catch (error) {
+      console.error("Error rendering resignations table:", error);
+      return (
+        <div className="hr-employee-error">
+          <h3>Error displaying resignations</h3>
+          <p>Something went wrong while displaying resignations data.</p>
+          <button onClick={() => window.location.reload()}>Refresh Page</button>
+        </div>
+      );
+    }
+  };
+
+  /***************************************************************************
    * Render Table for Employees or Positions
    ***************************************************************************/
 
@@ -1357,8 +1958,8 @@ const Employees = () => {
               <tr>
                 {isArchived && <th>Select</th>}
                 <th>Employee ID</th>
-                <th>User ID</th>
                 <th>Department ID</th>
+                <th>Department Superior Name</th>
                 <th>Department Name</th>
                 <th>Position ID</th>
                 <th>Position Title</th>
@@ -1366,10 +1967,11 @@ const Employees = () => {
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Phone</th>
-                <th>Employment Type</th> {/* Added column */}
-                <th>Reports To</th> {/* Added column */}
+                <th>Employment Type</th>
+                <th>Reports To</th>
                 <th>Status</th>
                 <th>Is Supervisor</th>
+                <th>Documents</th>
                 <th>Created At</th>
                 <th>Updated At</th>
                 <th></th>
@@ -1388,8 +1990,8 @@ const Employees = () => {
                     </td>
                   )}
                   <td>{emp.employee_id}</td>
-                  <td>{emp.user_id}</td>
                   <td>{emp.dept_id}</td>
+                  <td>{getDeptSuperiorName(emp)}</td>
                   <td>{emp.dept_name || "—"}</td>
                   <td>{emp.position_id || "—"}</td>
                   <td>{emp.position_title || "—"}</td>
@@ -1403,6 +2005,7 @@ const Employees = () => {
                     </span>
                   </td>
                   <td>{emp.reports_to || "—"}</td>
+                 
                   <td>
                     <span className={`hr-tag ${emp.status.toLowerCase()}`}>
                       {emp.status}
@@ -1412,6 +2015,49 @@ const Employees = () => {
                     <span className={`hr-tag ${emp.is_supervisor ? "yes" : "no"}`}>
                       {emp.is_supervisor ? "Yes" : "No"}
                     </span>
+                  </td>
+                  <td>
+                    <div className="hr-document-actions">
+                    {(() => {
+                      try {
+                        // Parse documents only once if it's a string
+                        let hasDocuments = false;
+                        if (emp.documents) {
+                          const docs = typeof emp.documents === 'string' 
+                            ? JSON.parse(emp.documents) 
+                            : emp.documents;
+                          
+                          // Check both required and optional sections
+                          if (docs) {
+                            const requiredDocs = docs.required || {};
+                            const optionalDocs = docs.optional || {};
+                            hasDocuments = Object.keys(requiredDocs).length > 0 || Object.keys(optionalDocs).length > 0;
+                          }
+                        }
+                        
+                        if (hasDocuments) {
+                          return (
+                            <button className="hr-view-btn" onClick={() => handleViewDocuments(emp)}>
+                              View Files
+                            </button>
+                          );
+                        }
+                        return <span className="hr-no-documents">No files</span>;
+                      } catch (e) {
+                        console.error("Error parsing documents:", e);
+                        return <span className="hr-no-documents">Error loading documents</span>;
+                      }
+                    })()}
+                      
+                      {!isArchived && (
+                        <button 
+                          className="hr-upload-btn"
+                          onClick={() => handleUploadDocument(emp)}
+                        >
+                          <FiUpload className="upload-icon" /> Upload Document
+                        </button>
+                      )}
+                    </div>
                   </td>
                   <td>{emp.created_at}</td>
                   <td>{emp.updated_at}</td>
@@ -1814,6 +2460,170 @@ const Employees = () => {
   };
 
   /***************************************************************************
+   * Functions for Document Management
+   ***************************************************************************/
+  const handleViewDocuments = async (employee) => {
+    try {
+      setCurrentEmployee(employee);
+      
+      // Fetch the employee to get the latest document data
+      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${employee.employee_id}/`);
+      const employeeData = response.data;
+      
+      console.log("Employee documents data:", employeeData.documents);
+      
+      // Initialize with proper structure
+      let documents = { required: {}, optional: {} };
+      
+      if (employeeData.documents) {
+        try {
+          // Handle string or object format
+          documents = typeof employeeData.documents === 'string' 
+            ? JSON.parse(employeeData.documents) 
+            : employeeData.documents;
+          
+          // Ensure the structure has required properties
+          documents.required = documents.required || {};
+          documents.optional = documents.optional || {};
+          
+          console.log("Parsed documents:", documents);
+        } catch (e) {
+          console.error("Error parsing documents:", e);
+          showToast("Error parsing document data", false);
+        }
+      }
+      
+      setViewingDocuments(documents);
+      setShowDocumentsModal(true);
+      setDotsMenuOpen(null);
+    } catch (err) {
+      console.error("Error fetching employee documents:", err);
+      showToast("Failed to load employee documents", false);
+    }
+  };
+
+  const handleUploadDocument = (employee) => {
+    setCurrentEmployee(employee);
+    setUploadingDocumentType('');
+    setUploadingFile(null);
+    setShowUploadDocumentModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!currentEmployee || !uploadingFile || !uploadingDocumentType) {
+      showToast("Please select a file and document type", false);
+      return;
+    }
+    
+    try {
+      setUploadingStatus('uploading');
+      
+      // Define S3 directory based on employee ID and document type
+      const S3_BASE_DIRECTORY = `Human_Resource_Management/Employees/${currentEmployee.employee_id}/`;
+      const directory = `${S3_BASE_DIRECTORY}${uploadingDocumentType}`;
+      
+      console.log("Uploading to directory:", directory);
+      
+      // Step 1: Get the upload URL from the API
+      const getUrlResponse = await axios.post('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
+        filename: uploadingFile.name,
+        directory: directory,
+        contentType: uploadingFile.type
+      });
+      
+      console.log("S3 URL response:", getUrlResponse.data);
+      
+      // Step 2: Extract the upload URL and public file URL
+      const { uploadUrl, fileUrl } = getUrlResponse.data;
+      
+      // Step 3: Upload the file to the provided URL with proper content type
+      await axios.put(uploadUrl, uploadingFile, {
+        headers: {
+          'Content-Type': uploadingFile.type
+        }
+      });
+      
+      // Step 4: Fetch current documents for the employee
+      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`);
+      
+      // Step 5: Parse existing documents or create a new structure
+      let documents = { required: {}, optional: {} };
+      
+      if (employeeResponse.data.documents) {
+        try {
+          // Parse if it's a string, otherwise use as is
+          documents = typeof employeeResponse.data.documents === 'string' 
+            ? JSON.parse(employeeResponse.data.documents) 
+            : employeeResponse.data.documents;
+            
+          // Ensure the structure has required and optional properties
+          documents.required = documents.required || {};
+          documents.optional = documents.optional || {};
+        } catch (e) {
+          console.error("Error parsing documents:", e);
+        }
+      }
+      
+      // Step 6: Update the documents structure with the new file
+      documents.required[uploadingDocumentType] = {
+        verified: false,
+        path: fileUrl,
+        verified_by: null
+      };
+      
+      console.log("Updated documents structure:", documents);
+      
+      // Step 7: Update the employee's documents in your backend
+      await axios.patch(
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/${currentEmployee.employee_id}/`, 
+        { documents: JSON.stringify(documents) }
+      );
+      
+      // Step 8: Update local state immediately before fetching fresh data
+      setEmployees(prevEmployees => 
+        prevEmployees.map(emp => {
+          if (emp.employee_id === currentEmployee.employee_id) {
+            return {
+              ...emp,
+              documents: JSON.stringify(documents) // Make sure it's stringified like the API expects
+            };
+          }
+          return emp;
+        })
+      );
+      
+      showToast("Document uploaded successfully", true);
+      
+      // Reset form and close modal
+      setUploadingFile(null);
+      setUploadingDocumentType('');
+      setShowUploadDocumentModal(false);
+      
+      // Fetch fresh data after a short delay to ensure database has updated
+      setTimeout(() => {
+        fetchEmployees();
+      }, 500);
+      
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      // More detailed error logging
+      if (err.response) {
+        console.error("Response data:", err.response.data);
+        console.error("Response status:", err.response.status);
+      }
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to upload document";
+      showToast(errorMessage, false);
+    } finally {
+      setUploadingStatus('idle');
+    }
+  };
+
+  /***************************************************************************
    * Main Render
    ***************************************************************************/
   return (
@@ -1904,6 +2714,12 @@ const Employees = () => {
                   )}
                 </>
               )}
+
+              {activeTab === "Resignations" && (
+                <button className="hr-employee-add-btn" onClick={() => setShowAddResignationModal(true)}>
+                  + Add Resignation
+                </button>
+              )}
             </div>
           </div>
 
@@ -1932,6 +2748,15 @@ const Employees = () => {
               >
                 Positions <span className="hr-employee-count">{positions.length}</span>
               </button>
+              <button
+                className={activeTab === "Resignations" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Resignations");
+                  setCurrentPage(1);
+                }}
+              >
+                Resignations <span className="hr-employee-count">{resignations.length}</span>
+              </button>
             </div>
           </div>
 
@@ -1942,10 +2767,12 @@ const Employees = () => {
                   showArchived ? archivedEmployees : employees,
                   showArchived
                 )
-              : renderPositionsTable(
+              : activeTab === "Positions"
+              ? renderPositionsTable(
                   showArchived ? archivedPositions : positions,
                   showArchived
-                )}
+                )
+              : renderResignationsTable(resignations)}
           </div>
         </div>
       </div>
@@ -1957,12 +2784,14 @@ const Employees = () => {
             <h3 style={{ marginBottom: "1rem" }}>Add New Employee</h3>
             <form onSubmit={submitEmployeeModal} className="hr-employee-modal-form hr-two-col">
               {/* System Fields - Read Only */}
+              
+              
+              {/* System Timestamps */}
               <div className="form-group">
-                <label>User ID</label>
-                <input 
+                <label>Created At</label>
+                <input
                   type="text"
-                  name="user_id"
-                  value={newEmployee.user_id}
+                  value={newEmployee.created_at}
                   disabled
                   placeholder="Auto-generated"
                 />
@@ -1980,7 +2809,6 @@ const Employees = () => {
                       ...prev,
                       dept_id: e.target.value,
                       dept_name: selectedDept?.dept_name || ""
-                      // Position fields are no longer reset
                     }));
                   }}
                   required
@@ -2019,7 +2847,7 @@ const Employees = () => {
                 </select>
               </div>
 
-              {/* Personal Information */}
+              {/* Personal Information - First Name and Last Name now properly side by side */}
               <div className="form-group">
                 <label>First Name *</label>
                 <input
@@ -2079,7 +2907,11 @@ const Employees = () => {
                   required
                 >
                   <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="On Leave">On Leave</option>
+                  <option value="Deployed">Deployed</option>
+                  <option value="Terminated">Terminated</option>
+                  <option value="Resigned">Resigned</option>
+                  
                 </select>
               </div>
 
@@ -2111,17 +2943,6 @@ const Employees = () => {
                       value: e.target.checked
                     }
                   })}
-                />
-              </div>
-
-              {/* System Timestamps */}
-              <div className="form-group">
-                <label>Created At</label>
-                <input
-                  type="text"
-                  value={newEmployee.created_at}
-                  disabled
-                  placeholder="Auto-generated"
                 />
               </div>
 
@@ -2200,17 +3021,7 @@ const Employees = () => {
                     </div>
                   </div>
                   
-                  <div className="form-group">
-                    <label>User ID</label>
-                    <div className="input-with-icon readonly">
-                      <i className="user-icon">👤</i>
-                      <input
-                        type="text"
-                        value={editingEmployee.user_id}
-                        disabled
-                      />
-                    </div>
-                  </div>
+                  
                   
                   <div className="form-group">
                     <label htmlFor="first_name">First Name <span className="required">*</span></label>
@@ -2294,9 +3105,12 @@ const Employees = () => {
                       className={`status-select ${editingEmployee.status.toLowerCase()}`}
                     >
                       <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Deployed">Deployed</option>
+                      <option value="Terminated">Terminated</option>
+                      <option value="Resigned">Resigned</option>
                     </select>
-                    <small>Active employees have system access</small>
+                    <small>Reflects the employee's current working status</small>
                   </div>
                   
                   <div className="form-group">
@@ -2704,6 +3518,430 @@ const Employees = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ========== Resignations: Add Modal ========== */}
+      {showAddResignationModal && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Add New Resignation</h3>
+            <form onSubmit={handleResignationSubmit} className="hr-employee-modal-form hr-two-col">
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Employee *</label>
+                  <select 
+                    name="employee_id" 
+                    value={newResignation.employee_id} 
+                    onChange={handleResignationChange}
+                    required
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {Array.isArray(employees) ? employees.map(emp => (
+                      <option key={emp.employee_id} value={emp.employee_id}>
+                        {emp.first_name} {emp.last_name}
+                      </option>
+                    )) : <option value="">No employees available</option>}
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Notice Period (Days) *</label>
+                  <input 
+                    type="number" 
+                    name="notice_period_days" 
+                    value={newResignation.notice_period_days} 
+                    onChange={handleResignationChange}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>HR Approver</label>
+                  <select 
+                    name="hr_approver_id" 
+                    value={newResignation.hr_approver_id} 
+                    onChange={handleResignationChange}
+                  >
+                    <option value="">-- Select HR Approver --</option>
+                    {Array.isArray(employees) ? employees
+                      .filter(employee => 
+                        employee.dept_name === "Human Resources" || 
+                        employee.dept_id === "HR-DEPT-2025-e9fa93" ||
+                        employee.dept?.dept_name === "Human Resources" || 
+                        employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
+                      )
+                      .map(employee => (
+                        <option key={employee.employee_id} value={employee.employee_id}>
+                          {employee.first_name} {employee.last_name}
+                        </option>
+                    )) : <option value="">No HR employees available</option>}
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Approval Status</label>
+                  <select
+                    name="approval_status"
+                    value={newResignation.approval_status || "Pending"}
+                    onChange={handleResignationChange}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Clearance Status</label>
+                  <select
+                    name="clearance_status"
+                    value={newResignation.clearance_status || "Not Started"}
+                    onChange={handleResignationChange}
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                <label>Reason for Resignation</label>
+                <textarea
+                  name="reason"
+                  value={newResignation.reason || ''}
+                  onChange={handleResignationChange}
+                  placeholder="Enter reason for resignation"
+                  rows="3"
+                ></textarea>
+              </div>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button type="submit" className="submit-btn">Submit</button>
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn" 
+                  onClick={() => setShowAddResignationModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========== Resignations: Edit Modal ========== */}
+      {showEditResignationModal && editingResignation && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Edit Resignation</h3>
+            <form onSubmit={handleEditResignationSubmit} className="hr-employee-modal-form hr-two-col">
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Employee ID</label>
+                  <input 
+                    type="text"
+                    value={editingResignation.employee_id || ""}
+                    disabled
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Notice Period (Days)</label>
+                  <input 
+                    type="number"
+                    value={editingResignation.notice_period_days || ""}
+                    disabled
+                  />
+                </div>
+              </div>
+              
+              <div className="form-column">
+
+                
+                <div className="form-group">
+                  <label>Clearance Status *</label>
+                  <select
+                    name="clearance_status"
+                    value={editingResignation.clearance_status || "Not Started"}
+                    onChange={(e) => setEditingResignation({
+                      ...editingResignation,
+                      clearance_status: e.target.value
+                    })}
+                    required
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button type="submit" className="submit-btn">Save Changes</button>
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn" 
+                  onClick={() => setShowEditResignationModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+          {/* Resignation Documents Viewing Modal */}
+          {showResignationDocumentsModal && viewingResignationDocs && (
+            <div className="hr-employee-modal-overlay" onClick={() => setShowResignationDocumentsModal(false)}>
+              <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
+                <h3>Resignation Documents</h3>
+                
+                <div className="documents-section">
+                  <h4>Required Documents</h4>
+                  <table className="hr-documents-table">
+                    <thead>
+                      <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Verified By</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {viewingResignationDocs && viewingResignationDocs.required && 
+                      Object.entries(viewingResignationDocs.required).map(([docType, docInfo]) => (
+                        <tr key={docType}>
+                          <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                          <td>
+                            <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
+                              {docInfo.verified ? 'Verified' : 'Pending'}
+                            </span>
+                          </td>
+                          <td>{docInfo.verified_by || '-'}</td>
+                          <td>
+                            {docInfo.path && (
+                              <a 
+                                href={docInfo.path} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hr-view-document-btn"
+                              >
+                                View / Download
+                              </a>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {(!viewingResignationDocs?.required || Object.keys(viewingResignationDocs.required).length === 0) && (
+                        <tr>
+                          <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="hr-employee-modal-buttons">
+                  <button className="hr-employee-cancel-btn" onClick={() => setShowResignationDocumentsModal(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Resignation Document Upload Modal */}
+          {showUploadResignationDocModal && (
+            <div className="hr-employee-modal-overlay">
+              <div className="hr-employee-modal">
+                <h3>Upload Document for Resignation {currentResignation?.resignation_id}</h3>
+                
+                <form onSubmit={handleResignationUploadSubmit} className="hr-employee-modal-form">
+                  <div className="form-group">
+                    <label htmlFor="resignation-document-type">Document Type *</label>
+                    <select 
+                      id="resignation-document-type"
+                      value={resignationDocType}
+                      onChange={(e) => setResignationDocType(e.target.value)}
+                      required
+                    >
+                      <option value="">Select Document Type</option>
+                      <option value="resignation_letter">Resignation Letter</option>
+                      <option value="clearance_form">Clearance Form</option>
+                      <option value="exit_interview">Exit Interview</option>
+                      <option value="handover_document">Handover Document</option>
+                      <option value="other_document">Other Supporting Document</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="resignation-document-file">File *</label>
+                    <input 
+                      type="file"
+                      id="resignation-document-file"
+                      onChange={(e) => setUploadingResignationFile(e.target.files[0])}
+                      required
+                    />
+                    <span className="input-help-text">
+                      Max file size: 5MB. Supported formats: PDF, DOC, DOCX, JPG, PNG.
+                    </span>
+                  </div>
+                  
+                  <div className="hr-employee-modal-buttons">
+                    <button 
+                      type="button" 
+                      className="hr-employee-cancel-btn" 
+                      onClick={() => {
+                        setShowUploadResignationDocModal(false);
+                        setResignationDocType("");
+                        setUploadingResignationFile(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    
+                    <button 
+                      type="submit" 
+                      className="submit-btn"
+                      disabled={uploadingStatus === 'uploading' || !uploadingResignationFile || !resignationDocType}
+                    >
+                      {uploadingStatus === 'uploading' ? 'Uploading...' : 'Upload Document'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+      {/* Document Upload Modal */}
+      {showUploadDocumentModal && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Upload Document for {currentEmployee?.first_name} {currentEmployee?.last_name}</h3>
+            
+            <form onSubmit={handleUploadSubmit} className="hr-employee-modal-form">
+              <div className="form-group">
+                <label htmlFor="document-type">Document Type *</label>
+                <select 
+                  id="document-type"
+                  value={uploadingDocumentType}
+                  onChange={(e) => setUploadingDocumentType(e.target.value)}
+                  required
+                >
+                  <option value="">Select Document Type</option>
+                  <option value="psa_birth_cert">PSA Birth Certificate</option>
+                  <option value="nbi_clearance">NBI Clearance</option>
+                  <option value="sss_id">SSS ID</option>
+                  <option value="pagibig_id">Pag-IBIG ID</option>
+                  <option value="philhealth_id">PhilHealth ID</option>
+                  <option value="tin_id">TIN ID</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="document-file">File *</label>
+                <input 
+                  type="file"
+                  id="document-file"
+                  onChange={(e) => setUploadingFile(e.target.files[0])}
+                  required
+                />
+                <span className="input-help-text">
+                  Max file size: 5MB. Supported formats: PDF, DOC, DOCX, JPG, PNG.
+                </span>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn"
+                  onClick={() => {
+                    setShowUploadDocumentModal(false);
+                    setUploadingDocumentType("");
+                    setUploadingFile(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={uploadingStatus === 'uploading' || !uploadingFile || !uploadingDocumentType}
+                >
+                  {uploadingStatus === 'uploading' ? 'Uploading...' : 'Upload Document'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+        {/* Documents Viewing Modal */}
+        {showDocumentsModal && viewingDocuments && (
+          <div className="hr-employee-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
+            <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
+              <h3>Employee Documents</h3>
+              
+              <div className="documents-section">
+                <h4>Required Documents</h4>
+                <table className="hr-documents-table">
+                  <thead>
+                    <tr>
+                      <th>Document Type</th>
+                      <th>Status</th>
+                      <th>Verified By</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {viewingDocuments && viewingDocuments.required && 
+                    Object.entries(viewingDocuments.required).map(([docType, docInfo]) => (
+                      <tr key={docType}>
+                        <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                        <td>
+                          <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
+                            {docInfo.verified ? 'Verified' : 'Pending'}
+                          </span>
+                        </td>
+                        <td>{docInfo.verified_by || '-'}</td>
+                        <td>
+                          {docInfo.path && (
+                            <a 
+                              href={docInfo.path} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="hr-view-document-btn"
+                            >
+                              View / Download
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {(!viewingDocuments?.required || Object.keys(viewingDocuments.required).length === 0) && (
+                      <tr>
+                        <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button className="hr-employee-cancel-btn" onClick={() => setShowDocumentsModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      {/* Uploading Overlay */}
+      {uploadingStatus === 'uploading' && (
+        <div className="hr-loading-overlay">
+          <div className="hr-spinner"></div>
+          <p>Uploading document...</p>
         </div>
       )}
 

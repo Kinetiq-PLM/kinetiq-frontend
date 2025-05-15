@@ -11,7 +11,7 @@
 .hr-department-body-content-container {
   width: 100%;
   height: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -557,7 +557,7 @@
 .hr-department-body-content-container {
   min-width: unset; /* Remove fixed min-width */
   width: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   padding: 1rem;
 }
 
