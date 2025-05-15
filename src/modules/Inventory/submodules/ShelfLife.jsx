@@ -12,6 +12,7 @@ const BodyContent = () => {
     // State for selected status and date
     const [selectedStatus, setSelectedStatus] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
+    const [selectedWarehouse, setSelectedWarehouse] = useState("");
 
     // State for selected row
     const [selectedRow, setSelectedRow] = useState(null);
@@ -27,6 +28,8 @@ const BodyContent = () => {
     }
 
 
+    // Local: http://127.0.0.1:8000/
+    // AWS: https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev
 
     useEffect(() => {
         fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
@@ -77,14 +80,15 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         "Expiring Items": {
-            columns: ["Item Name", "Item Type", "Item No", "Expiry Date", "Quantity", "Status"],
+            columns: ["Item Name", "Item Type", "Item No", "Expiry Date", "Quantity", "Status", "Warehouse"],
             data: expiringItemsData.map((item) => ({
                 "Item Name": item?.item_name || "---",
                 "Item Type": item?.item_type || "---",
                 "Item No": item?.item_no || "---",
-                "Expiry Date": item?.expiry,
+                "Expiry Date": item?.expiry.split("T")[0] || "---",
                 "Quantity": item?.current_quantity,
                 "Status": item?.expiry_report_status,
+                "Warehouse": item?.warehouse_location || "---",
             })),
         },
 
@@ -138,7 +142,8 @@ const BodyContent = () => {
         const statusMatch = selectedStatus ? item["Status"]?.toLowerCase() === selectedStatus.toLowerCase() : true;
         console.log("Status Match:", statusMatch, "item status:", item.status, "selected status from filter:", selectedStatus);
         const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
-        return statusMatch && dateMatch;
+        const warehouseMatch = selectedWarehouse ? item["Warehouse"]?.toLowerCase() === selectedWarehouse.toLowerCase() : true;
+        return statusMatch && dateMatch && warehouseMatch;
     });
 
 
@@ -177,12 +182,36 @@ const BodyContent = () => {
 
                 {/* Flex container seperating nav and main content */}
                 <div className="flex-col flex-wrap w-full min-h-screen space-y-2 px-3 py-[5rem]">
+                
+                {/* Header Section */}
+                <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
+                    <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
+                        <div className="flex-col w-full">
+                        <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY: SHELF LIFE</h2>
+                        <p className="text-base font-semibold mt-1">Selected Warehouse: <span className="font-normal">{selectedWarehouse}</span></p>
+                    </div>
 
-                    <nav className="md:flex flex-1 justify-between items-center p-2">
+                        <div className="w-">
 
-                        <div className="text-sm text-gray-500 md:order-2">
-                            {formatPhilippineTime(currentTime)}
+                            {/* Select Warehouse & Transfer Form Parent Box */}
+
+                            <label htmlFor="warehouse-select" className="block text-sm font-medium text-gray-700 mb-1">Filter by Warehouse</label>
+                            <select className="w-full md:w-[300px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}>
+                                <option value="">All Warehouses</option>
+                                {warehouseList.map((d) => (
+                                    <option key={d} value={d.warehouse_location}>{d.warehouse_location}</option>
+                                ))}
+                            </select>
+
+                        
                         </div>
+                    </div>
+                </div>
+                
+                    {/* NAVIGATION SECTION */}
+                    {/* <nav className="md:flex flex-1 justify-between items-center p-2">
+
+                        
 
                         <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 md:order-1">
                             {tabs.map((tab) => (
@@ -200,31 +229,31 @@ const BodyContent = () => {
                         </div>
 
 
-                    </nav>
+                    </nav> */}
 
                     {/* FILTER SECTION */}
-                    <div className="flex flex-wrap md:max-h-8 space-x-3 space-y-3 mt-1 mb-1 p-1">
-                        <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
-                            <option value="">Filter Status</option>
-                            {["Pending", "Approved"].map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
+                    <div className="flex flex-wrap justify-between md:max-h-8 space-x-3 space-y-3 mt-5 mb-1 p-1">
+                        <div className="flex flex-wrap md:max-h-8 space-x-3 space-y-3">
+                            <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                                <option value="">Filter Status</option>
+                                {["Pending", "Approved"].map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
 
-                        <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
-                            <option value="">Filter Period</option>
-                            {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                <option key={d} value={d}>{d}</option>
-                            ))}
-                        </select>
+                            <select className="w-full md:w-[230px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+                                <option value="">Filter Period</option>
+                                {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
+                                    <option key={d} value={d}>{d}</option>
+                                ))}
+                            </select>                            
+                        </div>
 
-                        <select className="w-full md:w-[150px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer">
-                            <option value="">Filter Warehouse</option>
-                            {warehouseList.map((d) => (
-                                <option key={d} value={d}>{d.warehouse_location}</option>
-                            ))}
-                        </select>
 
+
+                        <div className="text-sm text-gray-500 md:order-2">
+                            {formatPhilippineTime(currentTime)}
+                        </div>
 
 
                     </div>
