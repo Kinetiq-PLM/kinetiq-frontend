@@ -102,7 +102,9 @@ const Recruitment = () => {
     interview_type: "Technical", // Default value
     interviewer_id: "",
     status: "Scheduled", // Default value
-    notes: ""
+    notes: "",
+    feedback: "",
+    rating: null
   });
 
   const [showEditOnboardingModal, setShowEditOnboardingModal] = useState(false);
@@ -1509,16 +1511,17 @@ const handleAddClick = () => {
   } else if (activeTab === "Candidates") {
     handleAddCandidate();
   } else if (activeTab === "Interviews") {
-    // Initialize with current date
-    const today = new Date().toISOString().split('T')[0];
-    
+    // Reset the new interview form values
     setNewInterview({
       candidate_id: "",
-      interview_date: today,
-      interview_time: "09:00",
+      interview_date: "",
+      interview_time: "",
+      interview_type: "Technical",
       interviewer_id: "",
       status: "Scheduled",
-      notes: ""
+      notes: "",
+      feedback: "",
+      rating: null
     });
     setShowAddInterviewModal(true);
   } else if (activeTab === "Onboarding") {
@@ -2415,6 +2418,12 @@ const handleEditOnboardingTask = (task) => {
                 </button>
               )}
               
+              {activeTab === "Interviews" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Interview
+                </button>
+              )}
+              
               {activeTab !== "Job Postings" && (
                 <button
                   className="recruitment-add-btn"
@@ -2492,7 +2501,11 @@ const handleEditOnboardingTask = (task) => {
           <div className="recruitment-table-container">
             {activeTab === "Candidates" && renderCandidatesTable(showArchived ? archivedCandidates : candidates, showArchived)}
             {activeTab === "Job Postings" && renderJobPostingsTable(showArchived ? archivedJobPostings : jobPostings, showArchived)}
-            {activeTab === "Interviews" && renderInterviewsTable(showArchived ? archivedInterviews : interviews, showArchived)}
+            {activeTab === "Interviews" && (
+              <>
+                {renderInterviewsTable(showArchived ? archivedInterviews : interviews, showArchived)}
+              </>
+            )}
             {activeTab === "Onboarding" && renderOnboardingTable(showArchived ? archivedOnboardingTasks : onboardingTasks, showArchived)}
           </div>
         </div>
@@ -3602,58 +3615,34 @@ const handleEditOnboardingTask = (task) => {
               <div className="recruitment-form-two-columns">
                 <div className="form-column">
                   <div className="form-group">
-                    <label>Employee *</label>
+                    <label>Candidate *</label>
                     <select 
-                      name="employee_id" 
-                      value={newOnboardingTask.employee_id} 
+                      name="candidate_id" 
+                      value={newOnboardingTask.candidate_id || ""} 
                       onChange={handleOnboardingTaskChange}
                       required
                     >
-                      <option value="">-- Select Employee --</option>
-                      {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
                         </option>
                       ))}
                     </select>
                   </div>
                   
                   <div className="form-group">
-                    <label>Task Name *</label>
-                    <input 
-                      type="text" 
-                      name="task_name" 
-                      value={newOnboardingTask.task_name} 
-                      onChange={handleOnboardingTaskChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Due Date *</label>
-                    <input 
-                      type="date" 
-                      name="due_date" 
-                      value={newOnboardingTask.due_date} 
-                      onChange={handleOnboardingTaskChange}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Assigned To *</label>
-                    <select
-                      name="assigned_to"
-                      value={newOnboardingTask.assigned_to}
+                    <label>Job *</label>
+                    <select 
+                      name="job_id" 
+                      value={newOnboardingTask.job_id || ""} 
                       onChange={handleOnboardingTaskChange}
                       required
                     >
-                      <option value="">-- Select Assignee --</option>
-                      {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
+                      <option value="">-- Select Job --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.position_title}
                         </option>
                       ))}
                     </select>
@@ -3663,43 +3652,98 @@ const handleEditOnboardingTask = (task) => {
                     <label>Status</label>
                     <select
                       name="status"
-                      value={newOnboardingTask.status}
+                      value={newOnboardingTask.status || "Pending"}
                       onChange={handleOnboardingTaskChange}
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
                       <option value="Completed">Completed</option>
-                      <option value="Delayed">Delayed</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Priority</label>
-                    <select
-                      name="priority"
-                      value={newOnboardingTask.priority}
-                      onChange={handleOnboardingTaskChange}
-                    >
-                      <option value="High">High</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Low">Low</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Offer Pending">Offer Pending</option>
+                      <option value="Offer Sent">Offer Sent</option>
+                      <option value="Offer Accepted">Offer Accepted</option>
+                      <option value="Offer Rejected">Offer Rejected</option>
+                      <option value="Contract Pending">Contract Pending</option>
+                      <option value="Contract Signed">Contract Signed</option>
                     </select>
                   </div>
                 </div>
                 
-                <div className="form-group full-width">
-                  <label>Description</label>
-                  <textarea
-                    name="description"
-                    value={newOnboardingTask.description}
-                    onChange={handleOnboardingTaskChange}
-                    placeholder="Detailed description of the task..."
-                  />
+                <div className="form-column">
+                  <h4>Offer Details</h4>
+                  <div className="form-group">
+                    <label>Salary</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.salary" 
+                      value={newOnboardingTask.offer_details?.salary || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      name="offer_details.start_date" 
+                      value={newOnboardingTask.offer_details?.start_date || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <input 
+                      type="text" 
+                      name="offer_details.benefits" 
+                      value={newOnboardingTask.offer_details?.benefits || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column full-width">
+                  <h4>Contract Details</h4>
+                  <div className="form-group">
+                    <label>Contract Type</label>
+                    <select
+                      name="contract_details.type"
+                      value={newOnboardingTask.contract_details?.type || ""}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="">-- Select Contract Type --</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Duration (months)</label>
+                    <input 
+                      type="number" 
+                      name="contract_details.duration" 
+                      value={newOnboardingTask.contract_details?.duration || ""} 
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Additional Terms</label>
+                    <textarea
+                      name="contract_details.terms"
+                      value={newOnboardingTask.contract_details?.terms || ""}
+                      onChange={handleOnboardingTaskChange}
+                    />
+                  </div>
                 </div>
               </div>
               
               <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Create Task</button>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Creating..." : "Create Onboarding Task"}
+                </button>
                 <button 
                   type="button" 
                   className="cancel-btn" 
