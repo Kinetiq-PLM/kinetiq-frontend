@@ -23,7 +23,7 @@ const PayrollSummaryReport = ({ payroll: propPayroll = [] }) => {
 
       try {
         console.log("Fetching payroll data directly...");
-        const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/");
+        const response = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/");
         setPayroll(response.data || []);
       } catch (err) {
         console.error("Error fetching payroll data:", err);

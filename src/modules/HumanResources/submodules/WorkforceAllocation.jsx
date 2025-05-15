@@ -55,8 +55,8 @@ const WorkforceAllocation = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/archived/")
+        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/"),
+        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/archived/")
       ]);
       setAllocations(activeRes.data);
       setArchivedAllocations(archivedRes.data);
@@ -73,8 +73,8 @@ const WorkforceAllocation = () => {
       try {
         // Fetch employees and departments
         const [employeesRes, deptsRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
+          axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
+          axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
         ]);
         
         const allEmployees = employeesRes.data;
@@ -172,7 +172,7 @@ const WorkforceAllocation = () => {
       const wasDeployed = allocation?.approval_status === "Approved" && 
                         allocation?.status === "Active";
       
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/archive/`);
+      await axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/archive/`);
       showToast("Allocation archived successfully");
       
       // If employee was deployed, update their status back to Active
@@ -190,7 +190,7 @@ const WorkforceAllocation = () => {
   const handleUnarchive = async (id) => {
     try {
       await axios.post(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+        `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
         {}, // Empty payload
         {
           headers: {
@@ -218,7 +218,7 @@ const WorkforceAllocation = () => {
       await Promise.all(
         selectedArchivedAllocations.map(id => 
           axios.post(
-            `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+            `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
             {},
             {
               headers: {
@@ -284,7 +284,7 @@ const handleAddAllocation = async (e) => {
     console.log("Sending payload:", payload);
     
     const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/", 
+      "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/", 
       payload,
       {
         headers: {
@@ -379,7 +379,7 @@ const handleAddAllocation = async (e) => {
       const employeeChanged = originalAllocation && originalAllocation.employee_id !== editingAllocation.employee_id;
       
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${editingAllocation.allocation_id}/`, 
+        `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${editingAllocation.allocation_id}/`, 
         {
           employee: editingAllocation.employee_id,
           hr_approver: editingAllocation.hr_approver,
@@ -418,7 +418,7 @@ const handleAddAllocation = async (e) => {
       
       // Update to include proper headers and ensure data is formatted correctly
       const response = await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employeeId}/`,
+        `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employeeId}/`,
         { status: status },
         {
           headers: {
