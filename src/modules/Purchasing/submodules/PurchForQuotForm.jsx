@@ -17,13 +17,13 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   const [formData, setFormData] = useState({
     vendor: "",
     documentNumber: "",
-    status: "",
+    status: "Pending",
     contactPerson: "",
     documentDate: new Date().toISOString().split("T")[0],
     currency: "Philippine Peso",
     validUntil: "",
     requiredDate: "",
-    buyer: "",
+    buyer: employeeName,
     owner: "",
     deliveryLocation: "",
     remarks: "",
@@ -338,7 +338,7 @@ const fetchQuotations = async () => {
     const payload = {
       quotation_id: "",
       document_no: formData.documentNumber || null,
-      status: formData.status || null,
+      status: formData.status || "Pending",
       valid_date: formData.validUntil || null,
       document_date: formData.documentDate || null,
       required_date: formData.requiredDate || null,
@@ -374,112 +374,112 @@ const fetchQuotations = async () => {
   };
 
   const handleAddToList = async () => {
-    try {
-      // Check if a quotation already exists for the given request_id
-      const listResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
-      const existingQuotation = listResponse.data.find(
-        (quotation) => quotation.request_id === requestId
-      );
-  
-      if (existingQuotation) {
-        console.log("Existing Quotation Found:", existingQuotation);
-        return existingQuotation; // Return the existing quotation
-      }
-  
-      // If no existing quotation, create a new one
-      const payload = {
-        document_no: parseInt(formData.documentNumber),
-        status: formData.status || "Pending",
-        valid_date: formData.validUntil || null,
-        document_date: formData.documentDate || null,
-        required_date: formData.requiredDate || null,
-        total_before_discount: formData.totalAmount || null,
-        discount_percent: formData.discountPercentage || null,
-        freight: formData.freight || null,
-        tax: formData.tax || null,
-        total_payment: formData.totalPaymentDue || null,
-        vendor_code: formData.vendor || null,
-        request_id: requestId || null,
-        remarks: formData.remarks || null,
-        delivery_loc: formData.delivery_loc || null,
-        downpayment_request: formData.downpayment_request.enabled
-          ? parseFloat(formData.downpayment_request.value) || 0
-          : null,
-      };
-  
-      console.log("Payload being sent:", payload);
-  
-      const createResponse = await axios.post(
-        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
-        payload
-      );
-  
-      console.log("New Quotation Created:", createResponse.data);
-      return createResponse.data; // Return the newly created quotation
-    } catch (error) {
-      console.error("Error in handleAddToList:", error.response?.data || error.message);
-      alert("Failed to add or fetch quotation. Check the console for details.");
-      throw error;
+  try {
+    // Check if a quotation already exists for the given request_id
+    const listResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
+    const existingQuotation = listResponse.data.find(
+      (quotation) => quotation.request_id === requestId
+    );
+
+    if (existingQuotation) {
+      console.log("Existing Quotation Found:", existingQuotation);
+      return existingQuotation; // Return the existing quotation without reloading
     }
-  };
+
+    // If no existing quotation, create a new one
+    const payload = {
+      document_no: parseInt(formData.documentNumber),
+      status: formData.status || "Pending",
+      valid_date: formData.validUntil || null,
+      document_date: formData.documentDate || null,
+      required_date: formData.requiredDate || null,
+      total_before_discount: formData.totalAmount || null,
+      discount_percent: formData.discountPercentage || null,
+      freight: formData.freight || null,
+      tax: formData.tax || null,
+      total_payment: formData.totalPaymentDue || null,
+      vendor_code: formData.vendor || null,
+      request_id: requestId || null,
+      remarks: formData.remarks || null,
+      delivery_loc: formData.delivery_loc || null,
+      downpayment_request: formData.downpayment_request.enabled
+        ? parseFloat(formData.downpayment_request.value) || 0
+        : null,
+    };
+
+    console.log("Payload being sent:", payload);
+
+    const createResponse = await axios.post(
+      "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
+      payload
+    );
+
+    console.log("New Quotation Created:", createResponse.data);
+    return createResponse.data; // Return the newly created quotation
+  } catch (error) {
+    console.error("Error in handleAddToList:", error.response?.data || error.message);
+    alert("Failed to add or fetch quotation. Check the console for details.");
+    throw error;
+  }
+};
   
 
   const handleSendTo = async () => {
-    try {
-      setIsPopupVisible(false);
-  
-      // Fetch or create the quotation
-      const quotationResponse = await handleAddToList();
-  
-      if (!quotationResponse?.quotation_id) {
-        throw new Error("Failed to get valid quotation ID");
-      }
-  
-      console.log("Fetched Quotation ID:", quotationResponse.quotation_id);
-  
-      // Prepare purchase order payload
-      const poPayload = {
-        quotation_id: quotationResponse.quotation_id,
-        order_date: new Date().toISOString().split("T")[0],
-        delivery_date: formData.deliveryDate || new Date().toISOString().split("T")[0],
-        document_date: formData.documentDate || new Date().toISOString().split("T")[0],
-        status: formData.popupStatus || "Ordered",
-      };
-  
-      console.log("Purchase Order Payload:", JSON.stringify(poPayload, null, 2));
-  
-      // Create purchase order
-      const response = await axios.post(
-        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/",
-        poPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-  
-      console.log("Purchase Order Response:", response.data);
-      alert("Purchase order created successfully!");
-    } catch (error) {
-      console.error("Purchase Order Error Details:", {
-        message: error.message,
-        responseData: error.response?.data,
-        status: error.response?.status,
-        headers: error.response?.headers,
-        config: error.config,
-      });
-  
-      let errorMessage = "Failed to create purchase order. ";
-      if (error.response?.data) {
-        errorMessage += JSON.stringify(error.response.data);
-      }
-  
-      alert(errorMessage);
-      setIsPopupVisible(true); // Reopen popup to try again
+  try {
+    setIsPopupVisible(false);
+
+    // Fetch or create the quotation
+    const quotationResponse = await handleAddToList();
+
+    if (!quotationResponse?.quotation_id) {
+      throw new Error("Failed to get valid quotation ID");
     }
-  };
-  
+
+    console.log("Fetched Quotation ID:", quotationResponse.quotation_id);
+
+    // Prepare purchase order payload
+    const poPayload = {
+      quotation_id: quotationResponse.quotation_id,
+      order_date: new Date().toISOString().split("T")[0],
+      delivery_date: formData.deliveryDate || new Date().toISOString().split("T")[0],
+      document_date: formData.documentDate || new Date().toISOString().split("T")[0],
+      status: formData.popupStatus || "Ordered",
+    };
+
+    console.log("Purchase Order Payload:", JSON.stringify(poPayload, null, 2));
+
+    // Create purchase order
+    const response = await axios.post(
+      "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/",
+      poPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Purchase Order Response:", response.data);
+    alert("Purchase order created successfully!");
+    window.location.reload(); // Reload the page after successful submission
+  } catch (error) {
+    console.error("Purchase Order Error Details:", {
+      message: error.message,
+      responseData: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+      config: error.config,
+    });
+
+    let errorMessage = "Failed to create purchase order. ";
+    if (error.response?.data) {
+      errorMessage += JSON.stringify(error.response.data);
+    }
+
+    alert(errorMessage);
+    setIsPopupVisible(true); // Reopen popup to try again
+  }
+};
 
 const getItemName = (id, type) => {
   if (type === "Raw Material") {
@@ -593,13 +593,16 @@ useEffect(() => {
               </div>
               <div className="form-group">
                 <div className="label-req">
-                <label>Status</label></div>
-                <select name="status" value={formData.status || "Pending"} onChange={handleInputChange} disabled>
+                <label>Status</label><select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                >
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
-                  
-                </select>
+                </select></div>
+                
               </div>
 
               <div className="form-group">
