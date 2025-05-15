@@ -1105,8 +1105,7 @@ const renderJobPostingsTable = (data, isArchived = false) => {
     );
   };
 
-  // Function to render interviews table
-// renderInterviewsTable function - update or replace as needed
+// Function to render interviews table
 const renderInterviewsTable = (data, isArchived = false) => {
   const { paginated, totalPages } = filterAndPaginate(data);
   
@@ -1126,10 +1125,12 @@ const renderInterviewsTable = (data, isArchived = false) => {
                 {isArchived && <th>Select</th>}
                 <th>Interview ID</th>
                 <th>Candidate</th>
-                <th>Position</th>
-                <th>Date</th>
+                <th>Candidate ID</th>
+                <th>Job ID</th>
+                <th>Interview Date</th>
                 <th>Status</th>
                 <th>Interviewer</th>
+                <th>Interviewer ID</th>
                 <th>Feedback</th>
                 <th>Rating</th>
                 <th>Created At</th>
@@ -1147,6 +1148,15 @@ const renderInterviewsTable = (data, isArchived = false) => {
                 const formattedTime = interviewDate ? 
                   interviewDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-';
                 
+                // Get candidate name from candidates list if not already available
+                let candidateName = interview.candidate_name;
+                if (!candidateName && interview.candidate_id) {
+                  const candidate = candidates.find(c => c.candidate_id === interview.candidate_id);
+                  if (candidate) {
+                    candidateName = `${candidate.first_name} ${candidate.last_name}`;
+                  }
+                }
+                
                 return (
                 <tr key={interview.interview_id} className={isArchived ? "recruitment-archived-row" : ""}>
                   {isArchived && (
@@ -1159,15 +1169,17 @@ const renderInterviewsTable = (data, isArchived = false) => {
                     </td>
                   )}
                   <td>{interview.interview_id}</td>
-                  <td>{interview.candidate_name || interview.candidate_id}</td>
-                  <td>{interview.position_title || interview.job_id}</td>
+                  <td>{candidateName || 'Unknown'}</td>
+                  <td>{interview.candidate_id}</td>
+                  <td>{interview.job_id}</td>
                   <td>{formattedDate} {formattedTime}</td>
                   <td>
                     <span className={`recruitment-tag ${(interview.status || '').toLowerCase().replace(/\s+/g, '-')}`}>
                       {interview.status || 'Not Set'}
                     </span>
                   </td>
-                  <td>{interview.interviewer_name || interview.interviewer_id}</td>
+                  <td>{interview.interviewer_name || 'Unknown'}</td>
+                  <td>{interview.interviewer_id}</td>
                   <td>{interview.feedback || '-'}</td>
                   <td>{interview.rating ? `${interview.rating}/5` : '-'}</td>
                   <td>{formatDate(interview.created_at)}</td>
