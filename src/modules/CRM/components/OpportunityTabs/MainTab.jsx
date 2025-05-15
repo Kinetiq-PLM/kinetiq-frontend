@@ -34,7 +34,7 @@ export default function MainTab({ employee_id }) {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const customerOppQuery = useQuery({
     queryKey: ["customerOpps"],
     queryFn: async () =>
@@ -144,6 +144,31 @@ export default function MainTab({ employee_id }) {
     setSelectedEmployee(selectedOpportunity.salesrep);
   }, [selectedOpportunity]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          [
+            "REG-2504-fd99",
+            "CTR-2504-d25f",
+            "REG-2504-8f19",
+            "REG-2504-cf80",
+            "SEA-2504-8d37",
+            "SEA-2504-cc4a",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
+
   return (
     <section className="h-full">
       {/* Header Section */}
@@ -221,7 +246,7 @@ export default function MainTab({ employee_id }) {
                   <Button
                     type="primary"
                     onClick={() => setIsNewOpportunityModalOpen(true)}
-                    disabled={!selectedCustomer}
+                    disabled={!selectedCustomer || btnDisabled}
                   >
                     New
                   </Button>
@@ -229,7 +254,7 @@ export default function MainTab({ employee_id }) {
                   <Button
                     type="primary"
                     onClick={() => setIsOpportunityModalOpen(true)}
-                    disabled={!selectedOpportunity}
+                    disabled={!selectedOpportunity || btnDisabled}
                   >
                     Modify
                   </Button>
@@ -237,7 +262,7 @@ export default function MainTab({ employee_id }) {
                   <Button
                     type="outline"
                     onClick={() => setIsDeleteModalOpen(true)}
-                    disabled={!selectedOpportunity}
+                    disabled={!selectedOpportunity || btnDisabled}
                   >
                     Delete
                   </Button>

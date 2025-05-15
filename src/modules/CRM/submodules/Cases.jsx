@@ -68,6 +68,7 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           ticketInfo={ticketInfo}
           setTicketInfo={setTicketInfo}
           setTicketID={setTicketID}
+          employee_id={employee_id}
         />
       ),
     },
@@ -81,6 +82,7 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           ticketInfo={ticketInfo}
           setTicketInfo={setTicketInfo}
           setTicketID={setTicketID}
+          employee_id={employee_id}
         />
       ),
     },

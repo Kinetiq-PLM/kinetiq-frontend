@@ -11,12 +11,14 @@ import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 import { GET, PATCH } from "../../../Sales/api/api.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function CampaignContactTab() {
+export default function CampaignContactTab({ employee_id }) {
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
   const [isCampaignListOpen, setIsCampaignListOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState("");
   const [canSave, setCanSave] = useState(false); // Save button state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   const [isMessageOpen, setIsMessageOpen] = useState(false); // Message modal open state
 
@@ -47,6 +49,7 @@ export default function CampaignContactTab() {
         contact_person: contact.customer.contact_person,
       }));
       setContactList(contacts);
+      setIsLoading(false);
       await queryClient.refetchQueries(["campaigns"]);
     },
   });
@@ -71,9 +74,35 @@ export default function CampaignContactTab() {
       });
     },
   });
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          [
+            "REG-2504-fd99",
+            "CTR-2504-d25f",
+            "REG-2504-8f19",
+            "REG-2504-aaf5",
+            "REG-2504-fd68",
+            "SEA-2504-8d37",
+            "SEA-2504-cc4a",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (selectedCustomer) {
+      setIsLoading(true);
       setContactList((prevList) => [...prevList, selectedCustomer]);
       setCanSave(true);
     }
@@ -184,13 +213,13 @@ export default function CampaignContactTab() {
                 <Button
                   type="primary"
                   onClick={() => setIsCustomerListOpen(true)}
-                  disabled={selectedCampaign === ""}
+                  disabled={selectedCampaign === "" || btnDisabled || isLoading}
                 >
                   Add Contact
                 </Button>
                 <Button
                   type="outline"
-                  disabled={selectedCampaign === ""}
+                  disabled={selectedCampaign === "" || btnDisabled}
                   onClick={() => handleDelete()}
                 >
                   Remove
@@ -208,7 +237,11 @@ export default function CampaignContactTab() {
             </div>
             <div>
               <div className="flex">
-                <Button type="primary" disabled={!canSave} onClick={handleSave}>
+                <Button
+                  type="primary"
+                  disabled={!canSave || btnDisabled}
+                  onClick={handleSave}
+                >
                   Save Campaign
                 </Button>
               </div>

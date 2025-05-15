@@ -50,6 +50,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [dateIssued, setDateIssued] = useState("");
   const [dateDelivery, setDateDelivery] = useState("");
   const [datePosted, setDatePosted] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -152,6 +153,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   // the products customer chose
   const [products, setProducts] = useState([]);
   const [isSalesRep, setIsSalesRep] = useState(false);
+  const [isProcessor, setIsProcessor] = useState(false);
 
   const [orderInfo, setOrderInfo] = useState({
     customer_id: "",
@@ -256,9 +258,15 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     const get = async () => {
       try {
         const res = await GET(`misc/employee/${employee_id}`);
-        if (["REG-2504-6039"].includes(res.position_id) || res.is_supervisor) {
+        if (["REG-2504-6039"].includes(res.position_id)) {
           setIsSalesRep(true);
+        } else if (
+          ["REG-2504-a157"].includes(res.position_id) ||
+          res.is_supervisor
+        ) {
+          setIsProcessor(true);
         }
+        setIsLoading(false);
       } catch (err) {
         showAlert({
           type: "error",
@@ -513,34 +521,34 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   setCanClear(true);
                   setIsProductListOpen(true);
                 }}
-                disabled={!canEditTable}
+                disabled={!canEditTable || (!isSalesRep && !isProcessor)}
               >
                 Add Item
               </Button>
               <Button
                 type="outline"
                 onClick={() => handleDelete()}
-                disabled={!canEditTable}
+                disabled={!canEditTable || (!isSalesRep && !isProcessor)}
               >
                 Delete Item
               </Button>
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Sales Rep ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
-                <p className="text-sm">
-                  {selectedEmployee
-                    ? selectedEmployee.employee_id
-                    : employee_id}
-                </p>
+            {!isLoading && (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Sales Rep ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">
+                    {selectedEmployee
+                      ? selectedEmployee.employee_id
+                      : employee_id}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
-            {isSalesRep ? (
-              ""
-            ) : (
+            {!isLoading && isProcessor && (
               <div className="flex mb-2 w-full mt-4 gap-4 items-center">
                 <p className="">Processor ID</p>
                 <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
@@ -551,7 +559,14 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">
-              <Button type="primary" className="" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                className=""
+                onClick={handleSubmit}
+                disabled={
+                  (!isSalesRep && !isProcessor) || products.length === 0
+                }
+              >
                 Submit Order
               </Button>
               <Button
@@ -600,7 +615,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                 label=""
                 placeholder="Copy From"
                 options={copyFromOptions}
-                disabled={!copyFromOptions}
+                disabled={!copyFromOptions || (!isSalesRep && !isProcessor)}
                 setOption={setCopyFromModal}
               />
               <SalesDropup

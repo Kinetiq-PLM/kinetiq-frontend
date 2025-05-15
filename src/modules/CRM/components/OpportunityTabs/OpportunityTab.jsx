@@ -17,6 +17,7 @@ export default function OpportunityTab({ setActiveTab, employee_id }) {
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const opportunityQuery = useQuery({
     queryKey: ["opportunities"],
     queryFn: async () => await GET(`crm/opportunities?salesrep=${employee_id}`),
@@ -74,6 +75,31 @@ export default function OpportunityTab({ setActiveTab, employee_id }) {
   const handleClick = () => {
     console.log("CLICKED");
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          [
+            "REG-2504-fd99",
+            "CTR-2504-d25f",
+            "REG-2504-8f19",
+            "REG-2504-cf80",
+            "SEA-2504-8d37",
+            "SEA-2504-cc4a",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (opportunityQuery.status === "success") {
@@ -158,6 +184,7 @@ export default function OpportunityTab({ setActiveTab, employee_id }) {
               onClick={() => setActiveTab("Main Page")}
               type="primary"
               className="w-full sm:w-[200px] py-2"
+              disabled={btnDisabled || isLoading}
             >
               New Opportunity
             </Button>

@@ -19,7 +19,7 @@ import MessageModal from "../components/MessageModal.jsx";
 
 import loading from "../../Sales/components/Assets/kinetiq-loading.gif";
 
-const Leads = () => {
+const Leads = ({ employee_id }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { showAlert } = useAlert();
@@ -31,6 +31,7 @@ const Leads = () => {
   const [isViewCustomerModalOpen, setIsViewCustomerModalOpen] = useState(false);
   const [isConfirmQualifyOpen, setIsConfirmQualifyOpen] = useState(false);
   const [isMessageOpen, setIsMessageOpen] = useState(false); // Message modal open state
+  const [btnDisabled, setBtnDisabled] = useState(false);
 
   const [selected, setSelected] = useState("");
   const queryClient = useQueryClient();
@@ -102,6 +103,31 @@ const Leads = () => {
     }
   }, [customersQuery.data, customersQuery.status]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (
+          [
+            "REG-2504-fd99",
+            "CTR-2504-d25f",
+            "REG-2504-8f19",
+            "REG-2504-cf80",
+            "REG-2504-fd68",
+            "SEA-2504-8d37",
+            "SEA-2504-cc4a",
+          ].includes(res.position_id)
+        ) {
+          setBtnDisabled(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    })();
+  }, []);
   const handleQualification = async () => {
     // Handle qualification logic here || remove from leads table
     try {
@@ -204,6 +230,7 @@ const Leads = () => {
                 onClick={() => setIsNewCustomerModalOpen(true)}
                 type="primary"
                 className="w-full sm:w-[200px] py-2"
+                disabled={btnDisabled || isLoading}
               >
                 New Lead
               </Button>
@@ -212,7 +239,7 @@ const Leads = () => {
                 onClick={() => setIsConfirmQualifyOpen(true)}
                 type="primary"
                 className="w-full sm:w-[200px] py-2"
-                disabled={selected === ""}
+                disabled={selected === "" || btnDisabled || isLoading}
               >
                 Qualify
               </Button>
@@ -232,10 +259,10 @@ const Leads = () => {
   );
 };
 
-const BodyContent = () => {
+const BodyContent = ({ employee_id }) => {
   return (
     <AlertProvider>
-      <Leads />
+      <Leads employee_id={employee_id} />
     </AlertProvider>
   );
 };
