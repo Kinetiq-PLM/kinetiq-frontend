@@ -347,43 +347,38 @@
 }
 
 /* ========== Scroll Bar Styles ========== */
-.currency-container::-webkit-scrollbar,
-.scrollable-table .ant-table-body::-webkit-scrollbar,
-.popover-tags::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.log-container::-webkit-scrollbar,
+.scrollable-table .ant-table-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-.currency-container::-webkit-scrollbar-track,
-.scrollable-table .ant-table-body::-webkit-scrollbar-track,
-.popover-tags::-webkit-scrollbar-track {
-  background: #f0f0f0;
+.log-container::-webkit-scrollbar-track,
+.scrollable-table .ant-table-body::-webkit-scrollbar-track {
+    background: #f0f0f0;
 }
 
-.currency-container::-webkit-scrollbar-thumb,
-.scrollable-table .ant-table-body::-webkit-scrollbar-thumb,
-.popover-tags::-webkit-scrollbar-thumb {
-  background: #00a8a8;
-  border-radius: 4px;
+.log-container::-webkit-scrollbar-thumb,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb {
+    background: #00a8a8;
+    border-radius: 4px;
 }
 
-.currency-container::-webkit-scrollbar-thumb:hover,
-.scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover,
-.popover-tags::-webkit-scrollbar-thumb:hover {
-  background: #008080;
+.log-container::-webkit-scrollbar-thumb:hover,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+    background: #008080;
 }
 
 /* Firefox scrollbar */
-.currency-container,
-.scrollable-table .ant-table-body,
-.popover-tags {
-  scrollbar-width: thin;
-  scrollbar-color: #00a8a8 #f0f0f0;
+.log-container,
+.scrollable-table .ant-table-body {
+    scrollbar-width: thin;
+    scrollbar-color: #00a8a8 #f0f0f0;
 }
 
 /* ========== Responsive Styles ========== */
 @media (max-width: 992px) {
-    .currency .currency-container {
+    .currency .log-container {
         padding: 12px;
     }
 
@@ -405,7 +400,7 @@
         padding: 8px;
     }
 
-    .currency .currency-container {
+    .currency .log-container {
         padding: 8px;
         border-radius: 4px;
         overflow-x: hidden;
@@ -469,7 +464,7 @@
 }
 
 @media (max-width: 576px) {
-    .currency .currency-container {
+    .currency .log-container {
         max-height: calc(100vh - 120px);
         padding: 8px 4px;
     }

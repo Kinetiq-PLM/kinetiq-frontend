@@ -27,6 +27,7 @@ import {
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
+const { TextArea } = Input;
 
 const Warehouse = () => {
     // State variables
@@ -145,9 +146,7 @@ const Warehouse = () => {
         setSelectedRecord(record);
         warehouseForm.setFieldsValue({
             warehouse_location: record.warehouse_location,
-            warehouse_name: record.warehouse_name,
-            warehouse_manager: record.warehouse_manager,
-            contact_no: record.contact_no
+            stored_materials: record.stored_materials,
         });
         setWarehouseModalVisible(true);
     };
@@ -178,12 +177,12 @@ const Warehouse = () => {
         }
     };
 
-    const handleRestoreWarehouse = async (warehouseId) => {
+    const handleRestoreWarehouse = async (roleId) => {
         try {
-            await warehouseAPI.restoreWarehouse(warehouseId);
+            await warehouseAPI.restoreWarehouse(roleId);
             message.success("Warehouse restored successfully");
             fetchArchivedWarehouse(archivedSearchValue); // Keep current search term
-            fetchWarehouse(); // Refresh active warehouses list
+            fetchWarehouse(); // Refresh active roles list
         } catch (error) {
             message.error("Failed to restore warehouse");
         }
@@ -221,44 +220,26 @@ const Warehouse = () => {
             dataIndex: "warehouse_id",
             key: "warehouse_id",
             sorter: true,
-            width: 140,
+            width: 120,
         },
         {
             title: "Warehouse Location",
             dataIndex: "warehouse_location",
             key: "warehouse_location",
             sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 220
+            width: 120,
         },
         {
-            title: "Warehouse Name",
-            dataIndex: "warehouse_name",
-            key: "warehouse_name",
+            title: "Stored Materials",
+            dataIndex: "stored_materials",
+            key: "stored_materials",
             sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 120
-        },
-        {
-            title: "Warehouse Manager",
-            dataIndex: "warehouse_manager",
-            key: "warehouse_manager",
-            sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 140
-        },
-        {
-            title: "Contact No",
-            dataIndex: "contact_no",
-            key: "contact_no",
-            sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 80
+            width: 300,
         },
         {
             title: "Actions",
             key: "actions",
-            width: 80,
+            width: 80, // Increased width for 3 buttons
             align: "center",
             render: (_, record) => (
                 <Space size="small">
@@ -270,7 +251,6 @@ const Warehouse = () => {
                     />
                     <Popconfirm
                         title="Are you sure you want to archive this warehouse?"
-                        popupPlacement="topRight"
                         onConfirm={() => handleArchiveWarehouse(record.warehouse_id)}
                         okText="Yes"
                         cancelText="No"
@@ -293,7 +273,7 @@ const Warehouse = () => {
             key: "warehouse_id",
             sorter: true,
             sortDirections: ['ascend', 'descend'],
-            width: 120,
+            width: 200,
         },
         {
             title: "Warehouse Location",
@@ -301,32 +281,14 @@ const Warehouse = () => {
             key: "warehouse_location",
             sorter: true,
             sortDirections: ['ascend', 'descend'],
-            width: 140,
             render: (text) => text.replace("ARCHIVED_", ""),
         },
         {
-            title: "Warehouse Name",
-            dataIndex: "warehouse_name",
-            key: "warehouse_name",
+            title: "Stored Materials",
+            dataIndex: "stored_materials",
+            key: "stored_materials",
             sorter: true,
             sortDirections: ['ascend', 'descend'],
-            width: 140
-        },
-        {
-            title: "Warehouse Manager",
-            dataIndex: "warehouse_manager",
-            key: "warehouse_manager",
-            sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 140
-        },
-        {
-            title: "Contact No",
-            dataIndex: "contact_no",
-            key: "contact_no",
-            sorter: true,
-            sortDirections: ['ascend', 'descend'],
-            width: 140
         },
         {
             title: "Actions",
@@ -335,6 +297,12 @@ const Warehouse = () => {
             align: "center",
             render: (_, record) => (
                 <Space size="small">
+                    <Button
+                        type="primary"
+                        icon={<EyeOutlined />}
+                        size="small"
+                        onClick={() => handleViewDetails(record)}
+                    />
                     <Popconfirm
                         title="Are you sure you want to restore this warehouse?"
                         onConfirm={() => handleRestoreWarehouse(record.warehouse_id)}
@@ -481,27 +449,10 @@ const Warehouse = () => {
                         </Form.Item>
 
                         <Form.Item
-                            name="warehouse_name"
-                            label="Warehouse Name"
-                            rules={[{ required: true, message: "Please enter warehouse name" }]}
+                            name="stored_materials"
+                            label="Stored Materials"
                         >
-                            <Input />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="warehouse_manager"
-                            label="Warehouse Manager"
-                            rules={[{ required: true, message: "Please enter warehouse manager" }]}
-                        >
-                            <Input />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="contact_no"
-                            label="Contact No"
-                            rules={[{ required: true, message: "Please enter contact number" }]}
-                        >
-                            <Input />
+                            <TextArea rows={4} />
                         </Form.Item>
 
                         <Form.Item className="form-actions">
@@ -545,16 +496,10 @@ const Warehouse = () => {
                                 </Typography.Text>
                             </div>
                             <div className="detail-item">
-                                <Typography.Text strong>Warehouse Name:</Typography.Text>
-                                <Typography.Text>{selectedRecord.warehouse_name}</Typography.Text>
-                            </div>
-                            <div className="detail-item">
-                                <Typography.Text strong>Warehouse Manager:</Typography.Text>
-                                <Typography.Text>{selectedRecord.warehouse_manager}</Typography.Text>
-                            </div>
-                            <div className="detail-item">
-                                <Typography.Text strong>Contact No:</Typography.Text>
-                                <Typography.Text>{selectedRecord.contact_no}</Typography.Text>
+                                <Typography.Text strong>Stored Materials:</Typography.Text>
+                                <Typography.Paragraph>
+                                    {selectedRecord.stored_materials || "No materials information available"}
+                                </Typography.Paragraph>
                             </div>
                         </div>
                     )}
@@ -562,7 +507,7 @@ const Warehouse = () => {
 
                 {/* Archived Warehouses Modal */}
                 <Modal
-                    title="Archived Warehouses"
+                    title="Archived Warehouse"
                     visible={archiveModalVisible}
                     onCancel={() => setArchiveModalVisible(false)}
                     footer={[

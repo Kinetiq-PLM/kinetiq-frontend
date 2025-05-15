@@ -47,7 +47,6 @@ const PolicyManagement = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("policies");
-  const [uploadFile, setUploadFile] = useState(null);
   
   // Pagination state
   const [policyPagination, setPolicyPagination] = useState({
@@ -60,12 +59,10 @@ const PolicyManagement = () => {
   const [policyModalVisible, setPolicyModalVisible] = useState(false);
   const [archiveModalVisible, setArchiveModalVisible] = useState(false);
   const [documentViewModalVisible, setDocumentViewModalVisible] = useState(false);
-  const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
 
   // Form state
   const [policyForm] = Form.useForm();
-  const [uploadForm] = Form.useForm();
 
   // Fetch data when component mounts
   useEffect(() => {
@@ -185,17 +182,11 @@ const PolicyManagement = () => {
     setPolicyModalVisible(true);
   };
 
-  const handleUploadPolicy = (record) => {
-    setSelectedRecord(record);
-    uploadForm.resetFields();
-    setUploadModalVisible(true);
-  };
-
   const handleViewDocument = (record) => {
     setSelectedRecord(record);
-    if (record.policy_document) {
+    if (record.document_url) {
       // Prepend the local development server URL if needed
-      const documentUrl = record.policy_document.startsWith('http') ? record.policy_document : `http://127.0.0.1:8000${record.policy_document}`;
+      const documentUrl = record.document_url.startsWith('http') ? record.document_url : `http://127.0.0.1:8000${record.document_url}`;
       setViewDocumentUrl(documentUrl);
     } else {
       setViewDocumentUrl(null);
@@ -203,78 +194,40 @@ const PolicyManagement = () => {
     setDocumentViewModalVisible(true);
   };
 
-  // Fix for handlePolicyFormSubmit function in PolicyManagement.jsx
-const handlePolicyFormSubmit = async (values) => {
-  try {
-    // Format the date properly for the API
-    const formattedValues = {
-      ...values,
-      effective_date: values.effective_date ? values.effective_date.format('YYYY-MM-DD') : null
-    };
-    
-    if (modalMode === "add") {
-      // For new policies, generate a policy_id if not provided
-      if (!formattedValues.policy_id) {
-        // Generate a unique ID using timestamp and random string
-        const timestamp = new Date().getTime();
-        const randomStr = Math.random().toString(36).substring(2, 8);
-        formattedValues.policy_id = `POL-${timestamp}-${randomStr}`;
-      }
-      
-      await policiesAPI.createPolicy(formattedValues);
-      message.success("Policy created successfully");
-    } else {
-      // For editing, use the selected record's policy_id
-      await policiesAPI.updatePolicy(selectedRecord.policy_id, formattedValues);
-      message.success("Policy updated successfully");
-    }
-    setPolicyModalVisible(false);
-    fetchPolicies();
-  } catch (error) {
-    const errorMsg = error.response?.data?.detail || 
-                     error.response?.data?.message || 
-                     error.message || 
-                     "An unknown error occurred";
-    message.error(`Failed to ${modalMode} policy: ${errorMsg}`);
-    console.error("Error submitting policy form:", error);
-  }
-};
-
-  // Fixed handleUploadFormSubmit function
-  const handleUploadFormSubmit = async () => {
+  const handlePolicyFormSubmit = async (values) => {
     try {
-      if (!uploadFile) {
-        message.error("Please select a file to upload");
-        return;
-      }
+      const formData = new FormData();
       
-      // Log the file details for debugging
-      console.log("Uploading file:", {
-        name: uploadFile.name,
-        size: uploadFile.size,
-        type: uploadFile.type
+      // Add all form values to formData
+      Object.keys(values).forEach(key => {
+        if (key === 'effective_date' && values[key]) {
+          formData.append(key, values[key].format('YYYY-MM-DD'));
+        } else if (key === 'document' && values[key]) {
+          if (values[key].fileList && values[key].fileList.length > 0) {
+            formData.append('document', values[key].fileList[0].originFileObj);
+          }
+        } else if (values[key] !== undefined) {
+          formData.append(key, values[key]);
+        }
       });
-      
-      // Call the API to upload the document
-      await policiesAPI.uploadPolicyDocument(selectedRecord.policy_id, uploadFile);
-      
-      message.success("Document uploaded successfully");
-      setUploadModalVisible(false);
+
+      if (modalMode === "add") {
+        await policiesAPI.createPolicy(formData);
+        message.success("Policy created successfully");
+      } else {
+        await policiesAPI.updatePolicy(selectedRecord.policy_id, formData);
+        message.success("Policy updated successfully");
+      }
+      setPolicyModalVisible(false);
       fetchPolicies();
     } catch (error) {
-      // Display more detailed error message
-      const errorMessage = error.response?.data?.error || 
-                          error.response?.data?.detail || 
-                          error.message || 
-                          "Unknown error";
-      message.error(`Failed to upload document: ${errorMessage}`);
-      console.error("Upload error details:", error);
+      message.error(`Failed to ${modalMode} policy: ${error.response?.data?.message || error.message}`);
     }
   };
 
   const handleArchivePolicy = async (policyId) => {
     try {
-      await policiesAPI.deletePolicy(policyId);
+      await policiesAPI.archivePolicy(policyId);
       message.success("Policy archived successfully");
       fetchPolicies();
     } catch (error) {
@@ -299,20 +252,6 @@ const handlePolicyFormSubmit = async (values) => {
     const start = (current - 1) * pageSize;
     const end = start + pageSize;
     return policies.slice(start, end);
-  };
-
-  // Fixed handleFileChange function
-  const handleFileChange = (info) => {
-    if (info.file && info.file.originFileObj) {
-      console.log("File selected:", info.file.originFileObj.name);
-      setUploadFile(info.file.originFileObj);
-    } else if (info.fileList && info.fileList.length > 0 && info.fileList[0].originFileObj) {
-      console.log("File from fileList:", info.fileList[0].originFileObj.name);
-      setUploadFile(info.fileList[0].originFileObj);
-    } else {
-      console.log("No valid file found in the upload event");
-      setUploadFile(null);
-    }
   };
 
   // Table columns definitions
@@ -366,32 +305,21 @@ const handlePolicyFormSubmit = async (values) => {
     {
       title: "Actions",
       key: "actions",
-      width: 160,
+      width: 120,
       align: "center",
       render: (_, record) => (
         <Space size="small">
-          {record.policy_document ? (
-            <Button 
-              type="primary" 
-              icon={<EyeOutlined />} 
-              size="small"
-              onClick={() => handleViewDocument(record)}
-              title="View Document"
-            />
-          ) : (
-            <Button 
-              icon={<UploadOutlined />} 
-              size="small"
-              onClick={() => handleUploadPolicy(record)}
-              title="Upload Document"
-            />
-          )}
+          <Button 
+            type="primary" 
+            icon={<EyeOutlined />} 
+            size="small"
+            onClick={() => handleViewDocument(record)}
+          />
           <Button 
             type="primary" 
             icon={<EditOutlined />} 
             size="small"
             onClick={() => handleEditPolicy(record)}
-            title="Edit Policy"
           />
           <Popconfirm
             title="Are you sure you want to archive this policy?"
@@ -403,7 +331,6 @@ const handlePolicyFormSubmit = async (values) => {
               danger
               icon={<DeleteOutlined />} 
               size="small"
-              title="Archive Policy"
             />
           </Popconfirm>
         </Space>
@@ -470,13 +397,20 @@ const handlePolicyFormSubmit = async (values) => {
               type="primary" 
               icon={<UndoOutlined />} 
               size="small"
-              title="Restore Policy"
             />
           </Popconfirm>
         </Space>
       ),
     },
   ];
+
+  // Custom file upload components
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
 
   // Render main component
   return (
@@ -585,18 +519,8 @@ const handlePolicyFormSubmit = async (values) => {
             form={policyForm}
             layout="vertical"
             onFinish={handlePolicyFormSubmit}
-            initialValues={{
-              status: "Active"
-            }}
+            encType="multipart/form-data"
           >
-            {modalMode === "edit" && (
-              <Form.Item
-                label="Policy ID"
-              >
-                <Input value={selectedRecord?.policy_id} disabled />
-              </Form.Item>
-            )}
-            
             <Form.Item
               name="policy_name"
               label="Policy Name"
@@ -604,7 +528,7 @@ const handlePolicyFormSubmit = async (values) => {
             >
               <Input />
             </Form.Item>
-
+  
             <Form.Item
               name="description"
               label="Description"
@@ -612,7 +536,7 @@ const handlePolicyFormSubmit = async (values) => {
             >
               <TextArea rows={4} />
             </Form.Item>
-
+  
             <Form.Item
               name="effective_date"
               label="Effective Date"
@@ -620,10 +544,11 @@ const handlePolicyFormSubmit = async (values) => {
             >
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
-
+  
             <Form.Item
               name="status"
               label="Status"
+              initialValue="Active"
               rules={[{ required: true, message: "Please select status" }]}
             >
               <Select>
@@ -631,7 +556,24 @@ const handlePolicyFormSubmit = async (values) => {
                 <Select.Option value="Inactive">Inactive</Select.Option>
               </Select>
             </Form.Item>
-
+  
+            <Form.Item
+              name="document"
+              label="Document"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+              extra="Upload PDF document for this policy"
+            >
+              <Upload 
+                name="document" 
+                accept=".pdf,.doc,.docx" 
+                maxCount={1}
+                beforeUpload={() => false} // Prevent auto upload
+              >
+                <Button icon={<UploadOutlined />}>Select File</Button>
+              </Upload>
+            </Form.Item>
+  
             <Form.Item className="form-actions">
               <Space>
                 <Button type="primary" htmlType="submit">
@@ -644,56 +586,7 @@ const handlePolicyFormSubmit = async (values) => {
             </Form.Item>
           </Form>
         </Modal>
-        
-        {/* Document Upload Modal */}
-        <Modal
-          title="Upload Policy Document"
-          visible={uploadModalVisible}
-          onCancel={() => setUploadModalVisible(false)}
-          footer={null}
-          width={500}
-          className="custom-modal"
-        >
-          <div className="policy-info-display">
-            <p><strong>Policy ID:</strong> {selectedRecord?.policy_id}</p>
-            <p><strong>Policy Name:</strong> {selectedRecord?.policy_name}</p>
-          </div>
-          
-          <Form
-            form={uploadForm}
-            layout="vertical"
-            onFinish={handleUploadFormSubmit}
-          >
-            <Form.Item
-              label="Document"
-              required
-              extra="Upload PDF document for this policy"
-            >
-              <Upload 
-                name="file" 
-                accept=".pdf,.doc,.docx" 
-                maxCount={1}
-                beforeUpload={() => false} // Prevent auto upload
-                onChange={handleFileChange}
-                fileList={uploadFile ? [{ uid: '1', name: uploadFile.name }] : []}
-              >
-                <Button icon={<UploadOutlined />}>Select File</Button>
-              </Upload>
-            </Form.Item>
-
-            <Form.Item className="form-actions">
-              <Space>
-                <Button type="primary" htmlType="submit">
-                  Upload
-                </Button>
-                <Button onClick={() => setUploadModalVisible(false)}>
-                  Cancel
-                </Button>
-              </Space>
-            </Form.Item>
-          </Form>
-        </Modal>
-          
+  
         {/* Archived Policies Modal */}
         <Modal
           title="Archived Policies"
@@ -738,38 +631,37 @@ const handlePolicyFormSubmit = async (values) => {
         </Modal>
   
         {/* Document View Modal */}
-<Modal
-  title="Policy Document"
-  visible={documentViewModalVisible}
-  centered
-  onCancel={() => setDocumentViewModalVisible(false)}
-  footer={[
-    <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
-      Close
-    </Button>
-  ]}
-  width={900}
-  className="document-modal"
->
-  {viewDocumentUrl ? (
-    <div className="document-viewer">
-      <iframe
-        src={viewDocumentUrl}
-        title="Policy Document"
-        width="100%"
-        height="600"
-        frameBorder="0"
-        style={{ border: "1px solid #d9d9d9" }}
-      />
-    </div>
-  ) : (
-    <div className="no-document-message" style={{ textAlign: 'center', padding: '40px' }}>
-      <Typography.Title level={4}>No File Available</Typography.Title>
-      <Typography.Paragraph>There is no document attached to this policy.</Typography.Paragraph>
-    </div>
-  )}
-</Modal>
-
+        <Modal
+          title="Policy Document"
+          visible={documentViewModalVisible}
+          onCancel={() => setDocumentViewModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setDocumentViewModalVisible(false)}>
+              Close
+            </Button>
+          ]}
+          width={900}
+          height={700}
+          className="document-modal"
+        >
+          {viewDocumentUrl ? (
+            <div className="document-viewer">
+              <iframe
+                src={viewDocumentUrl}
+                title="Policy Document"
+                width="100%"
+                height="600"
+                frameBorder="0"
+                style={{ border: "1px solid #d9d9d9" }}
+              />
+            </div>
+          ) : (
+            <div className="no-document-message" style={{ textAlign: 'center', padding: '40px' }}>
+              <Typography.Title level={4}>No File Available</Typography.Title>
+              <Typography.Paragraph>There is no document attached to this policy.</Typography.Paragraph>
+            </div>
+          )}
+        </Modal>
       </div>
     </div>
   );
