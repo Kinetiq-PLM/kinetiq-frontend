@@ -41,7 +41,6 @@ const ItemRemoval = () => {
         external_id: selectedData.report_id,
         status: "pending"
       }
-      console.log(updatePayload)
       try {
           const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/send-to-management/`, {
               method: "POST",
@@ -69,18 +68,31 @@ const ItemRemoval = () => {
     const fetchData = async () => {
       try {
           setLoading(true);
-          setError(null); // Reset error state
- 
+          setError(null); 
+  
           const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-removal/");
           if (!response.ok) throw new Error("Connection to database failed");
- 
+  
           const data = await response.json();
           if (!Array.isArray(data)) throw new Error("Invalid goods data format");
- 
-          setTableData(data);
-          if (data.length > 0){
+  
+          const sortedData = data.sort((a, b) => {
+              if (a.deprecation_status === 'Pending' && b.deprecation_status !== 'Pending') {
+                  return -1;
+              }
+              if (a.deprecation_status !== 'Pending' && b.deprecation_status === 'Pending') {
+                  return 1; 
+              }
+  
+              const dateA = new Date(a.reported_date);
+              const dateB = new Date(b.reported_date);
+              return dateB - dateA; 
+          });
+  
+          setTableData(sortedData);
+          if (sortedData.length > 0) {
               setSelectedRow(0);
-              setSelectedData(data[0]);
+              setSelectedData(sortedData[0]);
           }
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
@@ -88,6 +100,7 @@ const ItemRemoval = () => {
           setLoading(false);
       }
   };
+  
  
   useEffect(() => {
       fetchData();
@@ -144,7 +157,6 @@ const ItemRemoval = () => {
                     filteredData.map((row, index) => (
                     <tr key={row.report_id}>
                         <td>
-                      
                         <input
                           type="checkbox"
                           className="checkbox"

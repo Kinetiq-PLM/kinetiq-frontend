@@ -34,10 +34,13 @@ const Operations = ({employee_id}) => {
 
     window.addEventListener('resize', handleResize);
     
-    // Fetch data from API
-    fetchData();
+    if (documents.length === 0) {
+      fetchData();
+    }
     
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
   const [currentTypeIndex, setCurrentTypeIndex] = useState(0);
   const [statusByType, setStatusByType] = useState({});
@@ -67,12 +70,10 @@ const Operations = ({employee_id}) => {
   
         total += amount;
   
-        // Total bucket
         if (grouped['Total'][status] !== undefined) {
           grouped['Total'][status]++;
         }
   
-        // Specific type bucket
         if (grouped[type] && grouped[type][status] !== undefined) {
           grouped[type][status]++;
         }
@@ -102,7 +103,6 @@ const Operations = ({employee_id}) => {
     setActiveIndex(index);
   };
 
-  // Prepare data for pie chart
   const currentType = docTypes[currentTypeIndex];
   const counts = statusByType[currentType] || { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 };
 
@@ -130,29 +130,27 @@ const Operations = ({employee_id}) => {
       .then(data => {
         const match = data.employees.find(emp => emp.employee_id === employee_id);
         if (match) {
-          setEmployeeName(match.first_name); // Or match.employee_name if you want full name
+          setEmployeeName(match.first_name); 
         }
       })
       .catch(error => {
         console.error('Failed to fetch employee data:', error);
       });
   }, [employee_id]);
-
+ 
   if (loading) {
     return (
       <div className="operations">
         <div className="body-content-container">
-          <div className="operations-container">
-          <div className="operations loading-center">
-            <p>Loading data...</p>
-          </div>
+          <div className="operations-container loading">
+            <div className="operations loading-center">
+              <p>Loading data...</p>
+            </div>
           </div>
         </div>
       </div>
     );
   }
-  
-
   return (
     <div className="operations">
       <div className="body-content-container">
@@ -169,7 +167,7 @@ const Operations = ({employee_id}) => {
             <p className="operations-breadcrumb">Operations / Dashboard</p>
             <PieChart width={chartSize.width} height={chartSize.height}>
             <Pie
-              key={currentTypeIndex}  // ADD THIS LINE
+              key={currentTypeIndex}  
               data={pieData}
               dataKey="value"
               nameKey="name"
@@ -212,7 +210,7 @@ const Operations = ({employee_id}) => {
                     className={`operations-status-card operations-${item.name.toLowerCase()}-card`}
                     style={{
                       transition: `all ${PIE_ANIMATION_DURATION}ms ease-out`,
-                      opacity: currentTypeIndex % 2 ? 0.9 : 1 // Optional: slight opacity change
+                      opacity: currentTypeIndex % 2 ? 0.9 : 1  
                     }}
                   >
                     <p className="operations-status-count">{item.value}</p>

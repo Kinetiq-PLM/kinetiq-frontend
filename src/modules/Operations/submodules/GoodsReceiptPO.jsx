@@ -5,6 +5,24 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 import { Tooltip } from 'react-tooltip';
 
+// Custom styles for the COPY FROM dropdown scrollbar
+const customSelectStyles = `
+  .copy-from-button::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .copy-from-button::-webkit-scrollbar-thumb {
+    background: #0d9488;
+    border-radius: 3px;
+  }
+
+  .copy-from-button::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+`;
+
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
@@ -21,7 +39,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     if (!selectedData?.document_items) return 0;
     
     return selectedData.document_items.reduce((sum, item) => {
-      // First try item_price, then check duplicateDetails for a price
       const price = item.item_price !== 0 ? item.item_price : 
                     (duplicateDetails[item.item_id]?.[0]?.price || 0);
       return sum + (parseFloat(item.quantity) * parseFloat(price));
@@ -44,12 +61,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   useEffect(() => {
     if (selectedData?.status) {
-      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
+      setSelectedStatus(selectedData.status); 
     }
   }, [selectedData]);
   useEffect(() => {
     if (selectedData?.delivery_note) {
-      setSelectedDelNote(selectedData.delivery_note); // Set selectedStatus from selectedData
+      setSelectedDelNote(selectedData.delivery_note);
     }
   }, [selectedData]);
 
@@ -105,7 +122,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
  
   const today = new Date().toISOString().slice(0, 10);
-  // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
     purchase_id: isCreateMode ? "" : selectedData.purchase_id || null,
     vendor_code: isCreateMode ? "" : vendorID,
@@ -163,9 +179,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     updatedItems[index][field] = e.target.value;
     setDocumentItems(updatedItems);
 
-    // Check if the row is NOT the last row and the item_name was cleared
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
-      // If this item exists in the database, delete it
       try {
         await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
@@ -173,19 +187,17 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            document_id: "",  // or null, depending on the backend expectations
+            document_id: "", 
           }),
         });
       } catch (error) {
         toast.error('Error deleting row from database:', error);
       }
  
-      // Remove the item from local state
       updatedItems.splice(index, 1);
       setDocumentItems(updatedItems);
     }
 
-    // If you're editing the last row and it was just filled, add a new row
     if (index === documentItems.length - 1) {
       handleAddRow();
     }
@@ -207,17 +219,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const handleAddRow = () => {
     const lastRow = documentItems[documentItems.length - 1];
     
-    // Only add a new row if the last row is filled (but don't make API calls yet)
     if (isRowFilled(lastRow)) {
       const updatedItems = [...documentItems];
       
-      // Calculate total for the current row
       updatedItems[updatedItems.length - 1] = {
         ...lastRow,
         total: (parseFloat(lastRow.quantity) * parseFloat(lastRow.cost)).toFixed(2)
       };
       
-      // Add new empty row with all possible fields
       updatedItems.push({
         item_id: '',
         item_name: '',
@@ -256,7 +265,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
-        // Sort A–Z by location
         const sorted = data.sort((a, b) => a.warehouse_location.localeCompare(b.warehouse_location));
         setWarehouseOptions(sorted);
       })
@@ -265,7 +273,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
   const [itemOptions, setItemOptions] = useState([]);
 
-  // Inside your item fetch useEffect:
   useEffect(() => {
       fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
         .then(res => res.json())
@@ -335,11 +342,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
  
-    // If "-- Select Item --" was chosen (empty value)
     if (selectedName === "") {
-      // Only delete if it's not the last row
       if (index !== updatedItems.length - 1) {
-        // If this item exists in the database, delete it
         try {
           const userConfirmed = await new Promise((resolve) => {
             toast.info(
@@ -378,7 +382,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           });
   
           if (!userConfirmed) {
-            // Reset the select value to the previous item name
             updatedItems[index] = {
               ...currentItem,
               item_name: currentItem.item_name || ''
@@ -395,7 +398,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              document_id: "",  // or null, depending on the backend expectations
+              document_id: "",  
             }),
           });
          
@@ -406,10 +409,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           return;
         }
  
-        // Remove the item from local state
         updatedItems.splice(index, 1);
       } else {
-        // For last row, just clear the values
         updatedItems[index] = {
           ...currentItem,
           item_id: '',
@@ -423,7 +424,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       return;
     }
  
-    // Normal item selection
     const selectedItem = itemOptions.find(opt => opt.name === selectedName);
     if (!selectedItem) return;
     const duplicatePrices = duplicateDetails[selectedItem.id] || [];
@@ -434,7 +434,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         item_id: selectedItem.id,
         cost: duplicatePrices[0]?.price || selectedItem.cost,
         unit_of_measure: selectedItem.unit,
-        available_costs: null // No cost selection needed
+        available_costs: null 
       };
     } else {
       const latestPrice = duplicatePrices[0]?.price;
@@ -442,7 +442,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         ...currentItem,
         item_name: selectedItem.name,
         item_id: selectedItem.id,
-        cost: latestPrice || 0, // Default to latest price if available
+        cost: latestPrice || 0, 
         unit_of_measure: selectedItem.unit,
         available_costs: duplicatePrices.map(priceObj => ({
           price: priceObj.price,
@@ -453,7 +453,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
     setDocumentItems(updatedItems);
  
-    // Add new row if this is the last row and we're selecting an item
     if (index === updatedItems.length - 1) {
       handleAddRow();
     }
@@ -462,7 +461,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     const updatedItems = [...documentItems];
     updatedItems[index].cost = selectedPrice;
     
-    // Recalculate total for this row
     updatedItems[index].total = (
       parseFloat(updatedItems[index].quantity || 0) * 
       parseFloat(selectedPrice)
@@ -491,11 +489,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }));
   };
 
-  // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
       
-      // Prepare the document items for creation
       const itemsToCreate = documentItems
       .slice(0, -1)
       .filter(item => isRowFilled(item));
@@ -507,7 +503,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         toast.error("Buyer information is required");
         return;
       }
-      // Prepare the payload for the create API
       const payload = {
         vendor_code: vendorID,
         document_type: "Goods Receipt PO",
@@ -538,7 +533,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         }))
       };
 
-      // Call the create API
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
@@ -553,10 +547,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       }
 
       const result = await response.json();
-      toast.success('Create successful:', result);
-     
-      // Call onSuccess with the created data if needed
-      onSuccess(result);
+      if(onSuccess){
+        await onSuccess(result);
+      }      
+      
      
     } catch (error) {
       toast.error(`Failed to create document. Please try again later`);
@@ -565,7 +559,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   };
 
   const handleBackWithUpdate = async () => {
-    const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
+    const updatedDocumentItems = documentItems.slice(0, -1); 
     let rowNum = 0
     if (!selectedOwner){
       toast.error("Owner is required")
@@ -580,6 +574,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }else if (!documentDetails.buyer){
       toast.dismiss()
       toast.error("Buyer is required.")
+      return
     }
     for (let item of updatedDocumentItems){
       rowNum += 1
@@ -679,11 +674,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       }
       if (onSuccess) {
         await onSuccess();
-        toast.success("Successfully updated documents.");
-        
-      }
-      if (onBack) {
-        onBack();  // Navigate back to GoodsTracking
+        toast.dismiss()
+        toast.success("Successfully updated documents.", {
+          autoClose: 1000,
+          onClose: () => onBack(), 
+        });
       }
     } catch (error) {
       toast.error(`Failed to update data. Please try again later`);
@@ -694,7 +689,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
 
-  // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
       const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
@@ -718,10 +712,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       return;
     }
     
-    setSelectedPO(poId); // Update the selected PO state
+    setSelectedPO(poId); 
  
     try {
-      // Fetch the selected purchase order details
       const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
@@ -731,7 +724,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setSelectedVendor(getVendor.company_name || "");
       setVendorID(getVendor.vendor_code || "");
       setContactPerson(quotation.contact_person || "");
-      // Update document details with PO information
 
       setDocumentDetails(prev => ({
         ...prev,
@@ -739,19 +731,19 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         company_name: getVendor.company_name || null,
         contact_person: quotation.contact_person || null,
         buyer: quotation?.buyer || "",
-        owner: quotation.request_id?.employee_name || null,
-        delivery_date: selectedPO.delivery_date || null,
+        delivery_date: date_today || null,
         status: "Draft",
-        posting_date: date_today,
-        document_date: selectedPO.document_date || null,
+        posting_date: date_today || null,
+        document_date: date_today || null,
         tax_amount: Number(parseFloat(quotation.tax || 0).toFixed(2)),
         discount_rate: Number(parseFloat(quotation.discount_percent || 0).toFixed(2)),
         freight: Number(parseFloat(quotation.freight || 0).toFixed(2)),
+        purchase_id: poId
       }));
  
-      // Get item details from pre-fetched itemOptions
+      
       const poItems = (selectedPO.quotation_contents || []).map(content => {
-        const itemId = content.material_id || content.asset_id || content.product_id;
+        const itemId = content.item_id;
         const matchedItem = itemOptions.find(opt => opt.id === itemId);
         if (!matchedItem) return null;
  
@@ -764,20 +756,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           type: matchedItem.type,
         };
       }).filter(item => item !== null);
- 
-      // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
       const taxAmount = parseFloat(quotation.tax || 0);
       const discountAmount = parseFloat(quotation.discount_amount || 0);
       const freight = parseFloat(quotation.freight || 0);
 
-      // Calculate tax rate
       const taxBase = poInitialAmount - discountAmount;
       const taxRate = taxBase > 0 ? (taxAmount / taxBase) * 100 : 0;
 
       setInitialAmount(poInitialAmount.toFixed(2));
 
-      // Set document details again to include tax rate
       setDocumentDetails(prev => ({
         ...prev,
         tax_amount: Number(parseFloat(taxAmount|| 0).toFixed(2)),
@@ -840,9 +828,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   useEffect(() => {
     const newInitialAmount = documentItems
-      .slice(0, -1) // exclude the last empty row
+      .slice(0, -1) 
       .reduce((sum, item) => {
-        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
         const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
         return sum + (parseFloat(item.quantity || 0) * price);
       }, 0)
@@ -853,7 +840,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   const checkCurrentDocumentItemsMatch = useCallback(async (purchaseId, deliveryNote) => {
     if (!purchaseId) {
-      //console.log("No purchase ID provided - setting match to false");
       setPurchaseItemsMatch(false);
       setPoMismatchDetails(null);
       return;
@@ -862,20 +848,18 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     try {
       //console.log("Starting items match check for PO:", purchaseId);
       
-      // Reset mismatch details
       const mismatches = [];
       
-      // Get current document items (excluding last empty row)
       const currentItems = documentItems.slice(0, -1)
-        .filter(item => item.item_id) // Only include items with IDs
+        .filter(item => item.item_id)
         .map(item => ({
           item_id: item.item_id,
+          item_name: item.item_name,
           quantity: parseInt(item.quantity || 0, 10)
         }));
   
       //console.log("Current document items (filtered):", currentItems);
   
-      // Find the selected purchase order
       const selectedPO = purchaseOrders.find(po => po.purchase_id === purchaseId);
       if (!selectedPO) {
         //console.log("PO not found in local state - setting match to false");
@@ -884,30 +868,25 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         return;
       }
   
-      // Check if vendor_code matches
       if (vendorID !== selectedPO.quotation_id.vendor_code.vendor_code) {
         const mismatchMsg = `Vendor mismatch: ${selectedVendor} (Current) ≠ ${selectedPO.quotation_id.vendor_code.company_name} (PO)`;
         //console.log(mismatchMsg);
         mismatches.push(mismatchMsg);
       }
   
-      // Check if buyer matches
       if (documentDetails.buyer !== selectedPO.quotation_id.buyer) {
         const mismatchMsg = `Buyer mismatch: ${documentDetails.buyer} (Current) ≠ ${selectedPO.quotation_id.buyer} (PO)`;
         //console.log(mismatchMsg);
         mismatches.push(mismatchMsg);
       }
   
-      // Update mismatch details state
       setPoMismatchDetails(mismatches.length > 0 ? mismatches : null);
   
-      // If we have any mismatches, don't proceed with item checks
       if (mismatches.length > 0) {
         setPurchaseItemsMatch(false);
         return;
       }
   
-      // Get items from purchase order
       const poItems = (selectedPO.quotation_contents || []).map(content => ({
         item_id: content.item_id,
         quantity: parseInt(content.purchase_quantity || 0, 10)
@@ -915,7 +894,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
       //console.log("PO items from quotation contents:", poItems);
   
-      // For partial delivery, check existing goods receipts
       let existingPartialItems = {};
       if (deliveryNote === "Partial Delivery") {
         //console.log("Partial delivery - checking existing receipts");
@@ -923,7 +901,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         if (!response.ok) throw new Error("Failed to fetch goods receipts");
         const goodsReceipts = await response.json();
   
-        // Find all partial deliveries for this purchase ID (excluding current document if editing)
         const partialReceipts = goodsReceipts.filter(gr => 
           gr.purchase_id === purchaseId && 
           gr.delivery_note === "Partial Delivery" &&
@@ -932,7 +909,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
         //console.log("Found partial receipts:", partialReceipts.length);
   
-        // Sum quantities from all partial receipts
         partialReceipts.forEach(gr => {
           gr.document_items.forEach(item => {
             existingPartialItems[item.item_id] = 
@@ -943,7 +919,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         //console.log("Existing partial items quantities:", existingPartialItems);
       }
   
-      // Check matching based on delivery note type
       let allItemsMatch = true;
       let noExtraItems = true;
       const itemMismatches = [];
@@ -953,55 +928,98 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         allItemsMatch = poItems.every(poItem => {
           const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
           const match = currentItem && currentItem.quantity === poItem.quantity;
+          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
           if (!match) {
-            const mismatchMsg = `Item ${poItem.item_id}: Qty ${currentItem?.quantity || 0} ≠ PO Qty ${poItem.quantity}`;
-            //console.log(mismatchMsg);
+            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Qty ${currentItem?.quantity || 0} ≠ PO Qty ${poItem.quantity}`;
             itemMismatches.push(mismatchMsg);
           }
           return match;
         });
-  
+
         noExtraItems = currentItems.every(ci => {
           const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
           if (!exists) {
-            const mismatchMsg = `Extra item: ${ci.item_id}`;
-            //console.log(mismatchMsg);
+            const itemName = ci.item_name || 
+                            itemOptions.find(opt => opt.id === ci.item_id)?.name || 
+                            `Item ${ci.item_id}`;
+            const mismatchMsg = `Extra item: ${itemName}`;
             itemMismatches.push(mismatchMsg);
           }
           return exists;
         });
       } else {
         //console.log("Checking partial delivery match");
-        allItemsMatch = poItems.every(poItem => {
-          const currentQty = currentItems.find(ci => ci.item_id === poItem.item_id)?.quantity || 0;
-          const existingQty = existingPartialItems[poItem.item_id] || 0;
-          const totalQty = currentQty + existingQty;
-          const withinLimit = totalQty <= poItem.quantity;
-          
-          if (!withinLimit) {
-            const mismatchMsg = `Item ${poItem.item_id}: Total Qty ${totalQty} exceeds PO Qty ${poItem.quantity}`;
-            //console.log(mismatchMsg);
-            itemMismatches.push(mismatchMsg);
-          }
-          return withinLimit;
-        });
-  
+        
         noExtraItems = currentItems.every(ci => {
           const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
           if (!exists) {
-            const mismatchMsg = `Extra item: ${ci.item_id}`;
-            //console.log(mismatchMsg);
+            const itemName = ci.item_name || 
+                            itemOptions.find(opt => opt.id === ci.item_id)?.name || 
+                            `Item ${ci.item_id}`;
+            const mismatchMsg = `Extra item: ${itemName}`;
             itemMismatches.push(mismatchMsg);
           }
           return exists;
         });
+      
+        allItemsMatch = poItems.every(poItem => {
+          const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
+          
+          if (!currentItem) {
+            //console.log(`Item ${poItem.item_id} not found in current items - skipping validation`);
+            return true;
+          }
+        
+          const currentQty = currentItem.quantity || 0;
+          const existingQty = existingPartialItems[poItem.item_id] || 0;
+          const totalQty = currentQty + existingQty;
+          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
+          /*
+          console.log([
+            `Validating item: ${matchedItem?.name || poItem.item_id}`,
+            `Current Qty: ${currentQty}`,
+            `Existing Qty: ${existingQty}`,
+            `Total Qty: ${totalQty}`,
+            `PO Qty: ${poItem.quantity}`,
+            `Has existing receipts: ${existingQty > 0 ? 'Yes' : 'No'}`
+          ].join(" | "));*/
+        
+          const shouldCheckExactMatch = existingQty === 0;
+          const exactMatch = shouldCheckExactMatch ? currentQty === poItem.quantity : true;
+          const withinLimit = totalQty <= poItem.quantity;
+          /*
+          console.log(`Validation rules:`, {
+            checkExactMatch: shouldCheckExactMatch,
+            exactMatch,
+            withinLimit
+          });*/
+        
+          if (!withinLimit) {
+            const mismatchMsg = existingQty > 0
+              ? `Item ${matchedItem?.name || poItem.item_id}: Combined quantity = ${totalQty} exceeds PO quantity ${poItem.quantity}`
+              : `Item ${matchedItem?.name || poItem.item_id}: Quantity ${currentQty} exceeds PO quantity ${poItem.quantity}`;
+            
+            //console.warn('Quantity limit violation:', mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+        
+          if (shouldCheckExactMatch && !exactMatch) {
+            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Quantity ${currentQty} doesn't match PO quantity ${poItem.quantity}`;
+            //console.warn('Exact match violation:', mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+        
+          const isValid = withinLimit && (!shouldCheckExactMatch || exactMatch);
+          //console.log(`Validation result: ${isValid ? 'PASS' : 'FAIL'}`);
+          
+          return isValid;
+        });
       }
   
-      // Combine all mismatches
       const allMismatches = [...mismatches, ...itemMismatches];
       setPoMismatchDetails(allMismatches.length > 0 ? allMismatches : null);
-  
-      /*console.log("Final match results:", {
+      /*
+      console.log("Final match results:", {
         allItemsMatch,
         noExtraItems,
         finalMatch: allItemsMatch && noExtraItems
@@ -1026,20 +1044,25 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   return (
     <div className="goods-r-po">
+      <style>{customSelectStyles}</style>
       <div className="body-content-container">
-        <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
+        <div className="back-button" onClick={handleBackWithUpdate}> ← Save</div>
         <div className="content-wrapper">
         <ToastContainer transition={Slide} />
         <Tooltip
   anchorId="purchaseIdSelect"
   place="bottom"
+  positionStrategy="fixed"
   content={poMismatchDetails ? poMismatchDetails.join('\n') : ''}
   style={{
     backgroundColor: '#E5E7EB',
+    width: '30em',
     color: '#000',
     fontSize: '0.5em',
     padding: '8px 12px',
-    borderRadius: '6px'
+    borderRadius: '6px',
+    overflowWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
   }}
 />
 
@@ -1423,7 +1446,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       </td>
                       <td>
                         {item.item_id && duplicateDetails[item.item_id]?.length > 1 ? (
-                          // Show dropdown if item has multiple prices
                           <select
                             value={item.cost || ''}
                             onChange={(e) => handleCostSelection(index, parseFloat(e.target.value))}
@@ -1436,7 +1458,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                             ))}
                           </select>
                         ) : (
-                          // Show read-only input with first available cost
                           <input
                             type="number"
                             value={
@@ -1504,31 +1525,76 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
 
-          <div className="button-section">
-            <div className="copy-from-button dropdown-scrollbar">
+          <div className="button-section" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div className="copy-from-container dropdown-scrollbar">
               {selectedButton === "Create" ? (
                 <select
-                  className="copy-from-select"
-                  value={selectedPO}
+                  className="copy-from-sele"
+                  value="Copy From"
                   onChange={(e) => handlePOSelect(e.target.value)}
+                  style={{ 
+                    width: 'auto', 
+                    maxWidth: '120px',
+                    padding: '0.5rem 1rem',
+                    paddingRight: '2rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    backgroundColor: '#0d9488',
+                    cursor: 'pointer',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    appearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundSize: '1rem'
+                  }}
                 >
-                  <option value="">Copy From</option>
+                  <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>Copy From</option>
                   {purchaseOrders.map(po => (
-                    <option key={po.purchase_id} value={po.purchase_id}>
+                    <option 
+                      key={po.purchase_id} 
+                      value={po.purchase_id}
+                      style={{ color: '#374151', backgroundColor: 'white' }}
+                    >
                       {po.purchase_id.split('-').slice(-2).join('-')}
                     </option>
                   ))}
                 </select>
               ) : (
-                <div className="copy-from-select"
-                  type="text"
-                  readOnly
-                  style={{ cursor: 'not-allowed' }}
-                >Copy From</div>
+                <button 
+                  className="copy-from-button"
+                  type="button"
+                  disabled
+                  style={{ 
+                    cursor: 'not-allowed',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    backgroundColor: '#0d9488',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    padding: '0.5rem 1rem',
+                    opacity: '0.7'
+                  }}
+                >Copy From</button>
               )}
             </div>
-            <div className="right-buttons">
-              <button className="cancel-button" onClick={onBack}>Cancel</button>
+            <div className="right-buttons" style={{ display: 'flex', gap: '0.75rem' }}>
+              <button 
+                className="cancel-button" 
+                onClick={onBack}
+                style={{ 
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '0.375rem',
+                  backgroundColor: 'white',
+                  color: '#374151',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

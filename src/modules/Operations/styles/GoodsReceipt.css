@@ -30,8 +30,8 @@
   gap: 1rem;
   flex: 1;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0 1rem; 
   overflow: hidden;
   position: relative;
 }
@@ -110,7 +110,7 @@
   background: #F9FAFB;
   color: #374151;
   font-size: 0.813rem;
-  height: 1.5rem;
+  height: 1.6rem;
 }
 
 
@@ -496,6 +496,47 @@
   background: #f1f5f9;
 }
 /* Media query for smaller tablets */
+/* Button section styling */
+.goods-r .button-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.goods-r .right-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.goods-r .copy-from-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #0d9488;
+  border-radius: 0.375rem;
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.goods-r .cancel-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #E5E7EB;
+  background: white;
+  border-radius: 0.375rem;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.goods-r .copy-from-button:hover {
+  background-color: #0b877b;
+}
+
+.goods-r .cancel-button:hover {
+  background: #F9FAFB;
+}
+
 @media (max-width: 768px) {
   .goods-r .body-content-container {
     padding: 0.75rem; /* Reduced padding */
@@ -537,6 +578,12 @@
     font-size: 0.7rem !important;
     position: relative;
     width: 10px;
+  }
+  
+  /* Keep buttons side by side in tablet view */
+  .goods-r .button-section {
+    flex-direction: row;
+    justify-content: space-between;
   }
 }
 
