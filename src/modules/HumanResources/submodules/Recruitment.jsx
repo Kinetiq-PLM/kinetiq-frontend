@@ -2423,7 +2423,11 @@ const handleEditOnboardingTask = (task) => {
                   <FiPlus className="icon" /> Add Interview
                 </button>
               )}
-              
+              {activeTab === "Onboarding" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Onboarding
+                </button>
+              )}
               {activeTab !== "Job Postings" && (
                 <button
                   className="recruitment-add-btn"
