@@ -34,6 +34,7 @@
   box-shadow: var(--shadow-md);
   font-family: 'Inter', 'Segoe UI', sans-serif;
   color: var(--text-primary);
+  overflow: scroll;
 }
 
 .project-planning-header {
