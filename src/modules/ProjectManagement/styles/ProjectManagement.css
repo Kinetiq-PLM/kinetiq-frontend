@@ -144,6 +144,7 @@
   width: 100%;
 }
 
+
 /* Tables */
 .data-table {
   width: 100%;
@@ -1780,5 +1781,678 @@
   
   .big-stat {
     font-size: 4.5rem;
+  }
+}
+
+.reminder-detail {
+    display: flex;
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.detail-label {
+    font-weight: bold;
+    margin-right: 8px;
+    min-width: 80px;
+}
+
+.detail-value {
+    color: #444;
+}
+
+/* Improved Reminder Card Styles */
+.reminder-content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  max-height: 450px;
+  overflow: hidden;
+}
+
+.reminder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.reminder-header h2 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.tabs-container {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+}
+
+.tab.active {
+  color: #14A2A0;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #14A2A0;
+}
+
+.tab-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+  background-color: #F5F5F5;
+}
+
+.tab-circle.today {
+  background-color: #E6F7F7;
+  color: #14A2A0;
+}
+
+.tab-circle.overdue {
+  background-color: #FFE6E6;
+  color: #FF4D4D;
+}
+
+.reminder-list {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 5px;
+}
+
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  border-left: 3px solid #14A2A0;
+  background-color: #F9F9F9;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 15px;
+}
+
+.reminder-content {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+
+.task-title {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.overdue-days {
+  color: #FF4D4D;
+  font-weight: bold;
+}
+
+.task-description {
+  margin: 5px 0 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+.reminder-detail {
+  display: flex;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 80px;
+  color: #555;
+}
+
+.detail-value {
+  flex-grow: 1;
+}
+
+.task-status-circle {
+  display: flex;
+  align-items: center;
+}
+
+.status-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.status-circle.completed {
+  background-color: #14A2A0;
+  border-color: #14A2A0;
+}
+
+.status-circle.overdue {
+  background-color: white;
+  border-color: #FF4D4D;
+}
+
+.loading-message,
+.error-message,
+.empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.error-message {
+  color: #FF4D4D;
+}
+
+/* Make sure the reminder card is responsive */
+@media (max-width: 768px) {
+  .reminder-card {
+      min-height: 350px;
+  }
+  
+  .reminder-item {
+      padding: 10px;
+  }
+  
+  .task-title {
+      font-size: 14px;
+  }
+  
+  .reminder-detail {
+      font-size: 12px;
+  }
+}
+
+/* Add this to your CSS file */
+.dashboard-section.reminder-section {
+  padding: 0;
+  overflow: visible;
+  height: auto;
+  box-shadow: none;
+  background: transparent;
+}
+
+.reminder-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tabs-container {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tab.active {
+  background: transparent;
+  color: #14A2A0;
+  box-shadow: none;
+}
+
+.tab-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.tab-circle.today {
+  background-color: #E6F7F7;
+  color: #14A2A0;
+}
+
+.tab-circle.overdue {
+  background-color: #FFE6E6;
+  color: #FF4D4D;
+}
+
+.reminder-list {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  border-left: 3px solid #14A2A0;
+  background-color: #F9F9F9;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.reminder-content {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+
+.task-title {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.task-description {
+  margin: 5px 0 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+.reminder-detail {
+  display: flex;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 80px;
+  color: #555;
+}
+
+.detail-value {
+  flex-grow: 1;
+}
+
+.task-status-circle {
+  display: flex;
+  align-items: center;
+}
+
+.status-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.status-circle.completed {
+  background-color: #14A2A0;
+  border-color: #14A2A0;
+}
+
+.status-circle.overdue {
+  background-color: white;
+  border-color: #FF4D4D;
+}
+
+/* Adjust grid layout to match the design */
+@media (min-width: 992px) {
+  .dashboard-sections {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto auto;
+      gap: 20px;
+  }
+  
+  .dashboard-section.overall-progress-section {
+      grid-column: 1;
+      grid-row: 1;
+  }
+  
+  .dashboard-column {
+      grid-column: 2;
+      grid-row: 1 / 3;
+  }
+  
+  .dashboard-section.reminder-section {
+      grid-column: 1;
+      grid-row: 2;
+  }
+  
+  .dashboard-section.task-completion-section {
+      grid-column: 1 / 3;
+      grid-row: 3;
+  }
+  
+  .dashboard-section.project-summary-section {
+      grid-column: 1 / 3;
+      grid-row: 4;
+  }
+}
+
+/* Add these styles to fix the Reminder card alignment */
+.reminder-card-container {
+  grid-column: 1;
+  grid-row: 2;
+  height: auto;
+}
+
+.reminder-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+/* Make sure the dashboard sections grid is properly defined */
+/* Add these styles for the reminder card container */
+.reminder-card-container {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.reminder-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+/* Make sure dashboard sections grid is defined correctly */
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto auto;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dashboard-section.overall-progress-section {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.dashboard-column {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+.dashboard-section.task-completion-section {
+  grid-column: 1 / 3;
+  grid-row: 3;
+}
+
+.dashboard-section.project-summary-section {
+  grid-column: 1 / 3;
+  grid-row: 4;
+}
+
+/* Tab styling updates */
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tab.active {
+  background: transparent;
+  color: #14A2A0;
+  box-shadow: none;
+}
+
+.tab-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.tab-circle.today {
+  background-color: #E6F7F7;
+  color: #14A2A0;
+}
+
+.tab-circle.overdue {
+  background-color: #FFE6E6;
+  color: #FF4D4D;
+}
+
+/* Add these styles for the new dashboard layout */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.dashboard-row > * {
+  flex: 1;
+}
+
+/* Reminder section specific styles */
+.dashboard-section.reminder-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-content {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reminder-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+}
+
+.reminder-tab {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  margin-right: 15px;
+  cursor: pointer;
+  position: relative;
+}
+
+.reminder-tab.active {
+  color: #14A2A0;
+}
+
+.reminder-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #14A2A0;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.tab-icon.today {
+  background-color: #E6F7F7;
+  color: #14A2A0;
+}
+
+.tab-icon.overdue {
+  background-color: #FFE6E6;
+  color: #FF4D4D;
+}
+
+.reminder-items {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-item {
+  display: flex;
+  padding: 12px;
+  border-left: 3px solid #14A2A0;
+  background-color: #f9f9f9;
+  border-radius: 0 4px 4px 0;
+}
+
+.reminder-item-content {
+  flex: 1;
+}
+
+.reminder-item-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.reminder-item-content p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.overdue-text {
+  color: #FF4D4D;
+  font-weight: 600;
+}
+
+.reminder-detail {
+  display: flex;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 80px;
+  color: #555;
+}
+
+.reminder-status {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.status-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.status-circle.completed {
+  background-color: #14A2A0;
+  border-color: #14A2A0;
+}
+
+.status-circle.overdue {
+  border-color: #FF4D4D;
+}
+
+.loading-message,
+.error-message,
+.empty-message {
+  padding: 15px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.error-message {
+  color: #FF4D4D;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .dashboard-row {
+      flex-direction: column;
   }
 }

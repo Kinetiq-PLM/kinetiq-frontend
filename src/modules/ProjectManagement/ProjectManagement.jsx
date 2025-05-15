@@ -3,7 +3,8 @@ import { Doughnut, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Legend, Filler } from 'chart.js';
 import "./styles/ProjectManagement.css";
 import axios from "axios";
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
+
 
 ChartJS.register(
   ArcElement, 
@@ -74,24 +75,7 @@ const BodyContent = () => {
     });
     
     // Reminder states
-    const [activeTab, setActiveTab] = useState('Notes');
-    const [reminderItems, setReminderItems] = useState([
-        {
-            id: 1,
-            title: 'Project Scheduling',
-            description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
-            completed: false,
-        },
-        {
-            id: 2,
-            title: 'Project Scheduling',
-            description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
-            completed: true,
-        }
-    ]);
-    const [showForm, setShowForm] = useState(false);
-    const [newTitle, setNewTitle] = useState('');
-    const [newDescription, setNewDescription] = useState('');
+    const [activeTab, setActiveTab] = useState('Today');
   
     // Fetch data on component mount
     useEffect(() => {
@@ -194,7 +178,6 @@ const BodyContent = () => {
     const fetchTodayTasks = async () => {
         setIsLoading(prev => ({ ...prev, todayTasks: true }));
         try {
-            // Get only today's tasks from the today-tasks endpoint
             const response = await axios.get('/api/dashboard/today-tasks/');
             setTodayTasks(Array.isArray(response.data) ? response.data : []);
             setErrors(prev => ({ ...prev, todayTasks: null }));
@@ -326,12 +309,6 @@ const BodyContent = () => {
             .join('')
             .toUpperCase()
             .substring(0, 2);
-    };
-    
-    // Format task deadline
-    const formatDeadline = (deadline) => {
-        if (!deadline) return 'N/A';
-        return deadline;
     };
     
     // Updated Employee Display Component
@@ -513,7 +490,6 @@ const BodyContent = () => {
     // Render pagination controls
     const renderPagination = (section, currentPage, totalPages) => {
         if (totalPages <= 1) return null;
-
         
         return (
             <div className="pagination-controls">
@@ -537,35 +513,6 @@ const BodyContent = () => {
             </div>
         );
     };
-
-    // Reminder form handlers
-    const handleAddClick = () => {
-        setShowForm(true);
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        if (newTitle.trim() !== '') {
-            const newItem = {
-                id: Date.now(),
-                title: newTitle,
-                description: newDescription,
-                completed: false
-            };
-            
-            setReminderItems([...reminderItems, newItem]);
-            setNewTitle('');
-            setNewDescription('');
-            setShowForm(false);
-        }
-    };
-
-    const handleCancel = () => {
-        setShowForm(false);
-        setNewTitle('');
-        setNewDescription('');
-    };
     
     return (
         <div className="project-management-container">
@@ -576,330 +523,214 @@ const BodyContent = () => {
                 </div>
 
                 {/* Main Dashboard Sections */}
-                <div className="dashboard-sections">
-                    {/* Overall Progress Section */}
-                    <div className="dashboard-section overall-progress-section">
-                        <div className="section-header">
-                            <h2><b>Overall Progress</b></h2>
-                        </div>
-                        <div className="chart-wrapper">
-                            <div className="doughnut-wrapper">
-                                <Doughnut data={progressChartData} options={doughnutOptions} />
-                                <div className="progress-text">
-                                    <div className="progress-percentage">{dashboardStats.overallProgress}%</div>
-                                    <div className="progress-label">Activity Progress</div>
+                <div className="dashboard-wrapper">
+                    <div className="dashboard-row">
+                        {/* Overall Progress Section */}
+                        <div className="dashboard-section overall-progress-section">
+                            <div className="section-header">
+                                <h2>Overall Progress</h2>
+                            </div>
+                            <div className="chart-wrapper">
+                                <div className="doughnut-wrapper">
+                                    <Doughnut data={progressChartData} options={doughnutOptions} />
+                                    <div className="progress-text">
+                                        <div className="progress-percentage">{dashboardStats.overallProgress}%</div>
+                                        <div className="progress-label">Activity Progress</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="stats-container">
-                            <div className="stat-box">
-                                <div className="stat-value">{dashboardStats.delayedProjects}</div>
-                                <div className="stat-label">Pending</div>
+                            <div className="stats-container">
+                                <div className="stat-box">
+                                    <div className="stat-value">{dashboardStats.delayedProjects}</div>
+                                    <div className="stat-label">Pending</div>
+                                </div>
+                                <div className="divider"></div>
+                                <div className="stat-box">
+                                    <div className="stat-value">{dashboardStats.ongoingProjects}</div>
+                                    <div className="stat-label">Need Action</div>
+                                </div>
                             </div>
-                            <div className="divider"></div>
-                            <div className="stat-box">
-                                <div className="stat-value">{dashboardStats.ongoingProjects}</div>
-                                <div className="stat-label">Need Action</div>
+
+                            <div className="improvement-text">
+                                You completed <strong>{weeklyImprovement}%</strong> more task this week
                             </div>
                         </div>
+                        
+                        {/* Right Column - Stats Cards */}
+                        <div className="dashboard-column">
+                            <div className="dashboard-row">
+                                {/* Existing Projects Card */}
+                                <div className="dashboard-section existing-project-section">
+                                    <div className="section-header">
+                                        <h2>Existing Project</h2>
+                                    </div>
+                                    <div className="center-stat">
+                                        <div className="big-stat">{dashboardStats.existingProjects}</div>
+                                    </div>
+                                </div>
 
-                        <div className="improvement-text">
-                            You completed <strong>{weeklyImprovement}%</strong> more task this week
+                                {/* Ongoing Projects Card */}
+                                <div className="dashboard-section ongoing-project-section">
+                                    <div className="section-header">
+                                        <h2>Ongoing</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={ongoingChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.ongoingProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="dashboard-row">
+                                {/* Delayed Projects Card */}
+                                <div className="dashboard-section delayed-project-section">
+                                    <div className="section-header">
+                                        <h2>Delayed</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={delayedChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.delayedProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Completed Projects Card */}
+                                <div className="dashboard-section completed-project-section">
+                                    <div className="section-header">
+                                        <h2>Completed</h2>
+                                    </div>
+                                    <div className="chart-wrapper">
+                                        <div className="doughnut-wrapper">
+                                            <Doughnut data={completedChartData} options={doughnutOptions} />
+                                            <div className="progress-text">
+                                                <div className="progress-percentage">{dashboardStats.completedProjects}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    {/* Project Stats Cards */}
-                    <div className="dashboard-column">
-                        <div className="dashboard-section-monitoring">
-                            {/* Existing Projects Card */}
-                            <div className="dashboard-section existing-project-section">
-                                <div className="section-header">
-                                    <h2><b>Existing Project</b></h2>
-                                </div>
-                                <div className="center-stat">
-                                    <div className="big-stat">{dashboardStats.existingProjects}</div>
-                                </div>
-                            </div>
 
-                            {/* Ongoing Projects Card */}
-                            <div className="dashboard-section ongoing-project-section">
-                                <div className="section-header">
-                                    <h2><b>Ongoing</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={ongoingChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.ongoingProjects}</div>
-                                        </div>
+                    <div className="dashboard-row">
+                        {/* Reminder Card */}
+                        <div className="dashboard-section reminder-section">
+                             <div className="reminder-content">
+                            <div className="section-header">
+                                <h2>Reminder</h2>
+                            </div>
+                           
+                                <div className="reminder-tabs">
+                                    <div 
+                                        className={`reminder-tab ${activeTab === 'Today' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('Today')}
+                                    >
+                                        <div className="tab-icon today">📅</div>
+                                        <span>Today</span>
+                                    </div>
+                                    <div 
+                                        className={`reminder-tab ${activeTab === 'Overdue' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('Overdue')}
+                                    >
+                                        <div className="tab-icon overdue">⚠️</div>
+                                        <span>Overdue</span>
                                     </div>
                                 </div>
                                 
-                            </div>
-                        </div>
-
-                        <div className="dashboard-section-monitoring">
-                            {/* Delayed Projects Card */}
-                            <div className="dashboard-section delayed-project-section">
-                                <div className="section-header">
-                                    <h2><b>Delayed</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={delayedChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.delayedProjects}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Completed Projects Card */}
-                            <div className="dashboard-section completed-project-section">
-                                <div className="section-header">
-                                    <h2><b>Completed</b></h2>
-                                </div>
-                                <div className="chart-wrapper">
-                                    <div className="doughnut-wrapper">
-                                        <Doughnut data={completedChartData} options={doughnutOptions} />
-                                        <div className="progress-text">
-                                            <div className="progress-percentage">{dashboardStats.completedProjects}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                       
-                        </div>
-                    </div>
-
-                    <div className="reminder-card">
-                        <div className="reminder-header">
-                            <h2>Reminder</h2>
-                            <button className="add-button" onClick={handleAddClick}>
-                                <span><b>+</b></span>
-                            </button>
-                        </div>
-                        
-                        <div className="tabs-container">
-                            <div className={`tab ${activeTab === 'Notes' ? 'active' : ''}`} onClick={() => setActiveTab('Notes')}>
-                                <div className="tab-icon">✓</div>
-                                <div className="tab-text"><b>Notes</b></div>
-                            </div>
-                        </div>
-                        
-                        {showForm && (
-                            <div className="reminder-form">
-                                <form onSubmit={handleSubmit} className="reminder-form-container">
-                                    <div className="form-header">
-                                        <h3>Add New Reminder</h3>
-                                        <button 
-                                            type="button" 
-                                            className="close-button" 
-                                            onClick={handleCancel}
-                                            aria-label="Close form"
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
+                                <div className="reminder-items">
+                                    {activeTab === 'Today' && (
+                                        isLoading.todayTasks ? (
+                                            <div className="loading-message">Loading today's tasks...</div>
+                                        ) : errors.todayTasks ? (
+                                            <div className="error-message">{errors.todayTasks}</div>
+                                        ) : todayTasks.length === 0 ? (
+                                            <div className="empty-message">No tasks scheduled for today</div>
+                                        ) : (
+                                            todayTasks.slice(0, 5).map(task => (
+                                                <div className="reminder-item" key={task.TaskID}>
+                                                    <div className="reminder-item-content">
+                                                        <h3>{task.Task}</h3>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Deadline:</span>
+                                                            <span className="detail-value">{task.Deadline}</span>
+                                                        </div>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Employee:</span>
+                                                            <span className="detail-value">{task.EmployeeName}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="reminder-status">
+                                                        <div 
+                                                            className={`status-circle ${task.Status === 'completed' ? 'completed' : ''}`}
+                                                            onClick={() => handleTaskStatusChange(
+                                                                task.TaskID, 
+                                                                task.Status === 'completed' ? 'in progress' : 'completed'
+                                                            )}
+                                                        >
+                                                            {task.Status === 'completed' ? '✓' : ''}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )
+                                    )}
                                     
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-title">Title</label>
-                                        <input
-                                            id="reminder-title"
-                                            type="text"
-                                            placeholder="Enter reminder title"
-                                            value={newTitle}
-                                            onChange={(e) => setNewTitle(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label htmlFor="reminder-description">Description</label>
-                                        <textarea
-                                            id="reminder-description"
-                                            placeholder="Enter reminder details"
-                                            value={newDescription}
-                                            onChange={(e) => setNewDescription(e.target.value)}
-                                            className="form-control"
-                                            rows="4"
-                                            required
-                                        />
-                                    </div>
-                                    
-                                    <div className="form-buttons">
-                                        <button 
-                                            type="button" 
-                                            onClick={handleCancel}
-                                            className="btn btn-secondary"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button 
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
-                                            Add Reminder
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-                        
-                        <div className="reminder-list">
-                            {reminderItems.map(item => (
-                                <div className="reminder-item" key={item.id}>
-                                    <div className="reminder-content">
-                                        <h3><b>{item.title}</b></h3>
-                                        <p>{item.description}</p>
-                                    </div>
-                                    <div className="reminder-actions">
-                                        <div 
-                                            className={`status-indicator-dashboard ${item.completed ? 'completed' : ''}`}
-                                            onClick={() => {
-                                                const updatedItems = reminderItems.map(i => 
-                                                    i.id === item.id ? {...i, completed: !i.completed} : i
-                                                );
-                                                setReminderItems(updatedItems);
-                                            }}
-                                        >
-                                            {item.completed ? '✓' : ''}
-                                        </div>
-                                    </div>
+                                    {activeTab === 'Overdue' && (
+                                        isLoading.overdueTasks ? (
+                                            <div className="loading-message">Loading overdue tasks...</div>
+                                        ) : errors.overdueTasks ? (
+                                            <div className="error-message">{errors.overdueTasks}</div>
+                                        ) : overdueTasks.length === 0 ? (
+                                            <div className="empty-message">No overdue tasks</div>
+                                        ) : (
+                                            overdueTasks.slice(0, 5).map(task => (
+                                                <div className="reminder-item" key={task.TaskID}>
+                                                    <div className="reminder-item-content">
+                                                        <h3><span className="overdue-text">Overdue: {task.Overdue}</span></h3>
+                                                        <p>{task.Task}</p>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Deadline:</span>
+                                                            <span className="detail-value">{task.Deadline}</span>
+                                                        </div>
+                                                        <div className="reminder-detail">
+                                                            <span className="detail-label">Employee:</span>
+                                                            <span className="detail-value">{task.Employee}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="reminder-status">
+                                                        <div 
+                                                            className="status-circle overdue"
+                                                            onClick={() => handleTaskStatusChange(task.TaskID, 'completed')}
+                                                        >
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )
+                                    )}
                                 </div>
-                            ))}
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Task Completion Overtime Chart */}
-                    <div className="dashboard-section task-completion-section">
-                        <div className="section-header">
-                            <h2><b>Task Completion Overtime</b></h2>
-                        </div>
-                        <div className="chart-wrapper2">
-                            <Line data={lineChartData} options={lineChartOptions} />
+                                        
+                        {/* Task Completion Overtime Chart */}
+                        <div className="dashboard-section task-completion-section">
+                            <div className="section-header">
+                                <h2>Task Completion Overtime</h2>
+                            </div>
+                            <div className="chart-wrapper2">
+                                <Line data={lineChartData} options={lineChartOptions} />
+                            </div>
                         </div>
                     </div>
                     
-                    {/* Overdue Tasks Section */}
-                    <div className="dashboard-section overdue-tasks-section">
-                        <div className="section-header">
-                            <h2>Overdue Task</h2>
-                        </div>
-                        <div className="section-content">
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Overdue</th>
-                                        <th>Task</th>
-                                        <th>Deadline</th>
-                                        <th>Employee</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isLoading.overdueTasks ? (
-                                        <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
-                                    ) : errors.overdueTasks ? (
-                                        <tr><td colSpan="4" className="error-cell">Error: {errors.overdueTasks}</td></tr>
-                                    ) : paginatedOverdueTasks.length === 0 ? (
-                                        <tr><td colSpan="4" className="no-data-cell">No overdue tasks</td></tr>
-                                    ) : (
-                                        paginatedOverdueTasks.map((item, index) => (
-                                            <tr key={index}>
-                                                <td className="due"><b>{item.Overdue}</b></td>
-                                                <td>{item.Task}</td>
-                                                <td>{item.Deadline}</td>
-                                                <td>
-                                                    <EmployeeDisplay 
-                                                        employee={{
-                                                            EmployeeID: item.EmployeeID,
-                                                            EmployeeName: item.Employee
-                                                        }} 
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            {renderPagination('overdueTasks', currentPage.overdueTasks, totalOverduePages)}
-                        </div>
-                    </div>
-
-                    {/* Today's Tasks Section - Updated to show only today's tasks */}
-                    <div className="dashboard-section todays-tasks-section">
-                        <div className="section-header">
-                            <div className="header-title-group">
-                                <h2>Today's Tasks</h2>
-                                <span className="section-subtitle">Tasks due today: {todayTasks.length}</span>
-                            </div>
-                        </div>
-                        <div className="section-content">
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Task</th>
-                                        <th>Deadline</th>
-                                        <th>Assigned To</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isLoading.todayTasks ? (
-                                        <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
-                                    ) : errors.todayTasks ? (
-                                        <tr><td colSpan="4" className="error-cell">Error: {errors.todayTasks}</td></tr>
-                                    ) : paginatedTodayTasks.length === 0 ? (
-                                        <tr><td colSpan="4" className="no-data-cell">No tasks due today</td></tr>
-                                    ) : (
-                                        paginatedTodayTasks.map((task, index) => (
-                                            <tr key={index}>
-                                                <td className="task-status">
-                                                    <span 
-                                                        className={`status-badge ${task.Status === 'completed' ? 'ok' : 'pending'}`}
-                                                        onClick={() => handleTaskStatusChange(
-                                                            task.TaskID, 
-                                                            task.Status === 'completed' ? 'in progress' : 'completed'
-                                                        )}
-                                                    >
-                                                        {task.Status === 'completed' ? 'Completed' : 'Pending'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span>{task.Task}</span>
-                                                        <small style={{ color: 'var(--light-text)' }}>
-                                                            {task.ProjectName}
-                                                        </small>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span className={`priority-indicator ${
-                                                        new Date(task.Deadline) < new Date() ? 'priority-high' : 
-                                                        new Date(task.Deadline).toDateString() === new Date().toDateString() ? 'priority-medium' : 
-                                                        'priority-low'
-                                                    }`}>
-                                                        {formatDeadline(task.Deadline)}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <EmployeeDisplay 
-                                                        employee={{
-                                                            EmployeeID: task.EmployeeID,
-                                                            EmployeeName: task.EmployeeName
-                                                        }} 
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            {renderPagination('todayTasks', currentPage.todayTasks, totalTodayTasksPages)}
-                        </div>
-                    </div>
-
                     {/* Project Summary Section */}
                     <div className="dashboard-section project-summary-section">
                         <div className="section-header">
@@ -1022,152 +853,152 @@ const BodyContent = () => {
                                                 </div>
                                             )}
                                             {projectDetail.project_issues && (
-                                                                                                <div className="detail-item full-width">
-                                                                                                <span className="detail-label">Project Issue:</span>
-                                                                                                <span className="detail-value">{projectDetail.project_issues}</span>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </>
-                                                                                )}
-                                            
-                                                                                {/* Internal Project */}
-                                                                                {selectedProject.type === 'Internal' && (
-                                                                                    <>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project Tracking ID:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project ID:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_project_id}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project Type:</span>
-                                                                                            <span className="detail-value">Internal</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Start Date:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_start_date}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Estimated End Date:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
-                                                                                        </div>
-                                                                                        {projectDetail.intrnl_project_issue && (
-                                                                                            <div className="detail-item full-width">
-                                                                                                <span className="detail-label">Project Issue:</span>
-                                                                                                <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </>
-                                                                                )}
-                                                                                
-                                                                                {/* Project Tasks Section */}
-                                                                                {projectDetail.tasks && projectDetail.tasks.length > 0 && (
-                                                                                    <div className="detail-item full-width">
-                                                                                        <span className="detail-label">Project Tasks:</span>
-                                                                                        <div className="tasks-container">
-                                                                                            <table className="details-table">
-                                                                                                <thead>
-                                                                                                    <tr>
-                                                                                                        <th>Task</th>
-                                                                                                        <th>Status</th>
-                                                                                                        <th>Deadline</th>
-                                                                                                    </tr>
-                                                                                                </thead>
-                                                                                                <tbody>
-                                                                                                    {projectDetail.tasks.map((task, idx) => (
-                                                                                                        <tr key={idx}>
-                                                                                                            <td>{task.description}</td>
-                                                                                                            <td>
-                                                                                                                <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
-                                                                                                                    {task.status}
-                                                                                                                </span>
-                                                                                                            </td>
-                                                                                                            <td>{task.deadline}</td>
-                                                                                                        </tr>
-                                                                                                    ))}
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        ) : (
-                                                                            <div className="no-data-cell">No detailed information available for this project.</div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="modal-footer">
-                                                                        <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        
-                                                        {/* Employee Details Modal */}
-                                                        {showEmployeeModal && selectedEmployee && (
-                                                            <div className="employee-details-modal">
-                                                                <div className="modal-content">
-                                                                    <div className="modal-header">
-                                                                        <h2>Employee: {selectedEmployee.EmployeeName}</h2>
-                                                                        <button className="close-button" onClick={closeEmployeeModal}>×</button>
-                                                                    </div>
-                                                                    <div className="modal-body">
-                                                                        {isLoadingEmployee ? (
-                                                                            <div className="loading-cell">Loading employee details...</div>
-                                                                        ) : employeeError ? (
-                                                                            <div className="error-cell">Error: {employeeError}</div>
-                                                                        ) : employeeDetails ? (
-                                                                            <div className="employee-details-container">
-                                                                                <div className="employee-avatar-large">
-                                                                                    <div className="avatar-circle">
-                                                                                        {getInitials(selectedEmployee.EmployeeName)}
-                                                                                    </div>
-                                                                                    <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
-                                                                                    <div className="employee-status-badge">
-                                                                                        {employeeDetails.status}
-                                                                                    </div>
-                                                                                </div>
-                                                                                
-                                                                                <div className="employee-info-grid">
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Employee ID</div>
-                                                                                        <div className="info-value">{employeeDetails.employee_id}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Department</div>
-                                                                                        <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Position</div>
-                                                                                        <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Phone</div>
-                                                                                        <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Employment Type</div>
-                                                                                        <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        ) : (
-                                                                            <div className="no-data-cell">No detailed information available for this employee.</div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="modal-footer">
-                                                                        <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            };
-                                            
-                                            export default BodyContent;
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.project_issues}</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    
+                                    {/* Internal Project */}
+                                    {selectedProject.type === 'Internal' && (
+                                        <>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Tracking ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Type:</span>
+                                                <span className="detail-value">Internal</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Start Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_start_date}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Estimated End Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
+                                            </div>
+                                            {projectDetail.intrnl_project_issue && (
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    
+                                    {/* Project Tasks Section */}
+                                    {projectDetail.tasks && projectDetail.tasks.length > 0 && (
+                                        <div className="detail-item full-width">
+                                            <span className="detail-label">Project Tasks:</span>
+                                            <div className="tasks-container">
+                                                <table className="details-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Task</th>
+                                                            <th>Status</th>
+                                                            <th>Deadline</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {projectDetail.tasks.map((task, idx) => (
+                                                            <tr key={idx}>
+                                                                <td>{task.description}</td>
+                                                                <td>
+                                                                    <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
+                                                                        {task.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{task.deadline}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="no-data-cell">No detailed information available for this project.</div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Employee Details Modal */}
+            {showEmployeeModal && selectedEmployee && (
+                <div className="employee-details-modal">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Employee: {selectedEmployee.EmployeeName}</h2>
+                            <button className="close-button" onClick={closeEmployeeModal}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            {isLoadingEmployee ? (
+                                <div className="loading-cell">Loading employee details...</div>
+                            ) : employeeError ? (
+                                <div className="error-cell">Error: {employeeError}</div>
+                            ) : employeeDetails ? (
+                                <div className="employee-details-container">
+                                    <div className="employee-avatar-large">
+                                        <div className="avatar-circle">
+                                            {getInitials(selectedEmployee.EmployeeName)}
+                                        </div>
+                                        <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
+                                        <div className="employee-status-badge">
+                                            {employeeDetails.status}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="employee-info-grid">
+                                        <div className="info-item">
+                                            <div className="info-label">Employee ID</div>
+                                            <div className="info-value">{employeeDetails.employee_id}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Department</div>
+                                            <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Position</div>
+                                            <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Phone</div>
+                                            <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Employment Type</div>
+                                            <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="no-data-cell">No detailed information available for this employee.</div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default BodyContent;

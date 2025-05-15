@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ProjectGanttChart from "./ProjectGanttChart.jsx";
 import "../styles/ProjectPlanning.css";
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
-
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
 // Import icons individually
 import { 
   FaClipboardList, 
@@ -14,10 +13,10 @@ import {
   FaChartLine, 
   FaArrowLeft, 
   FaPlus, 
+  FaBuilding,
   FaRegCalendarAlt, 
   FaFilter, 
   FaExternalLinkAlt, 
-  FaBuilding, 
   FaEdit, 
   FaEye, 
   FaCheckCircle, 
@@ -139,94 +138,97 @@ const ProjectPlanningDashboard = () => {
     employeeId: ""
   });
 
-  // Fetch all dropdown data on component mount
+  // Add fetch functions at the top, after useState declarations
+  const fetchApprovalIds = async () => {
+    const res = await axios.get('/api/project-planning/get-external-approval-ids/').catch(() => ({ data: [] }));
+    setApprovalIds(res.data);
+  };
+  const fetchInternalApprovalIds = async () => {
+    const res = await axios.get('/api/project-planning/get-internal-approval-ids/').catch(() => ({ data: [] }));
+    setInternalApprovalIds(res.data);
+  };
+  const fetchOrderIds = async () => {
+    const res = await axios.get('/api/project-planning/get-order-ids/').catch(() => ({ data: [] }));
+    setOrderIds(res.data);
+  };
+  const fetchProjectRequestIds = async () => {
+    const res = await axios.get('/api/project-planning/get-external-project-request-ids/').catch(() => ({ data: [] }));
+    setProjectRequestIds(res.data);
+  };
+  const fetchProjectIds = async () => {
+    const res = await axios.get('/api/project-planning/get-external-project-ids/').catch(() => ({ data: [] }));
+    setProjectIds(res.data);
+  };
+  const fetchEmployeeIds = async () => {
+    const res = await axios.get('/api/project-planning/get-employee-ids/').catch(() => ({ data: [] }));
+    setEmployeeIds(res.data);
+  };
+  const fetchEquipmentIds = async () => {
+    const res = await axios.get('/api/project-planning/get-equipment-ids/').catch(() => ({ data: [] }));
+    setEquipmentIds(res.data);
+  };
+  const fetchEquipmentNames = async () => {
+    try {
+      const res = await axios.get('/api/project-planning/get-equipment-names/');
+      setEquipmentNames(res.data);
+    } catch {
+      setEquipmentNames([
+        { id: "EQ-001", name: "Drill Machine" },
+        { id: "EQ-002", name: "Welding Equipment" },
+        { id: "EQ-003", name: "Forklift" },
+        { id: "EQ-004", name: "Concrete Mixer" },
+        { id: "EQ-005", name: "Excavator" }
+      ]);
+    }
+  };
+  const fetchInternalProjectRequestIds = async () => {
+    const res = await axios.get('/api/project-planning/get-internal-project-request-ids/').catch(() => ({ data: [] }));
+    setInternalProjectRequestIds(res.data);
+  };
+  const fetchInternalProjectIds = async () => {
+    const res = await axios.get('/api/project-planning/get-internal-project-ids/').catch(() => ({ data: [] }));
+    setInternalProjectIds(res.data);
+  };
+  const fetchDepartmentIds = async () => {
+    const res = await axios.get('/api/project-planning/get-department-ids/').catch(() => ({ data: [] }));
+    setDepartmentIds(res.data);
+  };
+  const fetchProjectStatusOptions = async () => {
+    const res = await axios.get('/api/project-planning/get-project-status-values/').catch(() => ({ data: ['not started', 'in progress', 'completed'] }));
+    setProjectStatusOptions(res.data);
+  };
+  const fetchInternalProjectStatusOptions = async () => {
+    const res = await axios.get('/api/project-planning/get-internal-project-status-values/').catch(() => ({ data: ['not started', 'in progress', 'completed'] }));
+    setInternalProjectStatusOptions(res.data);
+  };
+  const fetchExternalProjectsList = async () => {
+    const res = await axios.get('/api/project-planning/get-external-project-requests-list/').catch(() => ({ data: [] }));
+    setExternalProjectsList(res.data || []);
+  };
+  const fetchInternalProjectsList = async () => {
+    const res = await axios.get('/api/project-planning/get-internal-project-requests-list/').catch(() => ({ data: [] }));
+    setInternalProjectsList(res.data || []);
+  };
+
+  // Update useEffect to use these fetch functions
   useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        // First fetch internal approval IDs separately
-        const internalApprovalRes = await axios.get('/api/project-planning/get-internal-approval-ids/')
-          .catch(e => {
-            console.error("Error fetching internal approval IDs:", e);
-            return { data: [] };
-          });
-        setInternalApprovalIds(internalApprovalRes.data);
-        
-        // Create an array of promises for all other API calls
-        const apiCalls = [
-          axios.get('/api/project-planning/get-external-approval-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-order-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-external-project-request-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-external-project-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-employee-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-equipment-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-internal-project-request-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-internal-project-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-department-ids/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-project-status-values/').catch(e => ({ data: ['not started', 'in progress', 'completed'] })),
-          axios.get('/api/project-planning/get-internal-project-status-values/').catch(e => ({ data: ['not started', 'in progress', 'completed'] })),
-          axios.get('/api/project-planning/get-external-project-requests-list/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-internal-project-requests-list/').catch(e => ({ data: [] }))
-        ];
-        
-        // Execute all API calls in parallel
-        const [
-          approvalRes, 
-          orderRes, 
-          projectReqRes, 
-          projectIdRes, 
-          employeeRes, 
-          equipmentRes,
-          intProjectReqRes,
-          intProjectIdRes,
-          departmentRes,
-          projectStatusRes,
-          internalProjectStatusRes,
-          externalListRes,
-          internalListRes
-        ] = await Promise.all(apiCalls);
-        
-        // Set state with the results
-        setApprovalIds(approvalRes.data);
-        setOrderIds(orderRes.data);
-        setProjectRequestIds(projectReqRes.data);
-        setProjectIds(projectIdRes.data);
-        setEmployeeIds(employeeRes.data);
-        setEquipmentIds(equipmentRes.data);
-        setInternalProjectRequestIds(intProjectReqRes.data);
-        setInternalProjectIds(intProjectIdRes.data);
-        setDepartmentIds(departmentRes.data);
-        setProjectStatusOptions(projectStatusRes.data);
-        setInternalProjectStatusOptions(internalProjectStatusRes.data);
-        setExternalProjectsList(externalListRes.data || []);
-        setInternalProjectsList(internalListRes.data || []);
-        setCurrentExternalPage(1);
-        setCurrentInternalPage(1);
-        
-        // Fetch equipment names
-        try {
-          const equipmentNamesRes = await axios.get('/api/project-planning/get-equipment-names/');
-          setEquipmentNames(equipmentNamesRes.data);
-        } catch (error) {
-          console.error("Error fetching equipment names:", error);
-          // Create some mock equipment names if the API call fails
-          setEquipmentNames([
-            { id: "EQ-001", name: "Drill Machine" },
-            { id: "EQ-002", name: "Welding Equipment" },
-            { id: "EQ-003", name: "Forklift" },
-            { id: "EQ-004", name: "Concrete Mixer" },
-            { id: "EQ-005", name: "Excavator" }
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching dropdown data:", error);
-        setMessage({ 
-          text: "Some data could not be loaded. The application may have limited functionality.", 
-          type: "warning" 
-        });
-      }
-    };
-    
-    fetchDropdownData();
+    fetchInternalApprovalIds();
+    fetchApprovalIds();
+    fetchOrderIds();
+    fetchProjectRequestIds();
+    fetchProjectIds();
+    fetchEmployeeIds();
+    fetchEquipmentIds();
+    fetchInternalProjectRequestIds();
+    fetchInternalProjectIds();
+    fetchDepartmentIds();
+    fetchProjectStatusOptions();
+    fetchInternalProjectStatusOptions();
+    fetchExternalProjectsList();
+    fetchInternalProjectsList();
+    fetchEquipmentNames();
+    setCurrentExternalPage(1);
+    setCurrentInternalPage(1);
   }, []);
 
   // Handle form input changes
@@ -414,12 +416,10 @@ const handleEditProject = (projectId, isInternal = false) => {
       });
       
       // Refresh project request IDs
-      const projectReqRes = await axios.get('/api/project-planning/get-external-project-request-ids/');
-      setProjectRequestIds(projectReqRes.data);
+      await fetchProjectRequestIds();
       
       // Refresh external projects list
-      const externalListRes = await axios.get('/api/project-planning/get-external-project-requests-list/');
-      setExternalProjectsList(externalListRes.data || []);
+      await fetchExternalProjectsList();
       
       // Reset form
       setExternalProjectRequestForm({
@@ -475,12 +475,10 @@ const handleEditProject = (projectId, isInternal = false) => {
       });
       
       // Refresh project IDs
-      const projectIdRes = await axios.get('/api/project-planning/get-external-project-ids/');
-      setProjectIds(projectIdRes.data);
+      await fetchProjectIds();
       
       // Refresh external projects list
-      const externalListRes = await axios.get('/api/project-planning/get-external-project-requests-list/');
-      setExternalProjectsList(externalListRes.data || []);
+      await fetchExternalProjectsList();
       
       // Reset form
       setExternalProjectDetailsForm({
@@ -767,15 +765,10 @@ const handleEditProject = (projectId, isInternal = false) => {
         type: "success" 
       });
       
-      // Refresh internal project request IDs
-      const intProjectReqRes = await axios.get('/api/project-planning/get-internal-project-request-ids/');
-      setInternalProjectRequestIds(intProjectReqRes.data);
-      
-      // Refresh internal projects list
-      const internalListRes = await axios.get('/api/project-planning/get-internal-project-requests-list/');
-      setInternalProjectsList(internalListRes.data || []);
-      
-      // Reset form
+      // Refetch all relevant data
+      await fetchInternalProjectRequestIds();
+      await fetchInternalProjectsList();
+      await fetchInternalProjectIds();
       setInternalProjectRequestForm({
         projectName: "",
         requestDate: "",
@@ -787,8 +780,6 @@ const handleEditProject = (projectId, isInternal = false) => {
         equipmentNeeded: "",
         projectType: ""
       });
-      
-      // Return to dashboard
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error creating internal project:", error);
@@ -835,23 +826,15 @@ const handleEditProject = (projectId, isInternal = false) => {
         type: "success" 
       });
       
-      // Refresh internal project IDs
-      const intProjectIdRes = await axios.get('/api/project-planning/get-internal-project-ids/');
-      setInternalProjectIds(intProjectIdRes.data);
-      
-      // Refresh internal projects list
-      const internalListRes = await axios.get('/api/project-planning/get-internal-project-requests-list/');
-      setInternalProjectsList(internalListRes.data || []);
-      
-      // Reset form
+      // Refetch all relevant data
+      await fetchInternalProjectIds();
+      await fetchInternalProjectsList();
       setInternalProjectDetailsForm({
         projectRequestId: "",
         projectStatus: "",
         approvalId: "",
         projectDescription: ""
       });
-      
-      // Return to dashboard
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error updating internal project details:", error);
@@ -1103,7 +1086,7 @@ const handleEditProject = (projectId, isInternal = false) => {
                   currentExternalProjects.map(project => (
                     <tr key={project.project_request_id}>
                       <td>#{project.project_request_id || 'N/A'}</td>
-                      <td className="project-name">{project.project_name || 'N/A'}</td>
+                      <td>{project.project_name || 'N/A'}</td>
                       <td>{project.approval_id || 'N/A'}</td>
                       <td>{project.item_id || 'N/A'}</td>
                       <td className="date-cell">{project.start_date || 'Not set'}</td>
@@ -1186,7 +1169,7 @@ const handleEditProject = (projectId, isInternal = false) => {
                   currentInternalProjects.map(project => (
                     <tr key={project.project_request_id}>
                       <td>#{project.project_request_id || 'N/A'}</td>
-                      <td className="project-name">{project.project_name || 'N/A'}</td>
+                      <td>{project.project_name || 'N/A'}</td>
                       <td>{project.approval_id || 'N/A'}</td>
                       <td className="date-cell">{project.request_date || 'Not set'}</td>
                       <td>{project.employee || 'Not assigned'}</td>
@@ -1525,9 +1508,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('externalProjectDetails', 'projectRequestId', e.target.value)}
               required
             >
-              <option value="">Select Project Request ID</option>
-              {projectRequestIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project Request</option>
+              {projectRequestIds.map((req) => (
+                <option key={req.id} value={req.id}>
+                  {req.id}{req.name ? ` - ${req.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -1588,9 +1573,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('externalProjectLabor', 'projectId', e.target.value)}
               required
             >
-              <option value="">Select Project ID</option>
-              {projectIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project</option>
+              {projectIds.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.id}{project.name ? ` - ${project.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -1623,7 +1610,7 @@ const handleEditProject = (projectId, isInternal = false) => {
                 <option value="">Select Employee</option>
                 {employeeIds.map((employee) => (
                   <option key={employee.id} value={employee.id}>
-                    {employee.name} ({employee.id})
+                    {employee.name}
                   </option>
                 ))}
               </select>
@@ -1672,9 +1659,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('externalProjectEquipment', 'projectId', e.target.value)}
               required
             >
-              <option value="">Select Project ID</option>
-              {projectIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project</option>
+              {projectIds.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.id}{project.name ? ` - ${project.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -1767,9 +1756,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('externalProjectWarranty', 'projectId', e.target.value)}
               required
             >
-              <option value="">Select Project ID</option>
-              {projectIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project</option>
+              {projectIds.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.id}{project.name ? ` - ${project.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -1904,7 +1895,7 @@ const handleEditProject = (projectId, isInternal = false) => {
                 <option value="">Select Employee</option>
                 {employeeIds.map((employee) => (
                   <option key={employee.id} value={employee.id}>
-                    {employee.name} ({employee.id})
+                    {employee.name}
                   </option>
                 ))}
               </select>
@@ -1920,8 +1911,10 @@ const handleEditProject = (projectId, isInternal = false) => {
                 onChange={(e) => handleInputChange('internalProjectRequest', 'departmentId', e.target.value)}
               >
                 <option value="">Select Department</option>
-                {departmentIds.map((id) => (
-                  <option key={id} value={id}>{id}</option>
+                {departmentIds.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -2027,9 +2020,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('internalProjectDetails', 'projectRequestId', e.target.value)}
               required
             >
-              <option value="">Select Project Request ID</option>
-              {internalProjectRequestIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project Request</option>
+              {internalProjectRequestIds.map((req) => (
+                <option key={req.id} value={req.id}>
+                  {req.id}{req.name ? ` - ${req.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -2122,9 +2117,11 @@ const handleEditProject = (projectId, isInternal = false) => {
               onChange={(e) => handleInputChange('internalProjectLabor', 'projectId', e.target.value)}
               required
             >
-              <option value="">Select Project ID</option>
-              {internalProjectIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
+              <option value="">Select Project</option>
+              {internalProjectIds.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.id}{project.name ? ` - ${project.name}` : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -2157,42 +2154,7 @@ const handleEditProject = (projectId, isInternal = false) => {
                 <option value="">Select Employee</option>
                 {employeeIds.map((employee) => (
                   <option key={employee.id} value={employee.id}>
-                    {employee.name} ({employee.id})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">
-                Job Role*
-              </label>
-              <input
-                className="form-input"
-                type="text"
-                placeholder="e.g. Project Manager, Engineer, Technician"
-                value={internalProjectLaborForm.jobRole}
-                onChange={(e) => handleInputChange('internalProjectLabor', 'jobRole', e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                Employee*
-              </label>
-              <select
-                className="form-select"
-                value={internalProjectLaborForm.employeeId}
-                onChange={(e) => handleInputChange('internalProjectLabor', 'employeeId', e.target.value)}
-                required
-              >
-                <option value="">Select Employee</option>
-                {employeeIds.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {employee.name} ({employee.id})
+                    {employee.name}
                   </option>
                 ))}
               </select>

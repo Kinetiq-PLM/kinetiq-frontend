@@ -750,11 +750,6 @@
   color: var(--error-color);
 }
 
-.project-table .project-name {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
 .project-table .date-cell {
   color: var(--text-secondary);
   font-size: 0.85rem;

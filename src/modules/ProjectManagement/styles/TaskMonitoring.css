@@ -11,11 +11,12 @@
   background: white;
   border-radius: 10px;
   overflow: scroll;
-  font-family: 'Inter',sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .header-section {
   margin-bottom: 40px;
+  font-family: 'Inter', sans-serif;
 }
 
 .dashboard-title {
@@ -26,6 +27,7 @@
   display: flex;
   align-items: center;
   letter-spacing: -0.5px;
+  font-family: 'Inter', sans-serif;
 }
 
 .dashboard-title i {
@@ -37,6 +39,7 @@
 .dashboard-content {
   display: grid;
   gap: 35px;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Enhanced Navigation */
@@ -50,6 +53,7 @@
   width: fit-content;
   position: relative;
   z-index: 1;
+  font-family: 'Inter', sans-serif;
 }
 
 .task-nav-button {
@@ -65,6 +69,7 @@
   border-radius: 12px;
   display: flex;
   align-items: center;
+  font-family: 'Inter', sans-serif;
 }
 
 .task-nav-button:hover {
@@ -90,6 +95,7 @@
   margin-bottom: 35px;
   border: 1px solid rgba(0,0,0,0.03);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 .tasks-card:hover, 
@@ -106,6 +112,7 @@
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid #f1f5f9;
+  font-family: 'Inter', sans-serif;
 }
 
 .card-header h2, .card-header h3 {
@@ -115,11 +122,13 @@
   align-items: center;
   margin: 0;
   letter-spacing: -0.3px;
+  font-family: 'Inter', sans-serif;
 }
 
 .task-summary {
   display: flex;
   gap: 25px;
+  font-family: 'Inter', sans-serif;
 }
 
 .summary-item {
@@ -132,6 +141,7 @@
   border-radius: 10px;
   background-color: #f8f9fa;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 .summary-item:hover {
@@ -168,6 +178,7 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
+  font-family: 'Inter', sans-serif;
 }
 
 .loading-spinner {
@@ -178,6 +189,7 @@
   padding: 30px 40px;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  font-family: 'Inter', sans-serif;
 }
 
 .loading-spinner p {
@@ -211,11 +223,7 @@
   box-shadow: 0 4px 12px rgba(247, 37, 133, 0.1);
   animation: slideIn 0.4s ease;
   border-left: 4px solid #DC3545;
-}
-
-@keyframes slideIn {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  font-family: 'Inter', sans-serif;
 }
 
 .error-alert i {
@@ -246,6 +254,7 @@
   border-radius: 10px;
   scrollbar-width: thin;
   scrollbar-color: #adb5bd transparent;
+  font-family: 'Inter', sans-serif;
 }
 
 .table-responsive::-webkit-scrollbar {
@@ -266,6 +275,7 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
 }
 
 .tasks-table th, .task-table th {
@@ -280,6 +290,7 @@
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
 }
 
 .tasks-table td, .task-table td {
@@ -287,6 +298,7 @@
   border-bottom: 1px solid #f1f5f9;
   color: #475569;
   vertical-align: middle;
+  font-family: 'Inter', sans-serif;
 }
 
 .tasks-table tr:hover, .task-table tr:hover {
@@ -313,6 +325,7 @@
   color: #64748b;
   max-height: 3em; /* 2 lines × 1.5 line-height */
   position: relative;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Add fade out effect for truncated text */
@@ -338,6 +351,7 @@
   text-transform: capitalize;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 .status-badge:hover {
@@ -376,6 +390,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 500;
+  font-family: 'Inter', sans-serif;
 }
 
 .deadline-cell.past-deadline {
@@ -402,6 +417,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: 'Inter', sans-serif;
 }
 
 .user-avatar {
@@ -418,25 +434,57 @@
   box-shadow: 0 3px 8px rgba(67, 97, 238, 0.2);
   border: 2px solid white;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  position: relative;
+  font-family: 'Inter', sans-serif;
 }
 
 .user-avatar:hover {
   transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+}
+
+.user-avatar::after {
+  content: "\f067";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 10px;
+  background-color: white;
+  color: #00A8A8;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #00A8A8;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.user-avatar:hover::after {
+  opacity: 1;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
+  font-family: 'Inter', sans-serif;
 }
 
 .user-name {
   font-weight: 600;
   color: #2b2d42;
+  font-family: 'Inter', sans-serif;
 }
 
 .user-id {
   font-size: 12px;
   color: #adb5bd;
+  font-family: 'Inter', sans-serif;
 }
 
 /* No Tasks with improved visual */
@@ -450,6 +498,7 @@
   background-color: #f8f9fa;
   border-radius: 10px;
   margin: 20px 0;
+  font-family: 'Inter', sans-serif;
 }
 
 .no-tasks i {
@@ -463,6 +512,7 @@
   margin-bottom: 10px;
   color: #64748b;
   font-weight: 600;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Improved Forms */
@@ -471,11 +521,13 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
   margin-bottom: 30px;
+  font-family: 'Inter', sans-serif;
 }
 
 .form-group {
   margin-bottom: 20px;
   position: relative;
+  font-family: 'Inter', sans-serif;
 }
 
 .form-group label {
@@ -486,6 +538,7 @@
   color: #475569;
   display: flex;
   align-items: center;
+  font-family: 'Inter', sans-serif;
 }
 
 .form-control {
@@ -497,6 +550,7 @@
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background-color: #f8fafc;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  font-family: 'Inter', sans-serif;
 }
 
 .form-control:focus {
@@ -530,6 +584,7 @@ textarea.form-control {
   justify-content: center;
   border: none;
   letter-spacing: 0.3px;
+  font-family: 'Inter', sans-serif;
 }
 
 .primary-button {
@@ -592,6 +647,7 @@ textarea.form-control {
   justify-content: flex-end;
   gap: 18px;
   margin-top: 30px;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Task List Header */
@@ -599,6 +655,7 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 18px;
+  font-family: 'Inter', sans-serif;
 }
 
 .selected-count {
@@ -608,17 +665,20 @@ textarea.form-control {
   padding: 6px 12px;
   border-radius: 20px;
   font-weight: 600;
+  font-family: 'Inter', sans-serif;
 }
 
 .list-actions {
   display: flex;
   gap: 15px;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Select Column with improved checkbox */
 .select-col {
   width: 40px;
   text-align: center;
+  font-family: 'Inter', sans-serif;
 }
 
 .select-col input[type="checkbox"] {
@@ -653,6 +713,7 @@ textarea.form-control {
 .selected-row {
   background-color: #eef1ff !important;
   animation: highlight 0.3s ease;
+  font-family: 'Inter', sans-serif;
 }
 
 @keyframes highlight {
@@ -663,6 +724,7 @@ textarea.form-control {
 /* Description Cell - Replaced -webkit-line-clamp approach */
 .description-cell {
   max-width: 300px;
+  font-family: 'Inter', sans-serif;
 }
 
 .description-content {
@@ -671,6 +733,7 @@ textarea.form-control {
   max-height: 3em; /* 2 lines × 1.5 line-height */
   line-height: 1.5;
   position: relative;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Add fade-out effect to show truncation */
@@ -681,6 +744,7 @@ textarea.form-control {
   bottom: 0;
   padding-left: 40px;
   background: linear-gradient(to right, transparent, white 50%);
+  pointer-events: none;
 }
 
 /* Enhanced Pagination */
@@ -692,6 +756,7 @@ textarea.form-control {
   padding-top: 25px;
   border-top: 1px solid #f1f5f9;
   gap: 18px;
+  font-family: 'Inter', sans-serif;
 }
 
 .pagination-button {
@@ -708,6 +773,7 @@ textarea.form-control {
   background-color: white;
   color: #475569;
   box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  font-family: 'Inter', sans-serif;
 }
 
 .pagination-button:hover:not(:disabled) {
@@ -731,6 +797,7 @@ textarea.form-control {
   background-color: #f1f3f5;
   padding: 8px 16px;
   border-radius: 10px;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Responsive with improved breakpoints */
@@ -778,6 +845,7 @@ textarea.form-control {
   .task-nav-button {
     padding: 12px 20px;
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
   }
   
   .task-monitoring-container {
@@ -793,6 +861,7 @@ textarea.form-control {
   .form-actions, .list-actions {
     flex-direction: column;
     width: 100%;
+    font-family: 'Inter', sans-serif;
   }
   
   .primary-button,
@@ -800,6 +869,7 @@ textarea.form-control {
   .danger-button,
   .pagination-button {
     width: 100%;
+    font-family: 'Inter', sans-serif;
   }
   
   .tasks-table th, 
@@ -808,6 +878,7 @@ textarea.form-control {
   .task-table td {
     padding: 12px 10px;
     font-size: 13px;
+    font-family: 'Inter', sans-serif;
   }
   
   .dashboard-title {
@@ -818,6 +889,7 @@ textarea.form-control {
     flex-wrap: wrap;
   }
 }
+
 /* Employee Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -832,6 +904,7 @@ textarea.form-control {
   z-index: 1000;
   backdrop-filter: blur(5px);
   animation: fadeIn 0.3s ease;
+  font-family: 'Inter', sans-serif;
 }
 
 @keyframes fadeIn {
@@ -848,6 +921,7 @@ textarea.form-control {
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 @keyframes slideUp {
@@ -861,6 +935,7 @@ textarea.form-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-header h3 {
@@ -870,6 +945,7 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-close {
@@ -885,6 +961,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-close:hover {
@@ -894,6 +971,7 @@ textarea.form-control {
 
 .modal-body {
   padding: 25px;
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-footer {
@@ -901,6 +979,7 @@ textarea.form-control {
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: flex-end;
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-loading {
@@ -909,18 +988,21 @@ textarea.form-control {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-family: 'Inter', sans-serif;
 }
 
 .modal-loading .spinner {
   width: 40px;
   height: 40px;
   margin-bottom: 15px;
+  font-family: 'Inter', sans-serif;
 }
 
 .no-data {
   text-align: center;
   color: #64748b;
   padding: 30px 0;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Employee Profile */
@@ -931,6 +1013,7 @@ textarea.form-control {
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f1f5f9;
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-avatar-large {
@@ -946,6 +1029,7 @@ textarea.form-control {
   font-size: 30px;
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
   border: 3px solid white;
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-name-section h2 {
@@ -953,6 +1037,7 @@ textarea.form-control {
   font-size: 24px;
   font-weight: 700;
   color: #2b2d42;
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-status {
@@ -963,6 +1048,7 @@ textarea.form-control {
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-status.active {
@@ -989,6 +1075,7 @@ textarea.form-control {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-detail-item {
@@ -996,6 +1083,7 @@ textarea.form-control {
   background-color: #f1f3f5;
   border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', sans-serif;
 }
 
 .employee-detail-item:hover {
@@ -1012,51 +1100,15 @@ textarea.form-control {
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 8px;
+  font-family: 'Inter', sans-serif;
 }
 
 .detail-value {
   font-size: 16px;
   font-weight: 600;
   color: #2b2d42;
+  font-family: 'Inter', sans-serif;
 }
-
-/* Make the user avatar clickable */
-.user-avatar {
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-}
-
-.user-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-}
-
-.user-avatar::after {
-  content: "\f067";
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  font-size: 10px;
-  background-color: white;
-  color: #00A8A8;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #00A8A8;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.user-avatar:hover::after {
-  opacity: 1;
-}
-
 
 /* Success Toast Styling */
 .success-toast {
@@ -1076,6 +1128,7 @@ textarea.form-control {
   animation: slideIn 0.3s ease-out forwards;
   backdrop-filter: blur(4px);
   border-left: 4px solid #1b7a2e;
+  font-family: 'Inter', sans-serif;
 }
 
 .success-toast div {
@@ -1097,6 +1150,7 @@ textarea.form-control {
   margin-left: 10px;
   opacity: 0.8;
   transition: opacity 0.2s;
+  font-family: 'Inter', sans-serif;
 }
 
 .success-toast button:hover {
@@ -1128,3 +1182,4 @@ textarea.form-control {
 .success-toast.hiding {
   animation: slideOut 0.3s ease-in forwards;
 }
+
