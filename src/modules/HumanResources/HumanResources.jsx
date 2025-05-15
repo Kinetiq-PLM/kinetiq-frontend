@@ -29,7 +29,8 @@ import OvertimeSummaryReport from './components/reports/OvertimeSummaryReport';
 import PayrollSummaryReport from './components/reports/PayrollSummaryReport';
 import PositionsSummaryReport from './components/reports/PositionsSummaryReport';
 import ResignationsSummaryReport from './components/reports/ResignationsSummaryReport';
-import EmployeePerformanceTable from './components/EmployeePerformanceTable';
+import RecruitmentAnalytics from './components/RecruitmentAnalytics';
+
 // Define Kinetiq brand colors for charts
 const kinetiqColors = {
   primary: "#00a9ac",
@@ -42,6 +43,23 @@ const kinetiqColors = {
   accent6: "#ff8042",
   accent7: "#a5d8ef",
   neutral: "#687C7B"
+};
+
+// Add this helper function near the top of your component
+const createShade = (hexColor, percent) => {
+  const f = parseInt(hexColor.slice(1), 16);
+  const t = percent < 0 ? 0 : 255;
+  const p = percent < 0 ? percent * -1 : percent;
+  const R = f >> 16;
+  const G = (f >> 8) & 0x00ff;
+  const B = f & 0x0000ff;
+  
+  return `#${(
+    0x1000000 +
+    (Math.round((t - R) * p) + R) * 0x10000 +
+    (Math.round((t - G) * p) + G) * 0x100 +
+    (Math.round((t - B) * p) + B)
+  ).toString(16).slice(1)}`;
 };
 
 // Custom label component to better position labels
@@ -132,7 +150,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
   const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
 
   // Add state for managing report visibility
-  const [activeReport, setActiveReport] = useState(null);
+  const [activeReport, setActiveReport] = useState('department');
 
   // Add state for managing report period
   const [activePeriod, setActivePeriod] = useState('monthly'); // default to monthly
@@ -213,7 +231,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setLoading(true);
         
         // 1. Fetch all employees first to ensure we have the total count
-        const employeesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/");
+        const employeesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
         const employees = employeesRes.data;
         const totalEmployees = employees.length;
         
@@ -337,12 +355,20 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setDepartmentSuperiors(departmentSuperiors);
         
         // 6. Fetch resignations data
-        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/");
         const resignations = resignationsRes.data;
         
         // 7. Fetch recruitment data
-        // const recruitmentRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/recruitment/applicants/");
-        // const recruitment = recruitmentRes.data;
+        try {
+          const candidatesResponse = await axios.get('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/');
+          const interviewsResponse = await axios.get('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/');
+          
+          setCandidates(candidatesResponse.data || []);
+          setInterviews(interviewsResponse.data || []);
+        } catch (err) {
+          console.error("Error fetching recruitment data:", err);
+          // Don't set error state here to prevent the entire dashboard from showing an error
+        }
         
         // 8. Fetch payroll data
         const payrollRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/");
@@ -353,7 +379,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         // const training = trainingRes.data;
         
         // 10. Fetch overtime data
-        const overtimeResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/overtime_requests/");
+        const overtimeResponse = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/");
         setOvertimeRequestsData(overtimeResponse.data);
         
         // 11. Fetch positions data
@@ -365,7 +391,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setCandidates(candidatesRes.data);
 
         // 13. Fetch interviews data
-        const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/");
+        const interviewsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/");
         setInterviews(interviewsRes.data);
 
         // 14. Fetch job postings data
@@ -428,6 +454,9 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
           'Job Offer': 0,
           'Hired': 0
         };
+        
+        // Create a default empty array if recruitment data isn't available
+        const recruitment = [];
         
         recruitment.forEach(applicant => {
           const stage = applicant.stage || 'Application';
@@ -607,6 +636,20 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
     }
   };
 
+  // Add this helper function to calculate average rating
+  const calcAvgRating = () => {
+    if (!interviews || interviews.length === 0) return 0;
+    
+    const ratings = interviews
+      .filter(interview => interview && interview.rating)
+      .map(interview => interview.rating);
+    
+    if (ratings.length === 0) return 0;
+    
+    const avgRating = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+    return avgRating.toFixed(1);
+  };
+
   return (
     <div className="hr">
       <div className="hr-body-content-container">
@@ -702,73 +745,8 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
             {/* Main content grid */}
             <div className="hr-main-grid">
               <div className="hr-column-main">
-                {/* Performance table */}
-                <EmployeePerformanceTable 
-                  onViewAll={() => navigateTo('/employee-performance')} 
-                />
-                
-                {/* Leave requests section - Department KPIs section removed */}
-                <div className="hr-leave-requests-section">
-                  <div className="hr-section-header">
-                    <h3><strong>Leave Requests</strong></h3>
-                    <button 
-                      className="hr-view-all-btn" 
-                      onClick={() => navigateTo('/leave-requests')}
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="hr-leave-requests-table hr-table-responsive">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Employee Name</th>
-                          <th>Immediate Superior</th>
-                          <th>Leave Type</th>
-                          <th>Start Date</th>
-                          <th>End Date</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {loading ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>Loading leave requests...</td>
-                          </tr>
-                        ) : error ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>Error loading leave requests</td>
-                          </tr>
-                        ) : leaveRequests.length === 0 ? (
-                          <tr>
-                            <td colSpan="6" style={{textAlign: "center"}}>No leave requests found</td>
-                          </tr>
-                        ) : (
-                          leaveRequests.map((lr) => (
-                            <tr key={lr.leave_id} 
-                                className="interactive-row" 
-                                onClick={() => navigateTo('/leave-requests', { filterValue: lr.leave_id })}>
-                              <td>{lr.employee_name}</td>
-                              <td>{lr.immediate_superior_name}</td>
-                              <td>
-                                <span className={`hr-tag ${lr.leave_type.toLowerCase()}`}>
-                                  {lr.leave_type}
-                                </span>
-                              </td>
-                              <td>{lr.start_date}</td>
-                              <td>{lr.end_date}</td>
-                              <td>
-                                <span className={`hr-tag ${lr.status.toLowerCase().replace(/\s/g, "-")}`}>
-                                  {lr.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                {/* Replace both sections with the new component */}
+                <RecruitmentAnalytics navigateTo={navigateTo} />
               </div>
               
               <div className="hr-column-side">
@@ -784,6 +762,20 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
                   <div className="hr-donut-chart">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
+                        <defs>
+                          <radialGradient id="employeeType-regular" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stopColor={createShade(kinetiqColors.primary, 0.2)} stopOpacity={0.9} />
+                            <stop offset="100%" stopColor={kinetiqColors.primary} stopOpacity={1} />
+                          </radialGradient>
+                          <radialGradient id="employeeType-contractual" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stopColor={createShade(kinetiqColors.accent1, 0.2)} stopOpacity={0.9} />
+                            <stop offset="100%" stopColor={kinetiqColors.accent1} stopOpacity={1} />
+                          </radialGradient>
+                          <radialGradient id="employeeType-seasonal" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stopColor={createShade(kinetiqColors.secondary, 0.2)} stopOpacity={0.9} />
+                            <stop offset="100%" stopColor={kinetiqColors.secondary} stopOpacity={1} />
+                          </radialGradient>
+                        </defs>
                         <Pie
                           data={[
                             { name: 'Regular', value: employeeStats.regular || 0 },
@@ -798,9 +790,9 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
                           dataKey="value"
                           label={renderCustomizedLabel}
                         >
-                          <Cell fill={kinetiqColors.primary} />
-                          <Cell fill={kinetiqColors.accent1} />
-                          <Cell fill={kinetiqColors.secondary} />
+                          <Cell fill="url(#employeeType-regular)" />
+                          <Cell fill="url(#employeeType-contractual)" />
+                          <Cell fill="url(#employeeType-seasonal)" />
                         </Pie>
                         <Tooltip formatter={(value) => [`${value} employees`, '']} />
                       </PieChart>
@@ -833,6 +825,88 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
                   
                   <div className="hr-overlay-hint">
                     <span>View detailed employee breakdown</span>
+                  </div>
+                </div>
+                
+                {/* Add Recruitment Metrics here */}
+                <div className="hr-recruitment-metrics">
+                  <div className="hr-section-header">
+                    <h3><strong>Recruitment Metrics</strong></h3>
+                    <button 
+                      className="hr-view-all-btn" 
+                      onClick={() => navigateTo('/recruitment')}
+                    >
+                      View All
+                    </button>
+                  </div>
+                  
+                  <div className="recruitment-metrics-row">
+                    <div className="recruitment-metric-card primary">
+                      <div className="metric-icon">
+                        <i className="fas fa-users"></i>
+                      </div>
+                      <div className="metric-content">
+                        <h3>{loading ? "..." : candidates?.length || 0}</h3>
+                        <p>Total Candidates</p>
+                      </div>
+                      <div className="metric-trend">
+                        <i className="fas fa-chart-line"></i>
+                      </div>
+                    </div>
+                    
+                    <div className="recruitment-metric-card accent1">
+                      <div className="metric-icon">
+                        <i className="fas fa-file-alt"></i>
+                      </div>
+                      <div className="metric-content">
+                        <h3>{loading ? "..." : 
+                          candidates?.filter(c => {
+                            try {
+                              const createDate = new Date(c.created_at);
+                              const thirtyDaysAgo = new Date();
+                              thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                              return createDate >= thirtyDaysAgo;
+                            } catch(e) {
+                              return false;
+                            }
+                          })?.length || 0
+                        }</h3>
+                        <p>New Applications</p>
+                      </div>
+                      <div className="metric-trend">
+                        <i className="fas fa-arrow-up"></i>
+                      </div>
+                    </div>
+                    
+                    <div className="recruitment-metric-card accent5">
+                      <div className="metric-icon">
+                        <i className="fas fa-calendar-check"></i>
+                      </div>
+                      <div className="metric-content">
+                        <h3>{loading ? "..." : interviews?.filter(i => i.status === 'Scheduled')?.length || 0}</h3>
+                        <p>Scheduled Interviews</p>
+                      </div>
+                      <div className="metric-trend">
+                        <i className="fas fa-clock"></i>
+                      </div>
+                    </div>
+                    
+                    <div className="recruitment-metric-card secondary">
+                      <div className="metric-icon">
+                        <i className="fas fa-star"></i>
+                      </div>
+                      <div className="metric-content">
+                        <h3>{loading ? "..." : calcAvgRating()}/5.0</h3>
+                        <p>Avg. Interview Rating</p>
+                      </div>
+                      <div className="metric-trend">
+                        <div className="rating-stars">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <i key={star} className={`fas fa-star ${star <= Math.round(calcAvgRating()) ? 'filled' : ''}`}></i>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -961,18 +1035,6 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
                 </button>
                 <button 
                   className={`hr-report-tab ${activeReport === 'payroll' ? 'active' : ''}`} 
-                  onClick={() => setActiveReport('payroll')}
-                >
-                  Payroll
-                </button>
-                <button 
-                  className={`hr-report-tab ${activeReport === 'positions' ? 'active' : ''}`} 
-                  onClick={() => setActiveReport('positions')}
-                >
-                  Positions
-                </button>
-                <button 
-                  className={`hr-report-tab ${activeReport === 'resignations' ? 'active' : ''}`} 
                   onClick={() => setActiveReport('resignations')}
                 >
                   Resignations

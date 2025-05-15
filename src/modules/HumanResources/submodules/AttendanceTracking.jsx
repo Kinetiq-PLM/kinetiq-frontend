@@ -14,6 +14,7 @@ const AttendanceTracking = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [calendarDatesData, setCalendarDatesData] = useState([]);
   const [overtimeRequestsData, setOvertimeRequestsData] = useState([]);
+  const [employeesData, setEmployeesData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // UI States
@@ -45,10 +46,15 @@ const AttendanceTracking = () => {
     setLoading(true);
     try {
       const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
-      setAttendanceData(res.data);
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Attendance data:", responseData);
+      setAttendanceData(responseData);
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
       showToast("Failed to fetch attendance data", false);
+      // Set empty array on error
+      setAttendanceData([]);
     } finally {
       setLoading(false);
     }
@@ -58,37 +64,105 @@ const AttendanceTracking = () => {
     setLoading(true);
     try {
       const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/");
-      setCalendarDatesData(res.data);
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Calendar dates data:", responseData);
+      setCalendarDatesData(responseData);
     } catch (err) {
       console.error("Failed to fetch calendar dates:", err);
       showToast("Failed to fetch calendar dates", false);
+      // Set empty array on error
+      setCalendarDatesData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchOvertimeRequests = async () => {
-    setLoading(true);
+// Modify the fetchOvertimeRequests function to ensure employee data is properly loaded
+
+const fetchOvertimeRequests = async () => {
+  setLoading(true);
+  try {
+    // First ensure we have employee data
+    if (employeesData.length === 0) {
+      await fetchEmployees();
+    }
+    
+    const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/");
+    const responseData = Array.isArray(res.data) ? res.data : [];
+    
+    // Process the data to ensure employee_id and employee_name are properly set
+    const processedData = responseData.map(request => {
+      const processedRequest = {...request};
+      
+      // Only try to add missing information
+      // If employee_name is missing but we have employee_id
+      if (!processedRequest.employee_name && processedRequest.employee_id) {
+        const employee = employeesData.find(emp => 
+          emp.employee_id.toString() === processedRequest.employee_id.toString());
+        if (employee) {
+          processedRequest.employee_name = `${employee.first_name} ${employee.last_name}`;
+        }
+      }
+      
+      // If employee_id is missing but we have employee_name
+      if (!processedRequest.employee_id && processedRequest.employee_name) {
+        const nameParts = processedRequest.employee_name.split(' ');
+        if (nameParts.length >= 2) {
+          const firstName = nameParts[0];
+          const lastName = nameParts.slice(1).join(' ');
+          const employee = employeesData.find(emp => 
+            emp.first_name.toLowerCase() === firstName.toLowerCase() && 
+            emp.last_name.toLowerCase() === lastName.toLowerCase()
+          );
+          if (employee) {
+            processedRequest.employee_id = employee.employee_id;
+          }
+        }
+      }
+      
+      return processedRequest;
+    });
+    
+    console.log("Processed overtime requests data:", processedData);
+    setOvertimeRequestsData(processedData);
+  } catch (err) {
+    console.error("Failed to fetch overtime requests:", err);
+    showToast("Failed to fetch overtime requests data", false);
+    setOvertimeRequestsData([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const fetchEmployees = async () => {
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/");
-      setOvertimeRequestsData(res.data);
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+      // Ensure we're setting an array, even if the response is unexpected
+      const responseData = Array.isArray(res.data) ? res.data : [];
+      console.log("Employees data:", responseData);
+      setEmployeesData(responseData);
     } catch (err) {
-      console.error("Failed to fetch overtime requests:", err);
-      showToast("Failed to fetch overtime requests data", false);
-    } finally {
-      setLoading(false);
+      console.error("Failed to fetch employees:", err);
+      showToast("Failed to fetch employees data", false);
+      // Set empty array on error
+      setEmployeesData([]);
     }
   };
 
   useEffect(() => {
+    // First, fetch employees data
+    fetchEmployees();
+    
+    // Then load tab-specific data
     if (activeTab === "Attendance") {
       fetchAttendance();
     } else if (activeTab === "CalendarDates") {
       fetchCalendarDates();
     } else if (activeTab === "OvertimeRequests") {
-      fetchOvertimeRequests();
+      fetchOvertimeRequests(); // Always fetch overtime requests when tab is active
     }
-  }, [activeTab]);
+  }, [activeTab]); // Remove employeesData.length dependency
 
   useEffect(() => {
     // Check if there's a selected date in sessionStorage
@@ -121,6 +195,12 @@ const AttendanceTracking = () => {
    * 3) Sorting + Pagination + Filtering
    ******************************************/
   const filterAndPaginate = (dataArray) => {
+    // Make sure dataArray is an array
+    if (!Array.isArray(dataArray)) {
+      console.error("Expected array but got:", typeof dataArray, dataArray);
+      return { paginated: [], totalPages: 0, totalCount: 0 };
+    }
+    
     // Filter by searchTerm
     const filtered = dataArray.filter((item) =>
       Object.values(item).some((val) => 
@@ -343,6 +423,12 @@ const AttendanceTracking = () => {
       return <div className="hr-attendance-no-results">No overtime requests found.</div>;
     }
 
+    // Create a map of employee_id to employee names for easier lookup
+    const employeeMap = {};
+    employeesData.forEach(emp => {
+      employeeMap[emp.employee_id] = `${emp.first_name} ${emp.last_name}`;
+    });
+
     return (
       <>
         <div className="hr-attendance-no-scroll-wrapper">
@@ -353,36 +439,30 @@ const AttendanceTracking = () => {
                   <th>Request ID</th>
                   <th>Employee ID</th>
                   <th>Employee Name</th>
-                  <th>Date</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Hours</th>
+                  <th>Request Date</th>
+                  <th>Overtime Hours</th>
                   <th>Reason</th>
                   <th>Status</th>
                   <th>Approved By</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
+                  <th>Approval Date</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.map((request, index) => (
                   <tr key={request.request_id || index}>
                     <td>{request.request_id}</td>
-                    <td>{request.employee_id}</td>
-                    <td>{request.employee_name}</td>
-                    <td>{request.date}</td>
-                    <td>{request.start_time}</td>
-                    <td>{request.end_time}</td>
-                    <td>{request.hours}</td>
+                    <td>{request.employee_id || "-"}</td>
+                    <td>{request.employee_name || employeeMap[request.employee_id] || "-"}</td>
+                    <td>{request.request_date}</td>
+                    <td>{request.overtime_hours}</td>
                     <td>{request.reason}</td>
                     <td>
                       <span className={`hr-attendance-tag ${request.status?.toLowerCase()}`}>
                         {request.status}
                       </span>
                     </td>
-                    <td>{request.approved_by}</td>
-                    <td>{request.created_at}</td>
-                    <td>{request.updated_at}</td>
+                    <td>{employeeMap[request.approved_by] || "-"}</td>
+                    <td>{request.approval_date || "-"}</td>
                   </tr>
                 ))}
               </tbody>

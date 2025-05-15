@@ -450,9 +450,6 @@ function App() {
       "Rework": "Rework",
     },
     "Production": {
-      "Equipment and Labor": "Equipment&Labor",
-      //"Quality Control": "QualityControl",
-      "Cost of Production": "CostOfProduction",
       "Equipment": "Equipment",
       "Labor": "Labor",
       "Cost of Production": "CostOfProduction",

@@ -36,7 +36,8 @@ const LeaveRequests = () => {
     leave_type: "",
     start_date: "",
     end_date: "",
-    is_paid: false
+    is_paid: false,
+    reason: ""
   });
 
   // Add this to your state declarations at the top
@@ -244,13 +245,13 @@ const LeaveRequests = () => {
     };
     
     // Add immediate_superior_id and management_approval_id only if they're not empty
-    if (newLeaveRequest.immediate_superior_id) {
-      requestPayload.immediate_superior_id = newLeaveRequest.immediate_superior_id;
-    }
+    // if (newLeaveRequest.immediate_superior_id) {
+    //   requestPayload.immediate_superior_id = newLeaveRequest.immediate_superior_id;
+    // }
     
-    if (newLeaveRequest.management_approval_id) {
-      requestPayload.management_approval_id = newLeaveRequest.management_approval_id;
-    }
+    // if (newLeaveRequest.management_approval_id) {
+    //   requestPayload.management_approval_id = newLeaveRequest.management_approval_id;
+    // }
     
     // Console log for debugging
     console.log("Sending leave request payload:", requestPayload);
@@ -276,7 +277,7 @@ const LeaveRequests = () => {
         end_date: "",
         is_paid: false,
         immediate_superior_id: "",
-        management_approval_id: ""
+        // management_approval_id: ""
       });
       
       setShowAddModal(false);
@@ -541,13 +542,12 @@ const LeaveRequests = () => {
                   <th>Employee Name</th>
                   <th>Immediate Superior ID</th>
                   <th>Immediate Superior Name</th>
-                  <th>Management Approval ID</th>
-                  <th>Management Approval Name</th>
                   <th>Leave Type</th>
                   <th>Start Date</th>
                   <th>End Date</th>
                   <th>Total Days</th>
                   <th>Is Paid</th>
+                  <th>Reason</th>
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Updated At</th>
@@ -571,8 +571,6 @@ const LeaveRequests = () => {
                     <td>{request.employee_name}</td>
                     <td>{request.immediate_superior_id}</td>
                     <td>{request.immediate_superior_name}</td>
-                    <td>{request.management_approval_id}</td>
-                    <td>{request.management_approval_name}</td>
                     <td>
                       <span className={`hr-tag ${request.leave_type.toLowerCase()}`}>
                         {request.leave_type}
@@ -590,6 +588,7 @@ const LeaveRequests = () => {
                         {request.is_paid ? 'Yes' : 'No'}
                       </span>
                     </td>
+                    <td>{request.reason || "-"}</td>
                     <td>
                       <span className={`hr-tag ${request.status.toLowerCase().replace(/\s/g, '-')}`}>
                         {request.status}
@@ -868,11 +867,11 @@ const initializeEditForm = (request) => {
     start_date: request.start_date,
     end_date: request.end_date,
     is_paid: request.is_paid,
-    status: request.status
+    status: request.status,
+    reason: request.reason || ""
   });
   setShowEditModal(true);
 };
-
 // Add this function to handle edit form changes
 const handleEditLeaveRequestChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -1115,7 +1114,22 @@ const handleEditLeaveRequest = async (e) => {
                       onChange={handleLeaveRequestChange} 
                     />
                   </div>
-                  
+                  <div className="form-group">
+                    <label>Reason</label>
+                    <select 
+                      name="reason"
+                      value={newLeaveRequest.reason || ""}
+                      onChange={handleLeaveRequestChange}
+                    >
+                      <option value="">-- Select Reason --</option>
+                      <option value="Project Canceled">Project Canceled</option>
+                      <option value="Unused Funds">Unused Funds</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Family Emergency">Family Emergency</option>
+                      <option value="Personal Time">Personal Time</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
                   {/* Balance information showing current values */}
                   {renderLeaveBalanceInfo()}
                 </div>
@@ -1213,7 +1227,22 @@ const handleEditLeaveRequest = async (e) => {
                       onChange={handleEditLeaveRequestChange} 
                     />
                   </div>
-                  
+                  <div className="form-group">
+                    <label>Reason</label>
+                    <select 
+                      name="reason" 
+                      value={editedLeaveRequest.reason || ""} 
+                      onChange={handleEditLeaveRequestChange}
+                    >
+                      <option value="">-- Select Reason --</option>
+                      <option value="Project Canceled">Project Canceled</option>
+                      <option value="Unused Funds">Unused Funds</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Family Emergency">Family Emergency</option>
+                      <option value="Personal Time">Personal Time</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
                   <div className="form-group">
                     <label>Status</label>
                     <select 
@@ -1225,8 +1254,8 @@ const handleEditLeaveRequest = async (e) => {
                       <option value="Pending">Pending</option>
                       <option value="Approved by Superior">Approved by Superior</option>
                       <option value="Rejected by Superior">Rejected by Superior</option>
-                      <option value="Approved by Management">Approved by Management</option>
-                      <option value="Rejected by Management">Rejected by Management</option>
+                      {/* <option value="Approved by Management">Approved by Management</option>
+                      <option value="Rejected by Management">Rejected by Management</option> */}
                       <option value="Recorded in HRIS">Recorded in HRIS</option>
                     </select>
                   </div>

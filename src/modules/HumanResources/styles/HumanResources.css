@@ -821,15 +821,15 @@
 /* Advanced two-column layout */
 .hr-main-grid {
   display: grid;
-  grid-template-columns: 2.5fr 1fr;
+  grid-template-columns: 5fr 3fr;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .hr-column-main {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.5rem; */
 }
 
 .hr-column-side {
@@ -1274,6 +1274,10 @@
   .hr-metrics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .hr-summary-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 992px) {
@@ -1301,6 +1305,14 @@
   }
 
   .hr-key-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .hr-summary-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hr-main-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1617,8 +1629,232 @@
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 992px) {
-  .hr-report-charts-container {
-    grid-template-columns: 1fr;
-  }
+/* Summary Metrics Grid */
+.hr-summary-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+/* Summary Metric Card */
+.hr-summary-metric-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #f0f0f0;
+}
+
+.hr-summary-metric-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Card Header */
+.hr-summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.hr-summary-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hr-summary-card-title h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.hr-card-badge {
+  background-color: #00a9ac;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.hr-card-action-btn {
+  background-color: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.hr-card-action-btn:hover {
+  background-color: rgba(0, 169, 172, 0.1);
+  color: #00a9ac;
+}
+
+/* Card Stats Row */
+.hr-card-stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.hr-card-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.hr-card-stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.hr-card-stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Micro Chart */
+.hr-card-micro-chart {
+  height: 80px;
+  margin-top: 0.5rem;
+}
+
+/* Pie Chart */
+.hr-card-pie-chart {
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Task Progress */
+.hr-task-progress {
+  margin-top: 0.5rem;
+}
+
+.hr-task-progress-item {
+  margin-bottom: 0.5rem;
+}
+
+.hr-task-status {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.hr-task-status-label {
+  color: #555;
+}
+
+.hr-task-status-count {
+  font-weight: 500;
+}
+
+.hr-task-progress-bar {
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hr-task-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* Applications List */
+.hr-applications-list {
+  margin-top: 0.5rem;
+}
+
+.hr-application-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.hr-application-job {
+  width: 30%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #555;
+}
+
+.hr-application-bar-container {
+  flex-grow: 1;
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  margin: 0 0.5rem;
+  overflow: hidden;
+}
+
+.hr-application-bar {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.hr-application-count {
+  width: 20px;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Enhanced chart styling */
+.recharts-pie path {
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1));
+  transition: filter 0.3s, transform 0.3s;
+}
+
+.recharts-pie path:hover {
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2));
+  transform: scale(1.02);
+}
+
+.recharts-bar-rectangle {
+  transition: filter 0.3s, transform 0.3s;
+}
+
+.recharts-bar-rectangle:hover {
+  filter: brightness(1.1);
+}
+
+.recharts-radar-polygon {
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1));
+}
+
+/* Improve legend styling */
+.recharts-default-legend {
+  margin-top: 10px !important;
+}
+
+.recharts-legend-item {
+  margin-right: 15px !important;
+}
+
+/* Style chart tooltips */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }

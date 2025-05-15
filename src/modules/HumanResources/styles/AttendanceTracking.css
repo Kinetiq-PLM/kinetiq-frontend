@@ -434,21 +434,25 @@
 .hr-attendance-tag.present {
   background-color: #d1e7dd;
   color: #0f5132; /* Green - Present */
+  border: 1px solid #75b798; /* Darker border for present */
 }
 
 .hr-attendance-tag.absent {
   background-color: #f8d7da;
   color: #842029; /* Red - Absent */
+  border: 1px solid #ea868f; /* Darker border for absent */
 }
 
 .hr-attendance-tag.late {
   background-color: #fff3cd;
   color: #664d03; /* Yellow - Late */
+  border: 1px solid #ffe69c; /* Darker border for late */
 }
 
 .hr-attendance-tag.half-day {
   background-color: #cfe2ff;
   color: #084298; /* Blue - Half-day */
+  border: 1px solid #9ec5fe; /* Darker border for half-day */
 }
 
 /* Calendar Date Boolean Fields */
@@ -483,11 +487,13 @@
   background-color: #ff9e80;
   color: #7f0000;
   font-weight: bold;
+  border: 1px solid #ff6e40; /* Darker orange/red border */
 }
 
 .hr-attendance-tag.holiday-no {
   background-color: #e0e0e0;
   color: #424242;
+  border: 1px solid #bdbdbd; /* Darker gray border */
 }
 
 /* More specific calendar field type combinations */
@@ -497,23 +503,13 @@
   background-color: #d1e7dd;
   color: #0f5132;
   font-weight: bold;
+  border: 1px solid #75b798; /* Darker border */
 }
 
 .hr-attendance-tag.workday-no {
   background-color: #e0e0e0;
   color: #424242;
-}
-
-/* Holiday specific */
-.hr-attendance-tag.holiday-yes {
-  background-color: #ff9e80;
-  color: #7f0000;
-  font-weight: bold;
-}
-
-.hr-attendance-tag.holiday-no {
-  background-color: #e0e0e0;
-  color: #424242;
+  border: 1px solid #bdbdbd; /* Darker border */
 }
 
 /* Special day specific */
@@ -521,11 +517,38 @@
   background-color: #ffe082;
   color: #886a08;
   font-weight: bold;
+  border: 1px solid #ffc947; /* Darker yellow border */
 }
 
 .hr-attendance-tag.special-no {
   background-color: #e0e0e0;
   color: #424242;
+  border: 1px solid #bdbdbd; /* Darker gray border */
+}
+
+/* Overtime Request Status Tags */
+.hr-attendance-tag.pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.hr-attendance-tag.approved {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.hr-attendance-tag.rejected {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.hr-attendance-tag.completed {
+  background-color: #e6fffb;
+  color: #13c2c2;
+  border: 1px solid #87e8de;
 }
 
 /* Overtime Request Status Tags */
