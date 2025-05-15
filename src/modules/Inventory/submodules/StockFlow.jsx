@@ -245,39 +245,50 @@ const BodyContent = () => {
     
 
 
-    // Table Configurations per Active Tab
-    const stockFlowTableConfigs = {
-        "Warehouse": {
-            Columns: ["Item Name", "Type", "Item No", "Quantity", "Expiry"],
-            Data:  filteredData.map((item) => {
-                return {
-                    "Inventory Item ID": item?.inventory_item_id || "none",
-                    "Item Name": item?.item_name || "Unknown",
-                    "Type": item?.item_type || "Unspecified",
-                    "Item No": item.item_no || "-",
-                    "Quantity": item?.current_quantity || "-",
-                    "Expiry": item?.expiry.split("T")[0] || "-" 
-                }
-            })
-        },
-        "Transfer History": {
-            Columns: ["Movement ID", "Movement Date", "Origin", "Destination","Remarks", "Status" ],
-            Data: warehouseMovementsView.map((item) => {
-                return {
-                    "Movement ID": item?.movement_id || "-",
-                    "Movement Date": item?.movement_date.split("T")[0] || "-",
-                    "Origin": item?.source_location || "-",
-                    "Destination": item.destination_location || "-",
-                    "Remarks": item?.comments || "-",
-                    "Status": item?.movement_status || "-" 
-                }
-            })
-        },
-        
-        
-    };
+    // Filter Transfer History by warehouse and search
+const filteredTransferHistory = warehouseMovementsView.filter((item) => {
+    // Warehouse filter (destination only)
+    const warehouseMatch = selectedWarehouse
+        ? (item.destination_location && item.destination_location.toLowerCase() === selectedWarehouse.toLowerCase())
+        : true;
+    // Search filter
+    const search = searchTerm.toLowerCase();
+    const searchMatch = !searchTerm.trim() ? true : (
+        (item.movement_id && String(item.movement_id).toLowerCase().includes(search)) ||
+        (item.source_location && item.source_location.toLowerCase().includes(search)) ||
+        (item.destination_location && item.destination_location.toLowerCase().includes(search)) ||
+        (item.comments && item.comments.toLowerCase().includes(search))
+    );
+    return warehouseMatch && searchMatch;
+});
 
-    
+// Table Configurations per Active Tab
+const stockFlowTableConfigs = {
+    "Warehouse": {
+        Columns: ["Item Name", "Type", "Item No", "Quantity", "Expiry"],
+        Data:  filteredData.map((item) => ({
+            "Inventory Item ID": item?.inventory_item_id || "none",
+            "Item Name": item?.item_name || "Unknown",
+            "Type": item?.item_type || "Unspecified",
+            "Item No": item.item_no || "-",
+            "Quantity": item?.current_quantity || "-",
+            "Expiry": item?.expiry.split("T")[0] || "-" 
+        }))
+    },
+    "Transfer History": {
+        Columns: ["Movement ID", "Movement Date", "Origin", "Destination","Remarks", "Status" ],
+        Data: filteredTransferHistory.map((item) => ({
+            "Movement ID": item?.movement_id || "-",
+            "Movement Date": item?.movement_date?.split("T")[0] || "-",
+            "Origin": item?.source_location || "-",
+            "Destination": item.destination_location || "-",
+            "Remarks": item?.comments || "-",
+            "Status": item?.movement_status || "-" 
+        }))
+    },
+};
+
+
     console.log(stockFlowTableConfigs["Transfer History"])
     // console.log(stockFlowTableConfigs)
     const activeConfig = stockFlowTableConfigs[activeTab];
@@ -293,7 +304,7 @@ const BodyContent = () => {
             <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
                 <div className="flex-col w-full">
                 <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY: STOCKFLOW</h2>
-                <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{selectedWarehouse}</span></p>
+                <p className={`text-base font-semibold mt-1 `}>Selected Warehouse: <span className="font-normal">{selectedWarehouse}</span></p>
                 </div>
 
                 <div className="w-[400px] h-full flex flex-col">
