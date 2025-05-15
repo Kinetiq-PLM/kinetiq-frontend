@@ -10,7 +10,8 @@ import {
   FaBox,
   FaCalendarCheck,
   FaExclamationTriangle,
-  FaArrowRight
+  FaArrowRight,
+  FaClipboard
 } from "react-icons/fa";
 import "../../styles/Packing.css";
 
@@ -29,12 +30,39 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
     return packingType ? packingType.name : typeId;
   };
   
-  // Format currency
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP'
-    }).format(value || 0);
+  // Check if this is a partial delivery
+  const isPartialDelivery = !!(packingList.delivery_notes_info && packingList.delivery_notes_info.is_partial_delivery);
+  
+  // Get partial delivery info if available
+  let currentDelivery = isPartialDelivery ? packingList.delivery_notes_info.current_delivery : null;
+  const totalDeliveries = isPartialDelivery ? packingList.delivery_notes_info.total_deliveries : null;
+  
+  if (currentDelivery > totalDeliveries) {
+    currentDelivery = totalDeliveries;
+  }
+  const currentDeliveryNotes = isPartialDelivery ? packingList.delivery_notes_info.current_delivery_notes : [];
+  
+  // Get delivery notes display if available
+  const getDeliveryNotesDisplay = () => {
+    if (!isPartialDelivery || !currentDeliveryNotes || currentDeliveryNotes.length === 0) {
+      return null;
+    }
+    
+    return (
+      <div className="delivery-notes-section">
+        <h5 className="notes-header">
+          <FaClipboard className="notes-icon" /> 
+          Delivery Notes Included in This Batch
+        </h5>
+        <div className="delivery-notes-list">
+          {currentDeliveryNotes.map(noteId => (
+            <div key={noteId} className="delivery-note-item">
+              <span className="delivery-note-id">{noteId}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
   
   return (
@@ -42,7 +70,10 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
       <div className="completion-modal improved" onClick={e => e.stopPropagation()} aria-labelledby="modal-title">
         <div className="modal-header">
           <h3 id="modal-title">
-            <FaBoxes className="title-icon" /> Confirm Packing Completion
+            <FaBoxes className="title-icon" /> 
+            {isPartialDelivery
+              ? `Confirm Packing Completion (Batch ${currentDelivery} of ${totalDeliveries})`
+              : 'Confirm Packing Completion'}
           </h3>
           <button className="close-button" onClick={onCancel} aria-label="Close modal">&times;</button>
         </div>
@@ -54,10 +85,32 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
               <FaInfoCircle className="alert-icon" />
             </div>
             <div className="alert-content">
-              <p className="alert-heading">You are about to mark this packing list as <strong>Packed</strong></p>
-              <p className="alert-message">This action will create a new shipment record.</p>
+              <p className="alert-heading">
+                You are about to mark this packing list as <strong>Packed</strong>
+                {isPartialDelivery && (
+                  <span> (Batch {currentDelivery} of {totalDeliveries})</span>
+                )}
+              </p>
+              <p className="alert-message">
+                This action will create a new shipment record
+                {isPartialDelivery && ' for this partial delivery batch'}.
+              </p>
             </div>
           </div>
+          
+          {/* Partial delivery alert */}
+          {isPartialDelivery && (
+            <div className="partial-delivery-alert">
+              <FaExclamationTriangle className="alert-icon" />
+              <div className="alert-text">
+                <p className="alert-title">Partial Delivery in Progress</p>
+                <p className="alert-message">
+                  You are completing batch {currentDelivery} of {totalDeliveries}.
+                  After this batch is shipped, the next batch will become available for picking.
+                </p>
+              </div>
+            </div>
+          )}
           
           <div className="modal-scrollable-content">
             {/* Packing list details section */}
@@ -77,25 +130,7 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                     <div className="detail-value-with-icon">
                       <FaBoxes className="detail-icon" />
                       <span className="count-badge">
-                        {(() => {
-                          // Try different ways to get the total packed items
-                          // 1. First check packingList.total_items_packed
-                          if (packingList.total_items_packed && packingList.total_items_packed > 0) {
-                            return packingList.total_items_packed;
-                          }
-                          // 2. If packed_items_data exists, calculate from it
-                          else if (packingList.packed_items_data) {
-                            let total = 0;
-                            Object.values(packingList.packed_items_data).forEach(warehouseItems => {
-                              Object.values(warehouseItems).forEach(item => {
-                                total += (item.packedQuantity || 0);
-                              });
-                            });
-                            return total;
-                          }
-                          // 3. Fall back to 0
-                          return 0;
-                        })()}
+                        {packingList.total_items_packed || 0}
                       </span>
                     </div>
                   </div>
@@ -118,15 +153,8 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                   </div>
                 </div>
                 
-                {/* <div className="detail-row">
-                  <div className="detail-item full-width">
-                    <span className="detail-label">Total Cost</span>
-                    <div className="detail-value-with-icon">
-                      <FaMoneyBillWave className="detail-icon" />
-                      <span className="cost-value">{formatCurrency(packingList.total_packing_cost)}</span>
-                    </div>
-                  </div>
-                </div> */}
+                {/* Display delivery notes if partial delivery */}
+                {getDeliveryNotesDisplay()}
               </div>
             </div>
             
@@ -173,24 +201,29 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                       <FaBox className="step-icon" />
                     </div>
                     <div className="step-description">
-                      Create a new shipment record for this package
+                      {isPartialDelivery 
+                        ? `Create a new shipment record for batch ${currentDelivery}`
+                        : 'Create a new shipment record for this package'}
                     </div>
                   </div>
                 </div>
                 
-                <div className="workflow-connector"></div>
-                
-                {/* <div className="workflow-step">
-                  <div className="step-number">4</div>
-                  <div className="step-content">
-                    <div className="step-icon-container">
-                      <FaMoneyBillWave className="step-icon" />
+                {isPartialDelivery && (
+                  <>
+                    <div className="workflow-connector"></div>
+                    <div className="workflow-step">
+                      <div className="step-number">4</div>
+                      <div className="step-content">
+                        <div className="step-icon-container">
+                          <FaArrowRight className="step-icon" />
+                        </div>
+                        <div className="step-description">
+                          After shipping, the next batch will become available
+                        </div>
+                      </div>
                     </div>
-                    <div className="step-description">
-                      Create shipping cost and operational cost records
-                    </div>
-                  </div>
-                </div> */}
+                  </>
+                )}
               </div>
             </div>
             
@@ -216,9 +249,57 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
             onClick={onConfirm}
           >
             <FaCheck className="button-icon" />
-            Confirm
+            {isPartialDelivery 
+              ? `Complete Batch ${currentDelivery}/${totalDeliveries}`
+              : 'Complete Picking'}
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Add this component to show partial delivery progress
+const PartialDeliveryInfo = ({ deliveryNotesInfo }) => {
+  if (!deliveryNotesInfo || !deliveryNotesInfo.is_partial_delivery) return null;
+  
+  const { current_delivery, total_deliveries, completed_deliveries } = deliveryNotesInfo;
+  const progressPercentage = (completed_deliveries / total_deliveries) * 100;
+  
+  return (
+    <div className="partial-delivery-info">
+      <h4>Partial Delivery Progress</h4>
+      <div className="progress-bar-container">
+        <div 
+          className="progress-bar" 
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+      <div className="progress-text">
+        {completed_deliveries} of {total_deliveries} deliveries completed
+      </div>
+      
+      <div className="delivery-notes-list">
+        {deliveryNotesInfo.delivery_notes.map((note, index) => (
+          <div 
+            key={note.delivery_note_id} 
+            className={`delivery-note-item ${
+              index + 1 === current_delivery ? 'current-delivery' : 
+              index + 1 < current_delivery ? 'completed-delivery' : 'pending-delivery'
+            }`}
+          >
+            <div className="delivery-note-sequence">{index + 1}</div>
+            <div className="delivery-note-content">
+              <div className="delivery-note-id">{note.delivery_note_id}</div>
+              <div className="delivery-note-details">
+                <span className="item-count">{note.total_quantity || 0} items</span>
+                <span className={`status-badge status-${String(note.shipment_status || '').toLowerCase()}`}>
+                  {note.shipment_status || 'Pending'}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

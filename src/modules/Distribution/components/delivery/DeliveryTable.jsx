@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+// Import icons
+import { FaSort, FaSortUp, FaSortDown, FaCheck, FaSpinner } from 'react-icons/fa';
 
-const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) => {
+const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, partialFilter, deliveryType }) => {
   // State for table management
   const [filteredDeliveries, setFilteredDeliveries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -9,7 +11,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
   const [sortField, setSortField] = useState("del_order_id");
   const [sortDirection, setSortDirection] = useState("asc");
 
-  // Add loading state for approval process QA PURPOSES
+  // Add loading state for approval process 
   const [approving, setApproving] = useState(null);
 
   // Apply filters and sorting whenever dependencies change
@@ -19,6 +21,22 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
     // Apply status filter
     if (statusFilter !== "All") {
       filtered = filtered.filter(order => order.order_status === statusFilter);
+    }
+    
+    // Apply project-based filter (only for sales orders)
+    if (deliveryType === 'sales' && projectFilter !== "All") {
+      filtered = filtered.filter(order => {
+        const isProjectBased = order.is_project_based ? "Yes" : "No";
+        return isProjectBased === projectFilter;
+      });
+    }
+    
+    // Apply partial delivery filter (only for sales orders)
+    if (deliveryType === 'sales' && partialFilter !== "All") {
+      filtered = filtered.filter(order => {
+        const isPartialDelivery = order.is_partial_delivery ? "Yes" : "No";
+        return isPartialDelivery === partialFilter;
+      });
     }
     
     // Apply search filter
@@ -57,7 +75,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
     
     setFilteredDeliveries(filtered);
     setCurrentPage(1); // Reset to first page on filter change
-  }, [deliveries, searchTerm, statusFilter, sortField, sortDirection]);
+  }, [deliveries, searchTerm, statusFilter, projectFilter, partialFilter, sortField, sortDirection]);
 
   // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -65,6 +83,14 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
   const currentItems = filteredDeliveries.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredDeliveries.length / itemsPerPage);
   
+  // Get appropriate sort icon
+  const getSortIcon = (field) => {
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === "asc" ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
+  };
+
   // Handle column sort
   const handleSort = (field) => {
     const newDirection = field === sortField && sortDirection === "asc" ? "desc" : "asc";
@@ -122,7 +148,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
   return (
     <div className="delivery-table-container">
       <div className="table-metadata">
-        <span className="record-count">
+        <span className="total-count">
           Showing {filteredDeliveries.length} {deliveryType} delivery orders
         </span>
         <span className="pagination-info">
@@ -134,25 +160,32 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
         <table className="delivery-table">
           <thead>
             <tr>
-              <th>
-                  {deliveryType === 'sales' ? 'Sales Order ID' : 
-                  deliveryType === 'service' ? 'Service Order ID' : 
-                  deliveryType === 'content' ? 'Content ID' : 
-                  'Stock Transfer ID'}
-                </th>
-              <th onClick={() => handleSort("order_status")} className="sortable">
-                Status
-                {sortField === "order_status" && (
-                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
-                )}
+              <th className="sortable" onClick={() => handleSort(deliveryType === 'sales' ? 'sales_order_id' : 
+                deliveryType === 'service' ? 'service_order_id' : 
+                deliveryType === 'content' ? 'content_id' : 'stock_transfer_id')}>
+                {deliveryType === 'sales' ? 'Sales Order ID' : 
+                deliveryType === 'service' ? 'Service Order ID' : 
+                deliveryType === 'content' ? 'Content ID' : 
+                'Stock Transfer ID'}
+                {getSortIcon(deliveryType === 'sales' ? 'sales_order_id' : 
+                  deliveryType === 'service' ? 'service_order_id' : 
+                  deliveryType === 'content' ? 'content_id' : 'stock_transfer_id')}
               </th>
-              <th>Is Project-Based?</th>
-              <th>Is Partial Delivery?</th>
-              <th onClick={() => handleSort("del_order_id")} className="sortable">
+              <th className="sortable" onClick={() => handleSort("order_status")}>
+                Status
+                {getSortIcon("order_status")}
+              </th>
+              <th className="sortable" onClick={() => handleSort("is_project_based")}>
+                Is Project-Based?
+                {getSortIcon("is_project_based")}
+              </th>
+              <th className="sortable" onClick={() => handleSort("is_partial_delivery")}>
+                Is Partial Delivery?
+                {getSortIcon("is_partial_delivery")}
+              </th>
+              <th className="sortable" onClick={() => handleSort("del_order_id")}>
                 Delivery Order ID
-                {sortField === "del_order_id" && (
-                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
-                )}
+                {getSortIcon("del_order_id")}
               </th>
               {/* TEMPORARY: Approval column - Comment this line to hide the column */}
               <th>Actions</th>
@@ -183,16 +216,24 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
                   <td>{formatID(order.del_order_id, "delivery")}</td>
                   {/* TEMPORARY: Approval button - Comment these lines to remove the button */}
                   <td>
-                    {order.order_status !== 'Approved' ? (
+                    {order.order_status !== "Approved" ? (
                       <button
+                        className="approve-button"
                         onClick={() => handleApprove(order.del_order_id)}
                         disabled={approving === order.del_order_id}
-                        className="approve-button"
                       >
-                        {approving === order.del_order_id ? 'Approving...' : 'Approve'}
+                        {approving === order.del_order_id ? (
+                          <>
+                            <FaSpinner className="spinner-icon" /> Approving...
+                          </>
+                        ) : (
+                          'Approve'
+                        )}
                       </button>
                     ) : (
-                      <span className="approved-text">Approved</span>
+                      <span className="approved-text">
+                        <FaCheck className="check-icon" /> Approved
+                      </span>
                     )}
                   </td>
                 </tr>

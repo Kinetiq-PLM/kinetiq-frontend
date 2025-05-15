@@ -109,7 +109,7 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
     
     return (
       <span className="sort-icon">
-        {sortDirection === 'asc' ? '↑' : '↓'}
+        {sortDirection === 'asc' ? '▲' : '▼'}
       </span>
     );
   };

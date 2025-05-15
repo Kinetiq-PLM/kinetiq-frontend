@@ -19,6 +19,7 @@
     "@mui/styled-engine-sc": "^7.0.1",
     "@mui/x-charts": "^7.28.0",
     "@react-google-maps/api": "^2.20.6",
+    "@react-pdf/renderer": "^4.3.0",
     "@tailwindcss/vite": "^4.0.11",
     "@tanstack/react-query": "^5.68.0",
     "antd": "^5.24.7",

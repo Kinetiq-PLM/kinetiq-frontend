@@ -1,8 +1,13 @@
-import React from 'react';
-import { FaShippingFast, FaTruck, FaWeightHanging, FaRuler, FaMoneyBillWave, FaCheck, FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaShippingFast, FaTruck, FaWeightHanging, FaRuler, FaMoneyBillWave, FaCheck, FaExclamationTriangle, FaInfoCircle, FaTimes, FaLayerGroup } from 'react-icons/fa';
 import PropTypes from 'prop-types';
+import axios from 'axios'; // Make sure axios is imported
 
 const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
+  // Add loading state for API calls
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [nextBatchStatus, setNextBatchStatus] = useState(null);
+
   // Helper function to format currency
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-PH', {
@@ -11,12 +16,14 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
     }).format(value || 0);
   };
   
-  // Calculate total cost
-  const totalShippingCost = shipment.shipping_cost_info?.total_shipping_cost || 
-    (shipment.shipping_cost_info?.weight_kg * shipment.shipping_cost_info?.cost_per_kg) +
-    (shipment.shipping_cost_info?.distance_km * shipment.shipping_cost_info?.cost_per_km) || 0;
+  // Calculate total cost - Add safe checks to avoid undefined errors
+  const totalShippingCost = 
+    (shipment.shipping_cost_info?.total_shipping_cost) || 
+    ((shipment.shipping_cost_info?.weight_kg || 0) * (shipment.shipping_cost_info?.cost_per_kg || 0)) +
+    ((shipment.shipping_cost_info?.distance_km || 0) * (shipment.shipping_cost_info?.cost_per_km || 0)) || 0;
     
-  const totalOperationalCost = shipment.operational_cost_info?.total_operational_cost || 
+  const totalOperationalCost = 
+    (shipment.operational_cost_info?.total_operational_cost) || 
     (totalShippingCost + 
     (shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0) + 
     (shipment.operational_cost_info?.additional_cost || 0)) || 0;
@@ -24,11 +31,124 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
   // Check for warnings
   const hasNoCarrier = !shipment.carrier_id;
   const hasInvalidDimensions = 
-    (shipment.shipping_cost_info?.weight_kg <= 0) || 
-    (shipment.shipping_cost_info?.distance_km <= 0);
+    (!shipment.shipping_cost_info?.weight_kg || shipment.shipping_cost_info.weight_kg <= 0) || 
+    (!shipment.shipping_cost_info?.distance_km || shipment.shipping_cost_info.distance_km <= 0);
   
   // Check if we can proceed (has warnings but not blockers)
-  const canProceed = true; // We're letting them proceed with warnings
+  const canProceed = !isProcessing; // Disable during processing
+  
+  // Check if this is likely a partial delivery (based on delivery type and items)
+  const isPartialDelivery = shipment.delivery_type === 'sales' && 
+    shipment.items_details && shipment.items_details.some(item => item.delivery_note_id);
+  
+  // Function to create next batch picking list
+  const createNextBatchPickingList = async () => {
+    setNextBatchStatus({ status: 'loading', message: 'Creating next batch picking list...' });
+    
+    try {
+      // Call the API to create the next batch
+      const response = await axios.post(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/create-next-batch/`);
+      
+      if (response.data.success) {
+        setNextBatchStatus({ 
+          status: 'success', 
+          message: 'Next batch picking list created successfully' 
+        });
+      } else {
+        setNextBatchStatus({ 
+          status: 'info', 
+          message: response.data.message || 'No next batch required or all deliveries complete' 
+        });
+      }
+    } catch (error) {
+      console.error('Error creating next batch:', error);
+      setNextBatchStatus({ 
+        status: 'error', 
+        message: error.response?.data?.error || 'Failed to create next batch picking list' 
+      });
+    }
+  };
+  
+  // Handle confirmed shipment with processing for partial deliveries
+  const handleConfirmWithProcessing = async () => {
+    setIsProcessing(true);
+    
+    try {
+      // First confirm the shipment (call the original onConfirm)
+      await onConfirm();
+      
+      // If this is a partial delivery, trigger the next batch creation
+      if (isPartialDelivery) {
+        await createNextBatchPickingList();
+      }
+    } catch (error) {
+      console.error('Error during shipment processing:', error);
+      setNextBatchStatus({ 
+        status: 'error', 
+        message: 'Error processing shipment' 
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Fixed style objects with safe defaults to prevent undefined errors
+  const infoContainerStyle = {
+    margin: '1rem 0',
+    padding: '0.75rem',
+    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center'
+  };
+  
+  const infoIconStyle = { 
+    color: '#007bff', 
+    marginRight: '0.75rem',
+    fontSize: '1.25rem'
+  };
+  
+  const infoPrimaryTextStyle = {
+    margin: 0, 
+    fontWeight: 500, 
+    color: '#007bff'
+  };
+  
+  const infoSecondaryTextStyle = {
+    margin: '0.25rem 0 0 0', 
+    fontSize: '0.875rem'
+  };
+  
+  const statusContainerStyle = (status) => ({
+    margin: '1rem 0',
+    padding: '0.75rem',
+    borderRadius: '4px',
+    backgroundColor: status === 'success' 
+      ? 'rgba(40, 167, 69, 0.1)' 
+      : status === 'error'
+        ? 'rgba(220, 53, 69, 0.1)'
+        : status === 'loading'
+          ? 'rgba(0, 0, 0, 0.05)'
+          : 'rgba(0, 123, 255, 0.1)',
+    color: status === 'success' 
+      ? '#28a745' 
+      : status === 'error'
+        ? '#dc3545'
+        : status === 'loading'
+          ? '#666'
+          : '#007bff',
+  });
+  
+  const spinnerStyle = {
+    display: 'inline-block',
+    width: '1rem',
+    height: '1rem',
+    marginRight: '0.5rem',
+    borderRadius: '50%',
+    border: '2px solid currentColor',
+    borderTopColor: 'transparent',
+    animation: 'spin 1s linear infinite'
+  };
   
   return (
     <div className="shipment modal-overlay">
@@ -42,6 +162,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             className="close-button" 
             onClick={onCancel} 
             aria-label="Close modal"
+            disabled={isProcessing}
           >
             <FaTimes />
           </button>
@@ -57,6 +178,21 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
               Are you sure you want to mark this shipment as shipped?
             </p>
           </div>
+          
+          {/* Partial delivery notice - only shown for partial deliveries */}
+          {isPartialDelivery && (
+            <div className="info-container" style={infoContainerStyle}>
+              <FaLayerGroup style={infoIconStyle} />
+              <div>
+                <p style={infoPrimaryTextStyle}>
+                  Partial Delivery Detected
+                </p>
+                <p style={infoSecondaryTextStyle}>
+                  After confirming this shipment, the next batch will be automatically prepared for processing.
+                </p>
+              </div>
+            </div>
+          )}
           
           {/* Warnings section - only shown if there are warnings */}
           {(hasNoCarrier || hasInvalidDimensions) && (
@@ -76,6 +212,17 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             </div>
           )}
           
+          {/* Next batch status - only shown if there's a status */}
+          {nextBatchStatus && (
+            <div className={`status-container status-${nextBatchStatus.status || 'info'}`} 
+                 style={statusContainerStyle(nextBatchStatus.status)}>
+              {nextBatchStatus.status === 'loading' && (
+                <div className="spinner" style={spinnerStyle}></div>
+              )}
+              {nextBatchStatus.message || 'Processing...'}
+            </div>
+          )}
+          
           {/* Shipment details section */}
           <div className="details-section">
             <h4 className="section-title">
@@ -91,7 +238,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
               
               <div className="detail-item">
                 <span className="detail-label">Tracking Number</span>
-                <span className="detail-value">{shipment.tracking_number}</span>
+                <span className="detail-value">{shipment.tracking_number || 'Not Generated'}</span>
               </div>
               
               <div className="detail-item">
@@ -107,7 +254,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
                 <span className="detail-label">
                   <FaWeightHanging className="detail-icon" /> Weight
                 </span>
-                <span className={`detail-value ${shipment.shipping_cost_info?.weight_kg <= 0 ? 'warning-value' : ''}`}>
+                <span className={`detail-value ${!shipment.shipping_cost_info?.weight_kg || shipment.shipping_cost_info.weight_kg <= 0 ? 'warning-value' : ''}`}>
                   {shipment.shipping_cost_info?.weight_kg || 0} kg
                 </span>
               </div>
@@ -116,7 +263,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
                 <span className="detail-label">
                   <FaRuler className="detail-icon" /> Distance
                 </span>
-                <span className={`detail-value ${shipment.shipping_cost_info?.distance_km <= 0 ? 'warning-value' : ''}`}>
+                <span className={`detail-value ${!shipment.shipping_cost_info?.distance_km || shipment.shipping_cost_info.distance_km <= 0 ? 'warning-value' : ''}`}>
                   {shipment.shipping_cost_info?.distance_km || 0} km
                 </span>
               </div>
@@ -171,6 +318,13 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
                 <div className="step-marker">5</div>
                 <div className="step-text">The associated packing list will be marked as "Shipped"</div>
               </div>
+              
+              {isPartialDelivery && (
+                <div className="step-item">
+                  <div className="step-marker">6</div>
+                  <div className="step-text">The next batch picking list will be created for partial delivery</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -180,19 +334,28 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             type="button" 
             className="cancel-button"
             onClick={onCancel}
+            disabled={isProcessing}
           >
-            <FaTimes className="button-icon" />
             Cancel
           </button>
           
           <button 
             type="button" 
             className="confirm-button"
-            onClick={onConfirm}
+            onClick={handleConfirmWithProcessing}
             disabled={!canProceed}
           >
-            <FaShippingFast className="button-icon" />
-            Confirm Shipment
+            {isProcessing ? (
+              <>
+                <span className="spinner" style={spinnerStyle}></span>
+                Processing...
+              </>
+            ) : (
+              <>
+                <FaShippingFast className="button-icon" />
+                Confirm Shipment
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -206,6 +369,8 @@ ConfirmShipModal.propTypes = {
     tracking_number: PropTypes.string,
     carrier_id: PropTypes.string,
     carrier_name: PropTypes.string,
+    delivery_type: PropTypes.string,
+    items_details: PropTypes.array,
     shipping_cost_info: PropTypes.shape({
       weight_kg: PropTypes.number,
       distance_km: PropTypes.number,

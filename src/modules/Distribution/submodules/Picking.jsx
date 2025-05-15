@@ -8,6 +8,8 @@ import CompletionModal from "../components/picking/CompletionModal";
 import EditPickingModal from "../components/picking/EditPickingModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// Import icons
+import { FaSearch } from 'react-icons/fa';
 
 const Picking = () => {
   // State for data management
@@ -191,15 +193,47 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
       const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/items/`);
       const items = await response.json();
       
-      // Check if all items are picked
-      const allPicked = items.length > 0 && items.every(item => item.is_picked);
+      if (!items.length) {
+        toast.error("No items found for this picking list");
+        return;
+      }
+      
+      // For partial deliveries, group items by delivery note
+      const itemsByDeliveryNote = {};
+      items.forEach(item => {
+        const noteId = item.delivery_note_id || 'no_note';
+        if (!itemsByDeliveryNote[noteId]) {
+          itemsByDeliveryNote[noteId] = [];
+        }
+        itemsByDeliveryNote[noteId].push(item);
+      });
+      
+      // Check if all items in each delivery note are picked
+      let allPicked = true;
+      let unpickedNotes = [];
+      
+      for (const [noteId, noteItems] of Object.entries(itemsByDeliveryNote)) {
+        const isNotePicked = noteItems.every(item => item.is_picked);
+        if (!isNotePicked) {
+          allPicked = false;
+          unpickedNotes.push(noteId === 'no_note' ? 'Main Order' : noteId);
+        }
+      }
       
       if (!allPicked) {
-        toast.error("Cannot complete picking: Not all items have been picked");
+        if (unpickedNotes.length === 1) {
+          toast.error(`Cannot complete picking: Not all items in delivery note ${unpickedNotes[0]} have been picked`);
+        } else {
+          toast.error(`Cannot complete picking: Items remaining in multiple delivery notes`);
+        }
         return;
       }
     }
-  
+    if (newStatus === 'In Progress') {
+      setTimeout(() => {
+        fetchPickingItems();
+      }, 500); // Add slight delay to ensure backend processing completes
+    }
     // Build the update object
     const updateData = {
       picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
@@ -210,8 +244,8 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
       updateData.picked_by = employeeId;
     }
     
-    // Always make the API call when status changes (or when completing)
-    const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
+    // Make the API call
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -227,7 +261,7 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
     // Find the warehouse name for display purposes
     const warehouseName = warehouses.find(w => w.id === list.warehouse_id)?.name || list.warehouse_name;
 
-    // Update the selectedList with the new values so completion modal has the latest data
+    // Update the selectedList with the new values
     setSelectedList(prev => ({
       ...prev,
       picked_by: employeeId || prev.picked_by,
@@ -252,39 +286,49 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
   }
 };
   
-  // Handle completion confirmation
-  const handleConfirmCompletion = async () => {
-    if (!selectedList || !showCompletionModal) return;
+// In the handleConfirmCompletion function, update the success message to better explain next steps
+const handleConfirmCompletion = async () => {
+  if (!selectedList || !showCompletionModal) return;
+  
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        picked_status: 'Completed'
+      }),
+    });
     
-    try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          picked_status: 'Completed'
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to complete picking list');
-      }
-      
-      // Close modal and refresh the list
-      setShowCompletionModal(false);
-      setRefreshTrigger(prev => prev + 1);
-      
-      // Show success notification
-      toast.success('Picking list completed successfully! A new Packing List has been created.', {
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to complete picking list');
+    }
+    
+    // Close modal and refresh the list
+    setShowCompletionModal(false);
+    setRefreshTrigger(prev => prev + 1);
+    
+    // Different success message based on whether this is a partial delivery
+    const isPartialDelivery = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
+    const currentBatch = isPartialDelivery ? selectedList.delivery_notes_info.current_delivery : null;
+    const totalBatches = isPartialDelivery ? selectedList.delivery_notes_info.total_deliveries : null;
+    
+    // Show success notification with batch-specific message if applicable
+    if (isPartialDelivery) {
+      toast.success(`Batch ${currentBatch} of ${totalBatches} picked successfully! After this batch is shipped, the next batch will automatically be available for picking.`, {
         autoClose: 5000 // Keep this message visible a bit longer
       });
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
+    } else {
+      toast.success('Picking list completed successfully! A new packing list has been created.', {
+        autoClose: 3000
+      });
     }
-  };
+  } catch (err) {
+    toast.error(`Error: ${err.message}`);
+  }
+};
   
   return (
     <div className="picking">
@@ -298,7 +342,7 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               className="search-input"
