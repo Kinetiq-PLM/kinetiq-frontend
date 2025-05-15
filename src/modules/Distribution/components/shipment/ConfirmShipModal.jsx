@@ -47,7 +47,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
     
     try {
       // Call the API to create the next batch
-      const response = await axios.post(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/create-next-batch/`);
+      const response = await axios.post(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/${shipment.shipment_id}/create-next-batch/`);
       
       if (response.data.success) {
         setNextBatchStatus({ 

@@ -245,7 +245,7 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
     }
     
     // Make the API call
-    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+    const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ const handleConfirmCompletion = async () => {
   if (!selectedList || !showCompletionModal) return;
   
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+    const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

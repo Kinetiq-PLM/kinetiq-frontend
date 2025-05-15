@@ -209,7 +209,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
             ) : (
               <tr>
                 {/* Adjusted colspan to 7 */}
-                <td colSpan={7} className="no-data">
+                <td colSpan={7} className="no-data text-center">
                   No picking lists found with the current filters
                 </td>
               </tr>

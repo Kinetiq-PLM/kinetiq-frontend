@@ -217,6 +217,7 @@
 .picking .picking-table th.sortable {
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .picking .picking-table th.sortable:hover {
@@ -289,10 +290,11 @@
 }
 
 .picking .no-data {
-  text-align: center;
   padding: 2rem;
-  color: #666;
+  color: #6c757d;
   font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 /* Picking Actions */
@@ -2790,4 +2792,8 @@
   background-color: #00a8a8;
   color: white;
   border-color: #00a8a8;
+}
+
+.picking .text-center {
+  text-align: center !important;
 }
