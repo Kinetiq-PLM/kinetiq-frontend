@@ -17,16 +17,54 @@ const TaxRemittanceModal = ({
   const [remittanceData, setRemittanceData] = useState([]);
   const [notif, setNotif] = useState({ isOpen: false, type: "error", title: "", message: "" });
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
+  const [userEmail, setUserEmail] = useState(""); // State for logged-in user's email
 
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const TAXREMITTANCE_ENDPOINT = `${API_URL}/api/payroll-remittances/`;
 
+  // Fetch logged-in user's email
+  const getLoggedInUser = () => {
+    const keys = ["user", "authUser", "currentUser", "identity"];
+    for (const key of keys) {
+      const storedUser = localStorage.getItem(key) || sessionStorage.getItem(key);
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          return parsed.email || "unknown@kinetiq.ph";
+        } catch (e) {
+          console.error(`Error parsing ${key}:`, e);
+        }
+      }
+    }
+    return "unknown@kinetiq.ph";
+  };
+
   useEffect(() => {
+    const fetchUserFromApi = async () => {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await axios.get(`${API_URL}/api/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUserEmail(response.data.email || getLoggedInUser());
+        } catch (error) {
+          console.error("Error fetching user from API:", error);
+          setUserEmail(getLoggedInUser());
+        }
+      } else {
+        setUserEmail(getLoggedInUser());
+      }
+    };
+
+    fetchUserFromApi();
+
     if (isModalOpen) {
       const fetchRemittanceData = async () => {
         try {
+          setIsLoadingEmployees(true);
           const response = await fetch(TAXREMITTANCE_ENDPOINT);
           const data = await response.json();
           setRemittanceData(data);
@@ -70,8 +108,17 @@ const TaxRemittanceModal = ({
   };
 
   const handleInputChange = (index, value) => {
-    const isFieldEditable = index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 7;
+    // Only allow changes if the user is authorized
+    if (userEmail !== "kate.tan@kinetiq.ph") {
+      showNotif(
+        "error",
+        "Unauthorized",
+        "Only Kate Tan (kate.tan@kinetiq.ph) is authorized to update remittance records."
+      );
+      return;
+    }
 
+    const isFieldEditable = index === 2 || index === 3 || index === 4 || index === 5 || index === 7;
     if (!isFieldEditable) return;
 
     const updatedFormData = [...formData];
@@ -89,19 +136,17 @@ const TaxRemittanceModal = ({
   };
 
   const handleFormSubmit = () => {
-    if (!formData[1]) {
-      showNotif("error", "Missing Employee ID", "Please select an Employee ID.");
-      return;
-    }
-    const chiefAccountantId = "HR-EMP-2025-f5eab3";
-    if (formData[1] !== chiefAccountantId) {
+    // Authorization check
+    if (userEmail !== "kate.tan@kinetiq.ph") {
       showNotif(
         "error",
-        "Invalid Employee ID",
-        "Remittance is restricted to the Chief Accountant (ID: HR-EMP-2025-f5eab3)."
+        "Unauthorized",
+        "Only Kate Tan (kate.tan@kinetiq.ph) is authorized to update remittance records."
       );
       return;
     }
+
+    // Validate fields
     if (!formData[2]) {
       showNotif("error", "Missing Deduction Type", "Please select a Deduction Type.");
       return;
@@ -128,9 +173,9 @@ const TaxRemittanceModal = ({
   };
 
   const renderFormField = (header, index) => {
-    const isDisabled = !(index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 7);
+    const isDisabled = !(index === 2 || index === 3 || index === 4 || index === 5 || index === 7);
 
-    if (header === "Remittance ID" || header === "Reference Number") {
+    if (header === "Remittance ID" || header === "Reference Number" || header === "Employee ID") {
       return (
         <Forms
           type="text"
@@ -139,23 +184,6 @@ const TaxRemittanceModal = ({
           onChange={(e) => handleInputChange(index, e.target.value)}
           disabled={true}
         />
-      );
-    }
-
-    if (header === "Employee ID") {
-      return (
-        <div className="flex flex-col gap-y-2">
-          <label>{header}</label>
-          <Dropdown
-            style="selection"
-            defaultOption={isLoadingEmployees ? "Loading employees..." : "Select employee ID..."}
-            options={employeeIds}
-            value={formData[index] || ""}
-            onChange={(val) => handleInputChange(index, val)}
-            disabled={isDisabled || isLoadingEmployees}
-            required={true}
-          />
-        </div>
       );
     }
 
@@ -169,7 +197,7 @@ const TaxRemittanceModal = ({
             options={["SSS", "Philhealth", "Pagibig", "Tax"]}
             value={formData[index] || ""}
             onChange={(val) => handleInputChange(index, val)}
-            disabled={isDisabled}
+            disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
             required={true}
           />
         </div>
@@ -186,7 +214,7 @@ const TaxRemittanceModal = ({
             options={["Credit Card", "Bank Transfer", "Cash"]}
             value={formData[index] || ""}
             onChange={(val) => handleInputChange(index, val)}
-            disabled={isDisabled}
+            disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
             required={true}
           />
         </div>
@@ -203,7 +231,7 @@ const TaxRemittanceModal = ({
             options={["Processing", "Completed"]}
             value={formData[index] || ""}
             onChange={(val) => handleInputChange(index, val)}
-            disabled={false}
+            disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
             required={true}
           />
         </div>
@@ -217,7 +245,7 @@ const TaxRemittanceModal = ({
           formName={header}
           value={formData[index] || ""}
           onChange={(e) => handleInputChange(index, e.target.value)}
-          disabled={isDisabled}
+          disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
           required={true}
         />
       );
@@ -229,8 +257,8 @@ const TaxRemittanceModal = ({
           type="number"
           formName={header}
           value={formData[index] || ""}
-          onChange={(e) => handleInputChange(index, e.target.value)}
-          disabled={isDisabled}
+          onChange={(e)=>{handleInputChange(index, e.target.value)}}
+          disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
           required={true}
         />
       );
@@ -242,7 +270,7 @@ const TaxRemittanceModal = ({
         formName={header}
         value={formData[index] || ""}
         onChange={(e) => handleInputChange(index, e.target.value)}
-        disabled={isDisabled}
+        disabled={isDisabled || userEmail !== "kate.tan@kinetiq.ph"}
         required={true}
       />
     );
