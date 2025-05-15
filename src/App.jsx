@@ -369,6 +369,8 @@ function App() {
       "Dashboard": "ManagementDashboard",
       "Project Approval": "ManagementApprovals"
     },
+      "Approvals": "ManagementApprovals",
+     },
     Administration: {
       "User": "User",
       "Item Masterlist": "ItemMasterlist",

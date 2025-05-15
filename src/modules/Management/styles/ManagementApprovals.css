@@ -5,12 +5,9 @@
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  margin: 0 auto;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;  
+  min-height: 80vh; 
 }
 
 .section-title {
@@ -47,7 +44,7 @@
 .form-group label {
   font-size: 0.9em;
   margin-bottom: 5px;
-  color: #555;
+  color: #00A8A8;
 }
 
 .form-group input,
@@ -76,7 +73,7 @@ textarea {
   align-items: center;
   gap: 5px;
   font-size: 0.9em;
-  color: #555;
+  color: #00A8A8;
 }
 
 /* Buttons */
@@ -112,4 +109,18 @@ textarea {
 
 .save-button:hover {
   background-color: #00A8A8;
-} 
+}
+
+/* Status Colors */
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status.compliant {
+  color: #28a745;
+}
+
+.status.not-compliant {
+  color: #dc3545;
+}
