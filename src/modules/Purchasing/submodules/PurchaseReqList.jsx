@@ -333,7 +333,10 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
                 <select
                   className={`status-select status-${request.status?.toLowerCase() || 'pending'} ${pendingStatusUpdates[request.request_id] ? 'status-updating' : ''}`}
                   value={request.status || "Pending"}
-                  onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
+                 onChange={(e) => {
+    e.stopPropagation(); // Prevent the row's onClick from being triggered
+    handleStatusChange(request.request_id, e.target.value);
+  }}
                   disabled={pendingStatusUpdates[request.request_id]}
                 >
                   <option value="Acknowledged">Acknowledged</option>
