@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ProjectGanttChart from "./ProjectGanttChart.jsx";
 import "../styles/ProjectPlanning.css";
-
+axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
 // Import icons individually
 import { 
   FaClipboardList, 
