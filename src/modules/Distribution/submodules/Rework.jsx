@@ -277,7 +277,7 @@ const Rework = () => {
   return (
     <div className="rework">
       <div className="body-content-container">
-        <h2 className="page-title">Rework Management</h2>
+        <h2 className="page-title">Return Management</h2>
         
         {/* Add ToastContainer component */}
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
@@ -289,13 +289,13 @@ const Rework = () => {
             className={`tab ${activeTab === "pending" ? "active" : ""}`}
             onClick={() => handleTabChange("pending")}
           >
-            Pending Reworks
+            Pending Returns
           </div>
           <div 
             className={`tab ${activeTab === "completed" ? "active" : ""}`}
             onClick={() => handleTabChange("completed")}
           >
-            Completed Reworks
+            Completed Returns
           </div>
         </div>
         
@@ -329,7 +329,7 @@ const Rework = () => {
           {activeTab === "pending" ? (
             <>
               <div className="stat-box">
-                <span className="stat-label">Total Pending Reworks:</span>
+                <span className="stat-label">Total Pending Returns:</span>
                 <span className="stat-value">{pendingStats.total}</span>
               </div>
               <div className="stat-box">
