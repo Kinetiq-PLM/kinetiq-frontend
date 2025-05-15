@@ -45,7 +45,7 @@ const OnboardingSummaryReport = ({ onboarding: propsOnboarding = [] }) => {
       // Otherwise fetch from API
       try {
         const response = await axios.get(
-          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/"
+          "http://127.0.0.1:8000/api/onboarding/"
         );
         setOnboarding(response.data || []);
       } catch (err) {

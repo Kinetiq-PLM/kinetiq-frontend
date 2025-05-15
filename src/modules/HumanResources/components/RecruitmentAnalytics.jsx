@@ -140,8 +140,8 @@ const RecruitmentAnalytics = ({ navigateTo }) => {
       setLoading(true);
       try {
         // Use the provided API endpoints
-        const candidatesResponse = await axios.get('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/');
-        const interviewsResponse = await axios.get('https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/interviews/');
+        const candidatesResponse = await axios.get('http://127.0.0.1:8000/api/candidates/candidates/');
+        const interviewsResponse = await axios.get('http://127.0.0.1:8000/api/interviews/');
         
         const candidatesData = candidatesResponse.data || [];
         const interviewsData = interviewsResponse.data || [];

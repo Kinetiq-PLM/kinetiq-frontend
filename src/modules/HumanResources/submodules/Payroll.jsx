@@ -24,7 +24,7 @@ const Payroll = () => {
   const fetchPayroll = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/");
+      const res = await axios.get("http://127.0.0.1:8000/api/payroll/payrolls/");
       setPayrollData(res.data);
     } catch (err) {
       console.error("Failed to fetch payroll:", err);
@@ -48,7 +48,7 @@ const Payroll = () => {
     e.preventDefault();
     try {
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll/payrolls/${editingPayroll.payroll_id}/`,
+        `http://127.0.0.1:8000/api/payroll/payrolls/${editingPayroll.payroll_id}/`,
         {
           pay_period_start: editingPayroll.pay_period_start,
           pay_period_end: editingPayroll.pay_period_end

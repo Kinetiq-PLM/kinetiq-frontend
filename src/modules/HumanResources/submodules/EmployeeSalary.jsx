@@ -29,7 +29,7 @@ const EmployeeSalary = () => {
   const fetchSalaryData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_salary/employee_salary/");
+      const res = await axios.get("http://127.0.0.1:8000/api/employee_salary/employee_salary/");
       setSalaryData(res.data);
       
       // Store employment types for each employee for easy reference
@@ -38,7 +38,7 @@ const EmployeeSalary = () => {
       
       for (const employeeId of employeeIds) {
         try {
-          const empRes = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employeeId}/`);
+          const empRes = await axios.get(`http://127.0.0.1:8000/api/employees/${employeeId}/`);
           typesObj[employeeId] = empRes.data.employment_type;
         } catch (err) {
           console.error(`Failed to fetch employment type for ${employeeId}:`, err);
@@ -106,7 +106,7 @@ const EmployeeSalary = () => {
     let employeeType = employeeTypes[salary.employee_id];
     if (!employeeType) {
       try {
-        const empRes = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${salary.employee_id}/`);
+        const empRes = await axios.get(`http://127.0.0.1:8000/api/employees/${salary.employee_id}/`);
         employeeType = empRes.data.employment_type;
         
         // Update our cache
@@ -183,7 +183,7 @@ const EmployeeSalary = () => {
       }
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_salary/employee_salary/${editingSalary.salary_id}/`,
+        `http://127.0.0.1:8000/api/employee_salary/employee_salary/${editingSalary.salary_id}/`,
         payload
       );
       

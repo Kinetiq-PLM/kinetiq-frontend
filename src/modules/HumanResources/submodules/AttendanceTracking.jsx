@@ -45,7 +45,7 @@ const AttendanceTracking = () => {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
+      const res = await axios.get("http://127.0.0.1:8000/api/attendance_tracking/attendance_tracking/");
       // Ensure we're setting an array, even if the response is unexpected
       const responseData = Array.isArray(res.data) ? res.data : [];
       console.log("Attendance data:", responseData);
@@ -63,7 +63,7 @@ const AttendanceTracking = () => {
   const fetchCalendarDates = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/");
+      const res = await axios.get("http://127.0.0.1:8000/api/calendar_dates/calendar_dates/");
       // Ensure we're setting an array, even if the response is unexpected
       const responseData = Array.isArray(res.data) ? res.data : [];
       console.log("Calendar dates data:", responseData);
@@ -88,7 +88,7 @@ const fetchOvertimeRequests = async () => {
       await fetchEmployees();
     }
     
-    const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/overtime_requests/");
+    const res = await axios.get("http://127.0.0.1:8000/api/overtime_requests/");
     const responseData = Array.isArray(res.data) ? res.data : [];
     
     // Process the data to ensure employee_id and employee_name are properly set
@@ -137,7 +137,7 @@ const fetchOvertimeRequests = async () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
+      const res = await axios.get("http://127.0.0.1:8000/api/employees/");
       // Ensure we're setting an array, even if the response is unexpected
       const responseData = Array.isArray(res.data) ? res.data : [];
       console.log("Employees data:", responseData);
@@ -258,7 +258,7 @@ const fetchOvertimeRequests = async () => {
       
       // Submit the form data
       const response = await axios.post(
-        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/",
+        "http://127.0.0.1:8000/api/calendar_dates/calendar_dates/",
         newCalendarDate
       );
       

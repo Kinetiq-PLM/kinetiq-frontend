@@ -46,7 +46,7 @@ const EmployeesSummaryReport = ({ employees: propsEmployees = [] }) => {
 
       try {
         console.log("Fetching employee data...");
-        const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/employees/");
+        const response = await axios.get("http://127.0.0.1:8000/api/employees/employees/");
         setEmployees(response.data || []);
       } catch (err) {
         console.error("Error fetching employee data:", err);

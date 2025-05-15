@@ -143,8 +143,8 @@ useEffect(() => {
       // Fetch candidates
       try {
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
+          axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
+          axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
         ]);
         setCandidates(ensureArray(candidatesRes.data));
         setArchivedCandidates(ensureArray(archivedCandidatesRes.data));
@@ -158,8 +158,8 @@ useEffect(() => {
       // Fetch job postings
       try {
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
+          axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
+          axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
         ]);
         setJobPostings(ensureArray(jobPostingsRes.data));
         setArchivedJobPostings(ensureArray(archivedJobPostingsRes.data));
@@ -173,8 +173,8 @@ useEffect(() => {
       // Fetch interviews
       try {
         const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+          axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+          axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
         ]);
         setInterviews(ensureArray(activeInterviewsRes.data));
         setArchivedInterviews(ensureArray(archivedInterviewsRes.data));
@@ -186,8 +186,8 @@ useEffect(() => {
       }
       try {
         const [onboardingRes, archivedOnboardingRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true")
+          axios.get("http://127.0.0.1:8000/api/onboarding/"),
+          axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true")
         ]);
         setOnboardingTasks(ensureArray(onboardingRes.data));
         setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
@@ -201,9 +201,9 @@ useEffect(() => {
       // Fetch reference data
       try {
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
-          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/")
+          axios.get("http://127.0.0.1:8000/api/departments/department/"),
+          axios.get("http://127.0.0.1:8000/api/positions/positions/"),
+          axios.get("http://127.0.0.1:8000/api/employees/")
         ]);
         setDepartments(ensureArray(deptsRes.data));
         setPositions(ensureArray(positionsRes.data));
@@ -394,13 +394,13 @@ useEffect(() => {
   // Archive and restore functions
   const handleArchiveCandidate = async (candidate) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${candidate.candidate_id || candidate.id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${candidate.candidate_id || candidate.id}/archive/`);
       showToast("Candidate archived successfully", true);
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -413,13 +413,13 @@ useEffect(() => {
 
   const handleRestoreCandidate = async (candidate) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${candidate.candidate_id || candidate.id}/restore/`);
+      await axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${candidate.candidate_id || candidate.id}/restore/`);
       showToast("Candidate restored successfully", true);
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -446,6 +446,14 @@ useEffect(() => {
     // Add resume file if present
     if (editingCandidate.resume_file) {
       formData.append('resume', editingCandidate.resume_file);
+      // If a new file is being uploaded, set resume_path
+      formData.append('resume_path', 'pending_upload');
+    } else if (!editingCandidate.resume_path) {
+      // If no file and no existing path, set empty string
+      formData.append('resume_path', '');
+    } else {
+      // Keep existing resume path
+      formData.append('resume_path', editingCandidate.resume_path);
     }
     
     try {
@@ -453,7 +461,7 @@ useEffect(() => {
       
       // Submit to API
       const response = await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${editingCandidate.candidate_id || editingCandidate.id}/`,
+        `http://127.0.0.1:8000/api/candidates/candidates/${editingCandidate.candidate_id || editingCandidate.id}/`,
         formData,
         {
           headers: {
@@ -466,7 +474,7 @@ useEffect(() => {
       setShowEditCandidateModal(false);
       
       // Refresh the candidates list
-      const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
+      const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
       setCandidates(candidatesRes.data.filter(c => !c.is_archived));
       setArchivedCandidates(candidatesRes.data.filter(c => c.is_archived));
       
@@ -521,7 +529,7 @@ useEffect(() => {
       
       // Create an array of promises for each selected candidate
       const promises = selectedArchivedCandidates.map(id => 
-        axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${id}/restore/`)
+        axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${id}/restore/`)
       );
       
       // Execute all promises
@@ -535,8 +543,8 @@ useEffect(() => {
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -579,7 +587,7 @@ useEffect(() => {
         
         // Send update request
         return axios.patch(
-          `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${id}/`, 
+          `http://127.0.0.1:8000/api/job_posting/job_postings/${id}/`, 
           updateData
         );
       });
@@ -595,8 +603,8 @@ useEffect(() => {
       
       // Refresh job posting lists
       const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
       ]);
       
       setJobPostings(jobPostingsRes.data);
@@ -611,13 +619,13 @@ useEffect(() => {
   // Add these functions for interview management
 const handleArchiveInterview = async (interview) => {
   try {
-    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${interview.interview_id}/archive/`);
+    await axios.post(`http://127.0.0.1:8000/api/interviews/${interview.interview_id}/archive/`);
     showToast("Interview archived successfully", true);
     
     // Refresh interview lists
     const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
     setInterviews(ensureArray(activeInterviewsRes.data));
@@ -630,13 +638,13 @@ const handleArchiveInterview = async (interview) => {
 
 const handleRestoreInterview = async (interview) => {
   try {
-    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${interview.interview_id}/unarchive/`);
+    await axios.post(`http://127.0.0.1:8000/api/interviews/${interview.interview_id}/unarchive/`);
     showToast("Interview restored successfully", true);
     
     // Refresh interview lists
     const [activeInterviewsRes, archivedInterviewsRes] = await Promise.all([
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
     setInterviews(ensureArray(activeInterviewsRes.data));
@@ -707,7 +715,7 @@ const handleEditInterviewSubmit = async (e) => {
     
     // Submit to API
     const response = await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${editingInterview.interview_id}/`,
+      `http://127.0.0.1:8000/api/interviews/${editingInterview.interview_id}/`,
       apiData
     );
     
@@ -716,8 +724,8 @@ const handleEditInterviewSubmit = async (e) => {
     
     // Refresh interviews list
     const [activeInterviews, archivedInterviews] = await Promise.all([
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     setInterviews(ensureArray(activeInterviews.data));
     setArchivedInterviews(ensureArray(archivedInterviews.data));
@@ -740,7 +748,7 @@ const bulkUnarchiveInterviews = async () => {
     
     // Create an array of promises for each selected interview
     const promises = selectedArchivedInterviews.map(id => 
-      axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/${id}/unarchive/`)
+      axios.post(`http://127.0.0.1:8000/api/interviews/${id}/unarchive/`)
     );
     
     // Execute all promises
@@ -754,8 +762,8 @@ const bulkUnarchiveInterviews = async () => {
     
     // Refresh interview lists
     const [activeInterviews, archivedInterviews] = await Promise.all([
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
     setInterviews(ensureArray(activeInterviews.data));
@@ -1718,7 +1726,7 @@ const handleEditJobPostingSubmit = async (e) => {
     }
     
     await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${editingJobPosting.job_id}/`, 
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${editingJobPosting.job_id}/`, 
       jobPostingData
     );
     
@@ -1726,7 +1734,7 @@ const handleEditJobPostingSubmit = async (e) => {
     setShowEditJobModal(false);
     
     // Refresh job postings
-    const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
+    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
     setJobPostings(jobPostingsRes.data);
   } catch (err) {
     console.error("Error updating job posting:", err.response?.data || err);
@@ -1851,11 +1859,11 @@ const handleJobPostingSubmit = async (e) => {
     
     console.log("Submitting job posting data:", jobPostingData);
     // Submit the modified data
-    const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/", jobPostingData);
+    const response = await axios.post("http://127.0.0.1:8000/api/job_posting/job_postings/", jobPostingData);
     showToast("Job posting created successfully!", true);
     
     // Refresh job postings and close modal
-    const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
+    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
     setJobPostings(jobPostingsRes.data);
     setShowAddJobModal(false);
     
@@ -1909,7 +1917,7 @@ const handleArchiveJobPosting = async (jobPosting) => {
     
     // Call API to archive the job posting with all the required data
     await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
       updateData
     );
     
@@ -1955,7 +1963,7 @@ const handleRestoreJobPosting = async (jobPosting) => {
     
     // Call API to restore the job posting with all the required data
     await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
       updateData
     );
     
@@ -1981,7 +1989,7 @@ const submitCandidateForm = async (e) => {
   
   // Add all text fields
   Object.keys(newCandidate).forEach(key => {
-    if (key !== 'resume_file' && newCandidate[key] !== null) {
+    if (key !== 'resume_file' && key !== 'resume_path' && newCandidate[key] !== null) {
       formData.append(key, newCandidate[key]);
     }
   });
@@ -1989,6 +1997,11 @@ const submitCandidateForm = async (e) => {
   // Add resume file if present
   if (newCandidate.resume_file) {
     formData.append('resume', newCandidate.resume_file);
+    // Set a default resume_path as it's required by the backend
+    formData.append('resume_path', 'pending_upload');
+  } else {
+    // Resume path is required in the backend model
+    formData.append('resume_path', '');
   }
   
   try {
@@ -1996,7 +2009,7 @@ const submitCandidateForm = async (e) => {
     
     // Submit to API
     const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/",
+      "http://127.0.0.1:8000/api/candidates/candidates/",
       formData,
       {
         headers: {
@@ -2009,12 +2022,15 @@ const submitCandidateForm = async (e) => {
     setShowAddCandidateModal(false);
     
     // Refresh the candidates list
-    const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
+    const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
     setCandidates(candidatesRes.data);
     
   } catch (err) {
     console.error("Error adding candidate:", err);
-    showToast("Failed to add candidate: " + (err.response?.data?.message || err.message), false);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to add candidate: " + (err.message || "Unknown error");
+    showToast(errorMessage, false);
   } finally {
     setLoading(false);
   }
@@ -2057,7 +2073,7 @@ const submitCandidateForm = async (e) => {
       });
       
       // Step 4: Fetch current documents for the candidate
-      const candidateResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`);
+      const candidateResponse = await axios.get(`http://127.0.0.1:8000/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`);
       
       // Step 5: Parse existing documents or create a new structure
       let documents = { required: {}, optional: {} };
@@ -2092,14 +2108,14 @@ const submitCandidateForm = async (e) => {
       
       // Step 7: Update the candidate's documents in your backend
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`, 
+        `http://127.0.0.1:8000/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`, 
         { documents: JSON.stringify(documents) }
       );
       
       showToast("Document uploaded successfully", true);
       
       // Refresh candidates data
-      const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
+      const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
       setCandidates(candidatesRes.data.filter(c => !c.is_archived));
       setArchivedCandidates(candidatesRes.data.filter(c => c.is_archived));
       
@@ -2153,7 +2169,7 @@ const handleInterviewSubmit = async (e) => {
     
     // Submit to API
     const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/",
+      "http://127.0.0.1:8000/api/interviews/",
       interviewData
     );
     
@@ -2162,8 +2178,8 @@ const handleInterviewSubmit = async (e) => {
     
     // Refresh interviews list
     const [activeInterviews, archivedInterviews] = await Promise.all([
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=false"),
-      axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/?is_archived=true")
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=false"),
+      axios.get("http://127.0.0.1:8000/api/interviews/?is_archived=true")
     ]);
     
     setInterviews(ensureArray(activeInterviews.data));
@@ -2237,7 +2253,7 @@ const handleOnboardingTaskSubmit = async (e) => {
     
     // Submit to API
     const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/",
+      "http://127.0.0.1:8000/api/onboarding/",
       onboardingData
     );
     
@@ -2245,7 +2261,7 @@ const handleOnboardingTaskSubmit = async (e) => {
     setShowAddOnboardingModal(false);
     
     // Refresh onboarding tasks list
-    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
     setOnboardingTasks(ensureArray(onboardingRes.data));
     
   } catch (err) {
@@ -2275,7 +2291,7 @@ const handleEditOnboardingTaskSubmit = async (e) => {
     
     // Submit to API
     const response = await axios.patch(
-      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${editingOnboardingTask.onboarding_id}/`,
+      `http://127.0.0.1:8000/api/onboarding/${editingOnboardingTask.onboarding_id}/`,
       onboardingData
     );
     
@@ -2283,7 +2299,7 @@ const handleEditOnboardingTaskSubmit = async (e) => {
     setShowEditOnboardingModal(false);
     
     // Refresh onboarding tasks list
-    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
     setOnboardingTasks(ensureArray(onboardingRes.data));
     
   } catch (err) {
@@ -2299,16 +2315,16 @@ const handleEditOnboardingTaskSubmit = async (e) => {
 
 const handleArchiveOnboardingTask = async (task) => {
   try {
-    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${task.onboarding_id}/archive/`);
+    await axios.post(`http://127.0.0.1:8000/api/onboarding/${task.onboarding_id}/archive/`);
     showToast("Onboarding task archived successfully", true);
     
     // Refresh onboarding task lists
-    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
     setOnboardingTasks(ensureArray(onboardingRes.data));
     
     // Also fetch archived tasks if available
     try {
-      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
       setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
     } catch (err) {
       console.error("Error fetching archived onboarding tasks:", err);
@@ -2321,16 +2337,16 @@ const handleArchiveOnboardingTask = async (task) => {
 
 const handleRestoreOnboardingTask = async (task) => {
   try {
-    await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${task.onboarding_id}/unarchive/`);
+    await axios.post(`http://127.0.0.1:8000/api/onboarding/${task.onboarding_id}/unarchive/`);
     showToast("Onboarding task restored successfully", true);
     
     // Refresh onboarding task lists
-    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
     setOnboardingTasks(ensureArray(onboardingRes.data));
     
     // Also fetch archived tasks if available
     try {
-      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
       setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
     } catch (err) {
       console.error("Error fetching archived onboarding tasks:", err);
@@ -2347,7 +2363,7 @@ const bulkUnarchiveOnboardingTasks = async () => {
     
     // Create an array of promises for each selected onboarding task
     const promises = selectedArchivedOnboardingTasks.map(id => 
-      axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/${id}/unarchive/`)
+      axios.post(`http://127.0.0.1:8000/api/onboarding/${id}/unarchive/`)
     );
     
     // Execute all promises
@@ -2360,12 +2376,12 @@ const bulkUnarchiveOnboardingTasks = async () => {
     setSelectedArchivedOnboardingTasks([]);
     
     // Refresh onboarding task lists
-    const onboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/");
+    const onboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/");
     setOnboardingTasks(ensureArray(onboardingRes.data));
     
     // Also fetch archived tasks if available
     try {
-      const archivedOnboardingRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/?is_archived=true");
+      const archivedOnboardingRes = await axios.get("http://127.0.0.1:8000/api/onboarding/?is_archived=true");
       setArchivedOnboardingTasks(ensureArray(archivedOnboardingRes.data));
     } catch (err) {
       console.error("Error fetching archived onboarding tasks:", err);
