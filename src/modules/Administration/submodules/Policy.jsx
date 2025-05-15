@@ -48,6 +48,7 @@ const PolicyManagement = () => {
   const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("policies");
   const [uploadFile, setUploadFile] = useState(null);
+  const [directory, setDirectory] = useState('');
   
   // Pagination state
   const [policyPagination, setPolicyPagination] = useState({
@@ -263,16 +264,18 @@ const handleUploadFormSubmit = async () => {
       type: uploadFile.type
     });
     
+    // Ask server for presigned URL directly from the UI
+    const presignRes = await fetch('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: uploadFile.name,
+        directory: directory || `policies/${selectedRecord.policy_id}`, // Use directory if provided or generate one
+        contentType: uploadFile.type || 'application/octet-stream',
+      }),
+    });
     
-    const presignData = await policiesAPI.getUploadUrl(
-      selectedRecord.policy_id, 
-      uploadFile.name, 
-      uploadFile.type || 'application/octet-stream'
-    );
-    
-    
-    const { uploadUrl, fileUrl } = presignData;
-    
+    const { uploadUrl, fileUrl } = await presignRes.json();
     
     const uploadingMsg = message.loading('Uploading file to storage...', 0);
     
@@ -285,14 +288,13 @@ const handleUploadFormSubmit = async () => {
       body: uploadFile
     });
     
-    
     uploadingMsg();
     
     if (!uploadResponse.ok) {
       throw new Error(`S3 upload failed: ${uploadResponse.statusText}`);
     }
     
-    
+    // Update the policy record with the new document URL
     await policiesAPI.updateDocumentUrl(selectedRecord.policy_id, fileUrl);
     
     message.success("Document uploaded successfully");
@@ -301,9 +303,9 @@ const handleUploadFormSubmit = async () => {
   } catch (error) {
     // Display more detailed error message
     const errorMessage = error.response?.data?.error || 
-                        error.response?.data?.detail || 
-                        error.message || 
-                        "Unknown error";
+                      error.response?.data?.detail || 
+                      error.message || 
+                      "Unknown error";
     message.error(`Failed to upload document: ${errorMessage}`);
     console.error("Upload error details:", error);
   }
@@ -432,8 +434,10 @@ const handleUploadFormSubmit = async () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this policy?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchivePolicy(record.policy_id)}
             okText="Yes"
+
             cancelText="No"
           >
             <Button 
@@ -709,6 +713,7 @@ const handleUploadFormSubmit = async () => {
             layout="vertical"
             onFinish={handleUploadFormSubmit}
           >
+
             <Form.Item
               label="Document"
               required
