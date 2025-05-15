@@ -130,6 +130,34 @@ const VendorAppForm = () => {
         }
     };
 
+    const handleStatusChange = async (vendorCode, newStatus) => {
+        try {
+            const url = `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/VendorApp/edit/${vendorCode}/`; // Include vendor_code in the URL
+
+            const payload = {
+                status: newStatus, // Only send the status in the payload
+            };
+
+            console.log("📤 Updating Vendor Status Payload:", payload);
+
+            const response = await axios.patch(url, payload); // Use the dynamic URL
+
+            console.log("✅ Status updated successfully:", response.data);
+
+            // Update the local vendor list to reflect the change
+            setVendorList((prevList) =>
+                prevList.map((vendor) =>
+                    vendor.vendor_code === vendorCode ? { ...vendor, status: newStatus } : vendor
+                )
+            );
+
+            alert("Vendor status updated successfully!");
+        } catch (error) {
+            console.error("❌ Error updating vendor status:", error.response?.data || error.message);
+            alert("Failed to update vendor status. Check the console for details.");
+        }
+    };
+
     return (
         <div className="vendorappform">
             <div className="vendorappform-scrollable-wrapper">
@@ -162,8 +190,8 @@ const VendorAppForm = () => {
                                             <div>{vendor.contact_person}</div>
                                             <div>
                                                 <select
-                                                    value={vendor.status || "Pending"}
-                                                    disabled
+                                                    value={vendor.status || "Pending"} // Bind to the vendor's status
+                                                    onChange={(e) => handleStatusChange(vendor.vendor_code, e.target.value)} // Call the API on change
                                                 >
                                                     <option value="Approved">Approved</option>
                                                     <option value="Pending">Pending</option>
@@ -385,6 +413,23 @@ const VendorAppForm = () => {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Status Dropdown */}
+                        <div>
+                            <select
+                                value={formData.status || "Pending"} // Bind to formData.status
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        status: e.target.value, // Update formData.status on change
+                                    }))
+                                }
+                            >
+                                <option value="Approved">Approved</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
                         </div>
 
                         {/* Buttons */}
