@@ -1,43 +1,32 @@
-import "../styles/accounting-styling.css";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Button from "../components/button/Button";
-import Dropdown from "../components/dropdown/Dropdown";
-import Table from "../components/table/Table";
 import JournalModalInput from "../components/journalModal/JournalModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
+import Dropdown from "../components/dropdown/Dropdown";
+import React, { useState, useEffect } from "react";
+import Button from "../components/button/Button";
 import Search from "../components/search/Search";
+import Table from "../components/table/Table";
+import "../styles/accounting-styling.css";
+import axios from "axios";
 
 const Journal = () => {
-
-  // Current date for the Journal Entry form
+  // Function: Set the date for the Journal Entry form
   const getCurrentDate = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
 
 
-  // Table Columns
-  const columns = [
-    "Journal Id",
-    "Journal Date",
-    "Description",
-    "Debit",
-    "Credit",
-    "Invoice Id",
-    "Currency Id",
-  ];
 
-
-  // State variables
+  // UseStates 
+  const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id",];
   const [latestJournalId, setLatestJournalId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [currencies, setCurrencies] = useState([]);
-  const [invoices, setInvoices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortBy, setSortBy] = useState("Debit");
+  const [invoices, setInvoices] = useState([]);
   const [data, setData] = useState([]);
   const [journalForm, setJournalForm] = useState({
     journalDate: getCurrentDate(),
@@ -53,6 +42,7 @@ const Journal = () => {
   });
 
 
+
   // API Endpoints
   const API_URL =
     import.meta.env.VITE_API_URL ||
@@ -62,12 +52,14 @@ const Journal = () => {
   const CURRENCIES_ENDPOINT = `${API_URL}/api/currencies/`;
 
 
-  // Function to open and close the modal
+
+  // Function: Open and Close the Modal
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
 
-  // Fetching data from the API
+
+  // Function: Fetching data from the API for the journal
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -101,14 +93,15 @@ const Journal = () => {
         isOpen: true,
         type: "error",
         title: "Journal Fetch Failed",
-        message: "Failed to load journal entries. Please check your connection or API configuration.",
+        message: "Failed to load journal entries. Please check your connection.",
       });
       setIsLoading(false);
     }
   };
 
 
-  // Fetching currencies and invoices from the API
+
+  // Function: Fetching currencies from the admin and invoices from the API
   const fetchCurrencies = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -122,19 +115,24 @@ const Journal = () => {
         isOpen: true,
         type: "error",
         title: "Currency Fetch Failed",
-        message: "Could not load currency list. Please check your connection or API configuration.",
+        message: "Could not load currency list. Please check your connection.",
       });
     }
   };
 
+
+
+  // ReactHook: Calls both the data for the journal and currency 
   useEffect(() => {
     fetchData();
     fetchCurrencies();
   }, []);
 
 
+
   // Generate currency options for the dropdown
   const currencyOptions = currencies.map((c) => c.currency_name);
+
 
 
   // Generate invoice options for the dropdown
@@ -148,6 +146,7 @@ const Journal = () => {
     }
     return "ACC-JOE-2025-A00001";
   };
+
 
 
   // Increment the alphanumeric string
@@ -170,7 +169,8 @@ const Journal = () => {
   };
 
 
-  // Handle input changes in the form
+
+  // Function: Updates inputs from the modal
   const handleInputChange = (field, value) => {
     setJournalForm((prevState) => ({ ...prevState, [field]: value }));
   };
@@ -178,12 +178,8 @@ const Journal = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (
-      !journalForm.journalDate ||
-      !journalForm.description ||
-      !journalForm.currencyId ||
-      !journalForm.invoiceId
-    ) {
+    // User validations
+    if (!journalForm.journalDate && !journalForm.description && !journalForm.currencyId && !journalForm.invoiceId) {
       setValidation({
         isOpen: true,
         type: "warning",
@@ -193,12 +189,44 @@ const Journal = () => {
       return;
     }
 
+    if(!journalForm.description) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Description",
+        message: "Please Enter a Description"
+      })
+      return;
+    }
+
+    if(!journalForm.invoiceId) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Invoice Id",
+        message: "Please Enter a Invoice Id"
+      })
+      return;
+    }
+
+    if(!journalForm.currencyId) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Currency ID",
+        message: "Please Enter a Currency ID"
+      })
+      return;
+    }
+
+
 
     // Currency ID is now set to the selected currency's ID
     const nextJournalId = generateNextJournalId();
     const selectedCurrency = currencies.find(
       (c) => c.currency_name === journalForm.currencyId
     );
+
 
 
     // Prepare the payload for the API request
@@ -253,6 +281,7 @@ const Journal = () => {
   };
 
 
+
   // Handle sorting of the table data
   const handleSort = (value) => {
     let sortedData = [];
@@ -286,6 +315,7 @@ const Journal = () => {
   };
   
 
+
   // Handle search input change
   const filteredData = data.filter((row) =>
     [row[0], row[1], row[2], row[5], row[6]]
@@ -296,6 +326,7 @@ const Journal = () => {
   );
 
 
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -303,6 +334,7 @@ const Journal = () => {
       <p className="ml-4 text-gray-600">Loading journal data...</p>
     </div>
   );
+
 
   return (
     <div className="Journal">
@@ -345,11 +377,7 @@ const Journal = () => {
 
 
         {/* Table Component */}
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
-      )}
+        {isLoading ? (<LoadingSpinner />) : (<Table data={filteredData} columns={columns} enableCheckbox={false} />)}
       </div>
 
 
