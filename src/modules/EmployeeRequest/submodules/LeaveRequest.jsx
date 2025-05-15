@@ -29,6 +29,10 @@ const LeaveRequest = () => {
   const [renderError, setRenderError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Add a new state for leave balances
+  const [leaveBalances, setLeaveBalances] = useState(null);
+  const [fetchingLeaveBalances, setFetchingLeaveBalances] = useState(false);
+
   // Fetch employees on component mount with improved error handling
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -42,9 +46,14 @@ const LeaveRequest = () => {
           throw new Error("Invalid response from employees API");
         }
 
-        // Filter only active employees with safe access
-        const activeEmployees = response.data.filter(emp => emp && emp.status === "Active") || [];
-        setEmployees(activeEmployees);
+        // Filter only active employees with "Regular" employment type
+        const regularEmployees = response.data.filter(emp => 
+          emp && 
+          emp.status === "Active" && 
+          emp.employment_type === "Regular"
+        ) || [];
+        
+        setEmployees(regularEmployees);
       } catch (err) {
         console.error("Error fetching employees:", err);
         showToast("Failed to load employee list", false);
@@ -80,11 +89,41 @@ const LeaveRequest = () => {
     fetchDepartments();
   }, []);
 
+  // Add a function to fetch employee leave balances when employee changes
+  useEffect(() => {
+    const fetchLeaveBalances = async () => {
+      if (!formData.employee_id) return;
+      
+      try {
+        setFetchingLeaveBalances(true);
+        
+        // Fetch the current year's leave balances for this employee
+        const response = await axios.get(`http://127.0.0.1:8000/api/employee_leave_balances/balances/${formData.employee_id}/`);
+        
+        if (response && response.data) {
+          setLeaveBalances(response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching leave balances:", err);
+        // Don't show a toast here to avoid annoying the user
+        setLeaveBalances(null);
+      } finally {
+        setFetchingLeaveBalances(false);
+      }
+    };
+
+    fetchLeaveBalances();
+  }, [formData.employee_id]);
+
   // Toast message helper with improved error handling
   const showToast = (message, success = true) => {
     try {
       setToast({ message, success });
-      setTimeout(() => setToast(null), 3000);
+      
+      // Auto-hide the toast after a delay
+      // Use a longer timeout for error messages
+      const timeoutDuration = success ? 3000 : 6000;
+      setTimeout(() => setToast(null), timeoutDuration);
     } catch (err) {
       console.error("Error showing toast:", err);
       // Fallback if toast fails
@@ -196,14 +235,14 @@ const LeaveRequest = () => {
 
   // Calculate total days between start and end date with safe checks
   const calculateTotalDays = () => {
-    if (!formData.start_date || !formData.end_date) return null;
+    if (!formData.start_date || !formData.end_date) return 0;
 
     try {
       const start = new Date(formData.start_date);
       const end = new Date(formData.end_date);
 
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        return null;
+        return 0;
       }
 
       // Reset time part to avoid time zone issues
@@ -217,11 +256,95 @@ const LeaveRequest = () => {
       return Math.floor(differenceMs / (1000 * 60 * 60 * 24)) + 1;
     } catch (err) {
       console.error("Error calculating days:", err);
-      return null;
+      return 0;
     }
   };
 
-  // Form submission
+  // Add a validation function for leave balances
+  const validateLeaveRequest = () => {
+    const totalDays = calculateTotalDays();
+    
+    if (!leaveBalances) {
+      // If we can't fetch leave balances, we'll let the server validate
+      return { valid: true };
+    }
+    
+    const leaveType = formData.leave_type;
+    
+    // Validate based on leave type
+    switch (leaveType) {
+      case "Sick":
+        if (totalDays > leaveBalances.sick_leave_remaining) {
+          return {
+            valid: false,
+            message: `Insufficient sick leave balance. Remaining: ${leaveBalances.sick_leave_remaining} days`
+          };
+        }
+        break;
+        
+      case "Vacation":
+        if (totalDays > leaveBalances.vacation_leave_remaining) {
+          return {
+            valid: false,
+            message: `Insufficient vacation leave balance. Remaining: ${leaveBalances.vacation_leave_remaining} days`
+          };
+        }
+        break;
+        
+      case "Maternity":
+        if (totalDays > 105) {
+          return {
+            valid: false,
+            message: "Maternity leave cannot exceed 105 days"
+          };
+        }
+        if (totalDays > leaveBalances.maternity_leave_remaining) {
+          return {
+            valid: false,
+            message: `Insufficient maternity leave balance. Remaining: ${leaveBalances.maternity_leave_remaining} days`
+          };
+        }
+        break;
+        
+      case "Paternity":
+        if (totalDays > 7) {
+          return {
+            valid: false,
+            message: "Paternity leave cannot exceed 7 days"
+          };
+        }
+        if (totalDays > leaveBalances.paternity_leave_remaining) {
+          return {
+            valid: false,
+            message: `Insufficient paternity leave balance. Remaining: ${leaveBalances.paternity_leave_remaining} days`
+          };
+        }
+        break;
+        
+      case "Solo Parent":
+        if (totalDays > 7) {
+          return {
+            valid: false,
+            message: "Solo parent leave cannot exceed 7 days per year"
+          };
+        }
+        if (totalDays > leaveBalances.solo_parent_leave_remaining) {
+          return {
+            valid: false,
+            message: `Insufficient solo parent leave balance. Remaining: ${leaveBalances.solo_parent_leave_remaining} days`
+          };
+        }
+        break;
+        
+      // For other leave types (e.g., Unpaid, Emergency), no specific validation
+      default:
+        break;
+    }
+    
+    return { valid: true };
+  };
+
+  // Form submission with enhanced error handling for database validation errors
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -240,6 +363,13 @@ const LeaveRequest = () => {
 
     if (endDate < startDate) {
       showToast("End date must be after start date", false);
+      return;
+    }
+    
+    // Client-side validation for leave balances
+    const validation = validateLeaveRequest();
+    if (!validation.valid) {
+      showToast(validation.message, false);
       return;
     }
 
@@ -280,9 +410,48 @@ const LeaveRequest = () => {
 
     } catch (err) {
       console.error("Error submitting leave request:", err);
-      const errorMessage = err.response?.data?.detail ||
-        Object.values(err.response?.data || {}).flat().join(", ") ||
-        "Failed to submit leave request";
+      
+      // Enhanced error handling to extract specific validation messages
+      let errorMessage = "Failed to submit leave request";
+      
+      // Extract the specific error message from the response
+      if (err.response) {
+        // Check if it's a validation error with detail field
+        if (err.response.data?.detail) {
+          errorMessage = err.response.data.detail;
+          
+          // Look for specific database validation error patterns
+          if (typeof errorMessage === 'string') {
+            // Extract balance-related error messages
+            if (errorMessage.includes('Insufficient') || 
+                errorMessage.includes('leave cannot exceed') ||
+                errorMessage.includes('leave balance')) {
+              // This is likely a validation error from the DB trigger
+              errorMessage = errorMessage.replace(/.*?Failed to create leave request: /g, '');
+              errorMessage = errorMessage.replace(/.*?IntegrityError: /g, '');
+              errorMessage = errorMessage.replace(/.*?DETAIL: /g, '');
+            }
+          }
+        } 
+        // Check if there are field-specific errors
+        else if (err.response.data) {
+          const errorFields = Object.keys(err.response.data);
+          if (errorFields.length > 0) {
+            const messages = [];
+            errorFields.forEach(field => {
+              if (Array.isArray(err.response.data[field])) {
+                messages.push(`${field}: ${err.response.data[field].join(', ')}`);
+              } else if (typeof err.response.data[field] === 'string') {
+                messages.push(`${field}: ${err.response.data[field]}`);
+              }
+            });
+            if (messages.length > 0) {
+              errorMessage = messages.join('; ');
+            }
+          }
+        }
+      }
+      
       showToast(errorMessage, false);
     } finally {
       setLoading(false);
@@ -485,6 +654,30 @@ const LeaveRequest = () => {
                         <div className="leave-req-days-display">
                           <span>Total Days: </span>
                           <strong>{totalDays}</strong>
+                          
+                          {formData.leave_type && leaveBalances && (
+                            <div className="leave-req-balance-info">
+                              {formData.leave_type === "Sick" && (
+                                <small>Available Sick Leave: {leaveBalances.sick_leave_remaining} days</small>
+                              )}
+                              {formData.leave_type === "Vacation" && (
+                                <small>Available Vacation Leave: {leaveBalances.vacation_leave_remaining} days</small>
+                              )}
+                              {formData.leave_type === "Maternity" && (
+                                <small>Available Maternity Leave: {leaveBalances.maternity_leave_remaining} days (max 105)</small>
+                              )}
+                              {formData.leave_type === "Paternity" && (
+                                <small>Available Paternity Leave: {leaveBalances.paternity_leave_remaining} days (max 7)</small>
+                              )}
+                              {formData.leave_type === "Solo Parent" && (
+                                <small>Available Solo Parent Leave: {leaveBalances.solo_parent_leave_remaining} days (max 7)</small>
+                              )}
+                            </div>
+                          )}
+                          
+                          {fetchingLeaveBalances && (
+                            <div className="leave-req-loading-balance">Loading leave balances...</div>
+                          )}
                         </div>
                       )}
 
@@ -559,7 +752,7 @@ const LeaveRequest = () => {
         {/* Toast notification */}
         {toast && (
           <div
-            className="leave-req-toast"
+            className={`leave-req-toast ${!toast.success ? 'error' : ''}`}
             style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
           >
             {toast.message}

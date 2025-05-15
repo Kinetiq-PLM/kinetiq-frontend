@@ -213,7 +213,7 @@
   background-color: #d1d5db;
 }
 
-/* Toast notification */
+/* Toast notification with improved error display */
 .leave-req-toast {
   position: fixed;
   bottom: 20px;
@@ -223,6 +223,15 @@
   border-radius: 4px;
   z-index: 1000;
   animation: leave-req-slideIn 0.5s, leave-req-fadeOut 0.5s 2.5s forwards;
+  max-width: 350px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Make error toast stay visible longer */
+.leave-req-toast.error {
+  animation: leave-req-slideIn 0.5s, leave-req-fadeOut 0.5s 5s forwards;
 }
 
 @keyframes leave-req-slideIn {
@@ -314,4 +323,25 @@
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: -0.25rem;
+}
+
+/* Leave balance styling */
+.leave-req-balance-info {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.leave-req-balance-info small {
+  font-size: 0.8rem;
+  color: #4b5563;
+  padding: 2px 0;
+}
+
+.leave-req-loading-balance {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
 }
