@@ -467,7 +467,7 @@ const handleRenewalCheckbox = () => {
                 </div>
               </div>
 
-              <div className="form-group" style={{ flex: 1 }}>
+              <div className="form-group view-cont-desc" style={{ flex: 1 }}>
                 <label htmlFor="contractDescription">Contract Description</label>
                 <textarea
                   id="contractDescription"

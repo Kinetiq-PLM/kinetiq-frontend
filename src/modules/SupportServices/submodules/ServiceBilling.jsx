@@ -214,7 +214,7 @@ const ServiceBilling = ({employee_id}) => {
               onClick={handleUpdateClick}
               disabled={!selectedBilling}
             >
-              Update
+              Edit
             </button>
             <button className="add-button" onClick={handleAddContract}>
               Add

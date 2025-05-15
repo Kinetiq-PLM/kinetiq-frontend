@@ -290,7 +290,7 @@ const BillingDetails = ({ isOpen, onClose, billingId}) => {
                   />
                 </div>
               </div>
-              <button className="cancel-button close-button" onClick={onClose}>
+              <button className="cancel-button close-cancel-button" onClick={onClose}>
                 Close
               </button>
             </div>

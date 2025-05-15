@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
+import ViewStatementsModal from "./ViewStatementsModal"
 
 import { GET } from "../../api/api"
 
@@ -151,6 +152,34 @@ const handleSelectStatus = (status) => {
       contractStatus: "",
     });
   }
+
+  
+  const [showViewInventoryModal, setShowViewInventoryModal] = useState(false)
+
+  const handleViewInventory = () => {
+    setShowViewInventoryModal(true)
+  }
+
+  const handleSelectItemInventory = (statementItem) => {
+    setFormData((prev) => ({
+      ...prev,
+      statementId: statementItem.statement_item_id || "",
+      productId: statementItem.inventory_item?.item?.item_id || "",
+      productName: statementItem.inventory_item?.item?.item_name || "",
+      productQuantity: statementItem.quantity || "",
+      customerId: statementItem.statement?.customer?.customer_id || "",
+      phoneNumber: statementItem?.statement?.customer?.phone_number || "",
+      emailAddress: statementItem?.statement?.customer?.email_address || "",
+      name: statementItem?.statement?.customer?.name || "",
+      additionalServiceId: statementItem?.additional_service || ""
+    }));
+    if (statementItem.additional_service) {
+      fetchAddServices(statementItem.additional_service);
+    } else {
+      console.log("No additional service ID found.");
+      setAdditionalServices([{}]); 
+    }
+  };
 
   const statementItemRef = useRef(null);
   const statusRef = useRef(null);
@@ -356,7 +385,7 @@ const handleSelectStatus = (status) => {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
+              <div className="form-group add-cont-desc">
                 <label htmlFor="contractDescription">Contract Description</label>
                 <textarea
                   id="contractDescription"
@@ -394,6 +423,9 @@ const handleSelectStatus = (status) => {
         </div>
 
         <div className="modal-footer">
+        <button className="update-modal-button" onClick={handleViewInventory}>
+              View Statement Items
+            </button>
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
@@ -408,6 +440,17 @@ const handleSelectStatus = (status) => {
           </button>
         </div>
       </div>
+      {showViewInventoryModal && (
+        <ViewStatementsModal
+          isOpen={showViewInventoryModal}
+          onClose={() => setShowViewInventoryModal(false)}
+          onSelectItem={(item) => {
+            console.log("Selected item:", item)
+            handleSelectItemInventory(item)
+            setShowViewInventoryModal(false)
+          }}
+          />
+        )}
     </div>
   )
 }

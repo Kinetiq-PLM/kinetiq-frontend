@@ -143,7 +143,7 @@ const WarrantyRenewal = ({employee_id}) => {
               onClick={handleUpdateClick} 
               disabled={!selectedRenewal}
             >
-              Update
+              Edit
             </button>
           </div>
         </div>

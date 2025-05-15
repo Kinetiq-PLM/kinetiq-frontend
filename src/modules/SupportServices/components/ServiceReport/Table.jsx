@@ -31,7 +31,7 @@ const Table = ({ reports, onRowClick, selectedReport }) => {
                 <td>{report.service_request?.service_request_id || "Null"}</td>
                 <td>{report.service_call?.service_call_id || "Null"}</td>
                 <td>{report.technician ? `${report.technician.first_name || ""} ${report.technician.last_name || ""}`.trim() : "Unknown"}</td>
-                <td>{report.submission_date || "Null"}</td>
+                <td>{new Date(report.submission_date).toISOString().split("T")[0] || "Null"}</td>
                 <td>{report.report_status}</td>    
               </tr>
             ))
