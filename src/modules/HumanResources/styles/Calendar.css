@@ -178,6 +178,11 @@
   box-shadow: 0 4px 12px rgba(0,0,0,.12), inset 0 -3px 0 rgba(0, 176, 181, 0.5);
 }
 
+/* Interview indicator on calendar */
+.hr-calendar-cell.has-interviews {
+  background-color: rgba(100, 149, 237, 0.15); /* light cornflower blue */
+}
+
 /* empty cells (prev/next month) */
 .hr-calendar-cell.empty{
   background:#fafafa;
@@ -213,6 +218,12 @@
   position: absolute;
   top: 4px;
   right: 4px;
+}
+
+.badge.interviews {
+  background-color: #6495ED; /* cornflower blue */
+  color: white;
+  margin-left: 2px;
 }
 
 /* ------------------------------------------------------------------- */
@@ -339,6 +350,13 @@
   background: #fff6e6;
 }
 
+.hr-calendar-modal-interviews {
+  background-color: rgba(100, 149, 237, 0.15);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
 .hr-calendar-modal-badge {
   font-size: 1.5rem;
   margin-right: 0.75rem;
@@ -376,6 +394,10 @@
 
 .hr-calendar-modal-btn.leaves:hover {
   background: #e0e0e0;
+}
+
+.hr-calendar-modal-btn.interviews {
+  background-color: #6495ED;
 }
 
 /* Leave details in modal */
@@ -445,6 +467,42 @@
 .leave-emoji {
   margin-right: 0.5rem;
   font-size: 1rem;
+}
+
+/* Interview details in modal */
+.interview-emoji {
+  margin-right: 6px;
+  font-size: 1.1em;
+}
+
+.interview-type {
+  font-weight: 500;
+}
+
+.interview-time {
+  color: #666;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+.interview-type.technical {
+  color: #2e86c1;
+}
+
+.interview-type.hr {
+  color: #8e44ad;
+}
+
+.interview-type.panel {
+  color: #d35400;
+}
+
+.interview-type.final {
+  color: #27ae60;
+}
+
+.interview-type.initial {
+  color: #f39c12;
 }
 
 /* ------------------------------------------------------------------- */
