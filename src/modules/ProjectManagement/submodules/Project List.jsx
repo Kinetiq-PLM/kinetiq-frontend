@@ -3,7 +3,6 @@ import "../styles/Project List.css";
 import axios from 'axios';
 axios.defaults.baseURL = 'https://hp0w1llp43.execute-api.ap-southeast-1.amazonaws.com/dev';
 
-
 // Custom hook for debouncing values
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -295,6 +294,8 @@ const ProjectList = () => {
     try {
       return await fetchWithRetry(async () => {
         const response = await axios.get(`${API_URL}/archived-projects/internal_requests/?page=${page}`);
+        // Always clear previous state before setting new data
+        setArchivedInternalRequests([]);
         setArchivedInternalRequests(response.data.results || []);
         setArchivedInternalPagination({
           count: response.data.count,
@@ -304,6 +305,7 @@ const ProjectList = () => {
           current_page: response.data.current_page || page
         });
         setArchivedInternalPage(page);
+        console.log('[DEBUG] Archived Internal Requests IDs:', (response.data.results || []).map(r => r.project_request_id));
         return true;
       });
     } catch (err) {
@@ -324,6 +326,8 @@ const ProjectList = () => {
     try {
       return await fetchWithRetry(async () => {
         const response = await axios.get(`${API_URL}/archived-projects/external_requests/?page=${page}`);
+        // Always clear previous state before setting new data
+        setArchivedExternalRequests([]);
         setArchivedExternalRequests(response.data.results || []);
         setArchivedExternalPagination({
           count: response.data.count,
@@ -333,6 +337,7 @@ const ProjectList = () => {
           current_page: response.data.current_page || page
         });
         setArchivedExternalPage(page);
+        console.log('[DEBUG] Archived External Requests IDs:', (response.data.results || []).map(r => r.ext_project_request_id));
         return true;
       });
     } catch (err) {
@@ -456,20 +461,19 @@ const ProjectList = () => {
   const handleArchiveRequests = async () => {
     try {
       const selectedIds = [];
-      
       if (selectedNav === "Internal Request") {
         internalRequests.forEach((item, index) => {
           if (selectedRequests[index]) {
             selectedIds.push(item.project_request_id);
           }
         });
-        
+
         if (selectedIds.length > 0) {
           const response = await axios.post(`${API_URL}/internal-requests/bulk_archive/`, { ids: selectedIds });
-          // Show success notification
           showNotification(`Successfully archived ${response.data.success_count} of ${response.data.total_count} requests`);
-          // Refresh data after archiving
-          fetchInternalRequests(internalRequestsPage);
+          // Always reset to page 1 after archiving
+          fetchInternalRequests(1);
+          setInternalRequestsPage(1);
         }
       } else if (selectedNav === "External Request") {
         externalRequests.forEach((item, index) => {
@@ -477,16 +481,13 @@ const ProjectList = () => {
             selectedIds.push(item.ext_project_request_id);
           }
         });
-        
+
         if (selectedIds.length > 0) {
           const response = await axios.post(`${API_URL}/external-requests/bulk_archive/`, { ids: selectedIds });
-          // Show success notification
           showNotification(`Successfully archived ${response.data.success_count} of ${response.data.total_count} requests`);
-          // Refresh data after archiving
           fetchExternalRequests(externalRequestsPage);
         }
       }
-      
       setSelectedRequests([]);
     } catch (err) {
       console.error('Failed to archive requests:', err);
@@ -497,22 +498,21 @@ const ProjectList = () => {
   const handleRestoreRequests = async () => {
     try {
       const selectedIds = [];
-      
       if (archivedNav === "Internal Archived") {
         archivedInternalRequests.forEach((item, index) => {
           if (selectedArchivedRequests[index]) {
             selectedIds.push(item.project_request_id);
           }
         });
-        
         if (selectedIds.length > 0) {
           const response = await axios.post(`${API_URL}/archived-projects/restore_internal/`, { ids: selectedIds });
-          // Show success notification
           showNotification(`Successfully restored ${response.data.success_count} of ${response.data.total_count} requests`);
-          // Refresh data after restoring
-          fetchArchivedInternalRequests(archivedInternalPage);
-          // Also refresh the main list if we're going to switch to it
-          fetchInternalRequests(internalRequestsPage);
+          // Force refresh archived list twice for real-time update
+          await fetchArchivedInternalRequests(1);
+          await fetchArchivedInternalRequests(1);
+          setArchivedInternalPage(1);
+          await fetchInternalRequests(1);
+          setInternalRequestsPage(1);
         }
       } else if (archivedNav === "External Archived") {
         archivedExternalRequests.forEach((item, index) => {
@@ -520,18 +520,17 @@ const ProjectList = () => {
             selectedIds.push(item.ext_project_request_id);
           }
         });
-        
         if (selectedIds.length > 0) {
           const response = await axios.post(`${API_URL}/archived-projects/restore_external/`, { ids: selectedIds });
-          // Show success notification
           showNotification(`Successfully restored ${response.data.success_count} of ${response.data.total_count} requests`);
-          // Refresh data after restoring
-          fetchArchivedExternalRequests(archivedExternalPage);
-          // Also refresh the main list if we're going to switch to it
-          fetchExternalRequests(externalRequestsPage);
+          // Force refresh archived list twice for real-time update
+          await fetchArchivedExternalRequests(1);
+          await fetchArchivedExternalRequests(1);
+          setArchivedExternalPage(1);
+          await fetchExternalRequests(1);
+          setExternalRequestsPage(1);
         }
       }
-      
       setSelectedArchivedRequests([]);
     } catch (err) {
       console.error('Failed to restore requests:', err);
