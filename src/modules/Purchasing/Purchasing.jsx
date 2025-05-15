@@ -148,7 +148,7 @@ const PurchasingBody = () => {
                         <h1 className="purch-title">Purchasing Department Dashboard</h1>
 
                         <div className="purch-charts">
-    <div className="purch-chart-container">
+    <div className="purch-chart-container bar-chart">
         <div className="purch-chart-header">
             <h2>Purchase Request Status</h2>
         </div>

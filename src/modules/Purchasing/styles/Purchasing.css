@@ -3,6 +3,9 @@
   width: 100%;
   height: 100%;
 }
+.purch-chart-container.bar-chart {
+  margin-left: 1rem; /* Moves the BarChart slightly to the right */
+}
 
 .purch .purch-body-content-container {
   width: 100%;
@@ -212,8 +215,8 @@
 }
 
 .purch-charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column; /* Change to column layout */
   gap: 1.5rem;
   margin-top: -1rem;
   width: 100%;
@@ -231,6 +234,10 @@
   flex-direction: column;
   height: 100%;
   border: 1px solid #ddd;
+}
+
+.purch-chart-container.pie-chart {
+  margin-left: 1rem; /* Moves the PieChart slightly to the right */
 }
 
 .purch-chart-header {

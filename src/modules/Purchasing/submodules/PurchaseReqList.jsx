@@ -283,74 +283,80 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
           )}
         </div>
         {showNewForm && !showPurchQuot && (
-          <PurchaseReqForm onClose={() => {
-            setShowNewForm(false);
-            setShowPurchQuot(false);
-            setSelectedRequest(null);
-          }} />
-        )}
-        {showPurchQuot && selectedRequest && !showNewForm && (
-          <PurchForQuotForm
-            request={selectedRequest} // Pass the selected request object
-            onClose={() => {
-              setShowPurchQuot(false);
-              setShowNewForm(false);
-              setSelectedRequest(null);
-            }}
-          />
-        )}
-        {!showNewForm && !showPurchQuot && (
-          <div className="purchreq-table-container">
-            <div className="purchreq-table-header">
-              <div>PR No.</div>
-              <div>Employee Name</div>
-              <div>Status</div>
+  <PurchaseReqForm
+    onClose={() => {
+      setShowNewForm(false);
+      setShowPurchQuot(false);
+      setSelectedRequest(null);
+    }}
+  />
+)}
+{showPurchQuot && selectedRequest && !showNewForm && (
+  <PurchForQuotForm
+    request={selectedRequest} // Pass the selected request object
+    onClose={() => {
+      setShowPurchQuot(false);
+      setShowNewForm(false);
+      setSelectedRequest(null);
+    }}
+  />
+)}
+{!showNewForm && !showPurchQuot && (
+  <div className="purchreq-table-container">
+    <div className="purchreq-table-header">
+      <div>PR No.</div>
+      <div>Employee Name</div>
+      <div>Status</div>
+      <div>
+        <span
+          className="sortable-header"
+          onClick={handleSortToggle}
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Document Date ({sortOrder === "newest" ? "Newest" : "Oldest"})
+        </span>
+      </div>
+      <div>Valid Date</div>
+    </div>
+    <div className="purchreq-table-scrollable">
+      <div className="purchreq-table-rows">
+        {filteredRequests.length > 0 ? (
+          filteredRequests.map((request, index) => (
+            <div
+              key={index}
+              className="purchreq-row"
+              onClick={() => handleRequestClick(request)}
+            >
+              <div>{request.request_id}</div>
+              <div>{employeeMap[request.employee_id]?.name || " "}</div>
               <div>
-                <span
-                  className="sortable-header"
-                  onClick={handleSortToggle}
-                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                <select
+                  className={`status-select status-${request.status?.toLowerCase() || 'pending'} ${pendingStatusUpdates[request.request_id] ? 'status-updating' : ''}`}
+                  value={request.status || "Pending"}
+                  onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
+                  disabled={pendingStatusUpdates[request.request_id]}
                 >
-                  Document Date ({sortOrder === "newest" ? "Newest" : "Oldest"})
-                </span>
+                  <option value="Acknowledged">Acknowledged</option>
+                  <option value="Finished">Finished</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Returned">Returned</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Expired">Expired</option>
+                </select>
               </div>
-              <div>Valid Date</div>
+              <div>{request.document_date}</div>
+              <div>{request.valid_date}</div>
             </div>
-            <div className="purchreq-table-scrollable">
-              <div className="purchreq-table-rows">
-                {filteredRequests.length > 0 ? (
-                  filteredRequests.map((request, index) => (
-                    <div key={index} className="purchreq-row">
-                      <div>{request.request_id}</div>
-                      <div>{employeeMap[request.employee_id]?.name || " "}</div>
-                      <div>
-                        <select
-                          className={`status-select status-${request.status?.toLowerCase() || 'pending'} ${pendingStatusUpdates[request.request_id] ? 'status-updating' : ''}`}
-                          value={request.status || "Pending"}
-                          onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
-                          disabled={pendingStatusUpdates[request.request_id]}
-                        >
-                          <option value="Acknowledged">Acknowledged</option>
-                          <option value="Finished">Finished</option>
-                          <option value="Approved">Approved</option>
-                          <option value="Pending">Pending</option>
-                          <option value="Returned">Returned</option>
-                          <option value="Rejected">Rejected</option>
-                          <option value="Cancelled">Cancelled</option>
-                          <option value="Expired">Expired</option>
-                        </select>
-                      </div>
-                      <div>{request.document_date}</div>
-                      <div>{request.valid_date}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="purchreq-no-results">No results found</div>
-                )}
-              </div>
-            </div>
-          </div>
+          ))
+        ) : (
+          <div className="purchreq-no-results">No results found</div>
         )}
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
