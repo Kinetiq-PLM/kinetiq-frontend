@@ -81,7 +81,7 @@ const TaxAndRemittance = () => {
     setModalOpen(true);
   };
 
-  const handleEditSubmit = async (updatedRow, isNewRemittance = false) => {
+  const handleEditSubmit = async (updatedRow) => {
     try {
       const payload = {
         remittance_id: updatedRow[0],
@@ -102,12 +102,10 @@ const TaxAndRemittance = () => {
         throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
       }
 
-      const url = isNewRemittance
-        ? TAXREMITTANCE_ENDPOINT
-        : `${TAXREMITTANCE_ENDPOINT}${payload.remittance_id}/`;
+      const url = `${TAXREMITTANCE_ENDPOINT}${payload.remittance_id}/`;
 
       const response = await fetch(url, {
-        method: isNewRemittance ? "POST" : "PUT",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -125,9 +123,9 @@ const TaxAndRemittance = () => {
         console.log("Backend response data:", newData);
 
         setData((prevData) =>
-          isNewRemittance
-            ? [
-                [
+          prevData.map((row) =>
+            row[0] === updatedRow[0]
+              ? [
                   newData.remittance_id,
                   newData.employee_id,
                   newData.deduction_type,
@@ -136,30 +134,16 @@ const TaxAndRemittance = () => {
                   newData.payment_method,
                   newData.reference_number,
                   newData.status,
-                ],
-                ...prevData,
-              ]
-            : prevData.map((row) =>
-                row[0] === updatedRow[0]
-                  ? [
-                      newData.remittance_id,
-                      newData.employee_id,
-                      newData.deduction_type,
-                      newData.amount,
-                      newData.payment_date,
-                      newData.payment_method,
-                      newData.reference_number,
-                      newData.status,
-                    ]
-                  : row
-              )
+                ]
+              : row
+          )
         );
 
         setValidation({
           isOpen: true,
           type: "success",
           title: "Success",
-          message: `Remittance record ${isNewRemittance ? "created" : "updated"} successfully.`,
+          message: "Remittance record updated successfully.",
         });
       } else {
         throw new Error("Unexpected response format: Expected JSON but received HTML");
@@ -183,7 +167,7 @@ const TaxAndRemittance = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searching.toLowerCase().trim())
   );
 
   const LoadingSpinner = () => (
@@ -233,11 +217,11 @@ const TaxAndRemittance = () => {
             setIsCreating(false);
           }}
           selectedRow={selectedRow}
-          handleSubmit={(data, isNewRemittance) => handleEditSubmit(data, isNewRemittance)}
+          handleSubmit={handleEditSubmit}
           columnHeaders={columns}
           isCreating={isCreating}
           employeeIds={employeeIds}
-          isNewRemittance={isCreating}
+          isNewRemittance={true}
         />
       )}
 

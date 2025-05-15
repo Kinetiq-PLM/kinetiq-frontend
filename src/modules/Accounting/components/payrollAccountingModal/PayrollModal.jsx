@@ -12,38 +12,64 @@ const PayrollModal = ({
   selectedRow,
   handleSubmit,
   columnHeaders,
-  isCreating,
   payrollHrIds,
   isNewPayroll,
 }) => {
-  const [formData, setFormData] = useState(selectedRow);
-  const [notif, setNotif] = useState({ isOpen: false, type: '', title: '', message: '' });
+  const [formData, setFormData] = useState(selectedRow || []);
+  const [notif, setNotif] = useState({
+    isOpen: false,
+    type: "",
+    title: "",
+    message: "",
+  });
+  const [approvedByOptions, setApprovedByOptions] = useState([]);
+  const [isLoadingApprovers, setIsLoadingApprovers] = useState(true);
+
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const PAYROLL_HR_ENDPOINT = `${API_URL}/api/payrolls/`;
 
   useEffect(() => {
     if (selectedRow) {
-      const updatedRow = [...selectedRow];
+      setFormData([...selectedRow]);
+    } else {
+      setFormData(Array(columnHeaders.length).fill(""));
+    }
+  }, [selectedRow, columnHeaders]);
 
-      if (isCreating && !updatedRow[0]) {
-        const currentYear = new Date().getFullYear();
-        const uniqueId = generateLowercaseId(6);
-        updatedRow[0] = `ACC-PAY-${currentYear}-${uniqueId}`;
+  useEffect(() => {
+    const fetchEmployeeIds = async () => {
+      try {
+        const response = await fetch(PAYROLL_HR_ENDPOINT);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        const uniqueApprovers = [
+          ...new Set(result.map((item) => item.employee_id).filter(Boolean)),
+        ];
+        setApprovedByOptions(uniqueApprovers);
+      } catch (error) {
+        setNotif({
+          isOpen: true,
+          type: "error",
+          title: "Error",
+          message: "Failed to fetch approver options. Please try again later.",
+        });
+        setApprovedByOptions([]);
+      } finally {
+        setIsLoadingApprovers(false);
       }
+    };
 
-      setFormData(updatedRow);
-    }
-  }, [selectedRow, isCreating]);
-
-  const generateLowercaseId = (length) => {
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
+    fetchEmployeeIds();
+  }, [PAYROLL_HR_ENDPOINT]);
 
   const generateReferenceNumber = (paymentMethod) => {
-    const randomNum = Math.floor(100000 + Math.random() * 900000);
+    const randomNum = Math.floor(Math.random() * 1000000)
+      .toString()
+      .padStart(6, "0");
     switch (paymentMethod) {
       case "Cash":
         return `REF-Cash-${randomNum}`;
@@ -52,7 +78,7 @@ const PayrollModal = ({
       case "Credit Card":
         return `REF-Credit Card-${randomNum}`;
       default:
-        return `REF-Cash-${randomNum}`;
+        return "";
     }
   };
 
@@ -64,17 +90,18 @@ const PayrollModal = ({
   };
 
   const handleInputChange = (index, value) => {
-    const isFieldEditable = isCreating
-      ? index !== 0 && index !== 5
-      : index === 6;
+    const isFieldEditable =
+      index === 0 || index === 3 || index === 4 || index === 5; // Only editable fields
 
-    if (!isFieldEditable) return;
+    if (!isFieldEditable) {
+      return;
+    }
 
     const updatedFormData = [...formData];
-    updatedFormData[index] = value;
+    updatedFormData[index] = value; // Store the value as-is
 
-    if (index === 4 && isNewPayroll) {
-      updatedFormData[5] = generateReferenceNumber(value);
+    if (index === 5 && isNewPayroll) {
+      updatedFormData[6] = generateReferenceNumber(value);
     }
 
     setFormData(updatedFormData);
@@ -85,40 +112,137 @@ const PayrollModal = ({
   };
 
   const handleFormSubmit = () => {
-    if (isCreating) {
-      if (!formData[1]) {
-        showValidationModal('error', 'Missing Payroll HR ID', 'Please select a Payroll HR ID.');
-        return;
-      }
-      if (!formData[2] || !isValidDate(formData[2])) {
-        showValidationModal('error', 'Invalid Date', 'Please select a valid Date Approved (YYYY-MM-DD).');
-        return;
-      }
-      if (!formData[3]) {
-        showValidationModal('error', 'Missing Approver', 'Please enter an Approved By value.');
-        return;
-      }
-      if (!formData[4]) {
-        showValidationModal('error', 'Missing Payment Method', 'Please select a Payment Method.');
-        return;
-      }
+    if (!formData[0]) {
+      showValidationModal("error", "Missing Status", "Please select a Status.");
+      return;
+    }
+    if (!formData[3] || !isValidDate(formData[3])) {
+      showValidationModal(
+        "error",
+        "Invalid Date Approved",
+        "Please select a valid Date Approved (YYYY-MM-DD)."
+      );
+      return;
+    }
+    // Validation: Ensure the approver is the Chief Accountant
+    const chiefAccountantId = "HR-EMP-2025-f5eab3";
+    if (formData[4] !== chiefAccountantId) {
+      showValidationModal(
+        "error",
+        "Invalid Approver",
+        "Approval is restricted to the Chief Accountant (ID: HR-EMP-2025-f5eab3)."
+      );
+      return;
+    }
+    if (!formData[5]) {
+      showValidationModal(
+        "error",
+        "Missing Payment Method",
+        "Please select a Payment Method."
+      );
+      return;
     }
 
     const updatedFormData = [...formData];
-
-    if (isNewPayroll) {
-      if (!updatedFormData[5] && updatedFormData[4]) {
-        updatedFormData[5] = generateReferenceNumber(updatedFormData[4]);
-      }
-      if (updatedFormData[2]) {
-        updatedFormData[2] = `${updatedFormData[2]}T00:00:00Z`;
-      }
-    }
-
-    handleSubmit(updatedFormData, isNewPayroll);
+    handleSubmit(updatedFormData); // Pass the plain string for the date
   };
 
   if (!isModalOpen) return null;
+
+  const renderFormField = (header, index) => {
+    const isDisabled = !(index === 0 || index === 3 || index === 4 || index === 5);
+
+    if (header === "Date Approved") {
+      return (
+        <Forms
+          key={index}
+          type="date"
+          formName={header}
+          value={formData[index] || ""} // Pass the value directly
+          onChange={(e) => handleInputChange(index, e.target.value)} // Update formData with selected date
+          disabled={isDisabled}
+          required={true}
+        />
+      );
+    }
+
+    if (header === "Payroll Accounting ID" || header === "Payroll HR ID" || header === "Reference Number") {
+      return (
+        <Forms
+          key={index}
+          type="text"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={true}
+        />
+      );
+    }
+
+    if (header === "Approved By") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption={
+              isLoadingApprovers ? "Loading approvers..." : "Select approver..."
+            }
+            options={approvedByOptions}
+            value={formData[index] || ""}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled || isLoadingApprovers}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    if (header === "Payment Method") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select payment method..."
+            options={["Credit Card", "Bank Transfer", "Cash"]}
+            value={formData[index] || ""}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    if (header === "Status") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select status..."
+            options={["Processing", "Completed"]}
+            value={formData[index] || ""}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Forms
+        key={index}
+        type="text"
+        formName={header}
+        value={formData[index] || ""}
+        onChange={(e) => handleInputChange(index, e.target.value)}
+        disabled={isDisabled}
+      />
+    );
+  };
 
   return (
     <>
@@ -133,7 +257,7 @@ const PayrollModal = ({
         <div className="modal-overlay">
           <div className="modal-container">
             <div className="modal-header">
-              <h2>{isCreating ? "Create Payroll Record" : "Edit Payroll Record"}</h2>
+              <h2>Update Payroll Record</h2>
               <img
                 className="cursor-pointer hover:scale-110"
                 src="/accounting/Close.svg"
@@ -143,129 +267,45 @@ const PayrollModal = ({
             </div>
 
             <div className="modal-body">
-              {columnHeaders.map((header, index) => {
-                const isDisabled = isCreating
-                  ? header === "Payroll Accounting ID" || header === "Reference Number"
-                  : header !== "Status";
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[0] && renderFormField(columnHeaders[0], 0)}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[1] && renderFormField(columnHeaders[1], 1)}
+                </div>
+              </div>
 
-                if (header === "Date Approved" && isNewPayroll) {
-                  return (
-                    <Forms
-                      key={index}
-                      type="date"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[2] && renderFormField(columnHeaders[2], 2)}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[3] && renderFormField(columnHeaders[3], 3)}
+                </div>
+              </div>
 
-                if (header === "Payroll Accounting ID" || header === "Reference Number") {
-                  return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={true}
-                    />
-                  );
-                }
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[4] && renderFormField(columnHeaders[4], 4)}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[5] && renderFormField(columnHeaders[5], 5)}
+                </div>
+              </div>
 
-                if (header === "Payroll HR ID") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      {isNewPayroll ? (
-                        <Dropdown
-                          style="selection"
-                          defaultOption="Select Payroll HR ID..."
-                          options={payrollHrIds}
-                          value={formData[index]}
-                          onChange={(val) => handleInputChange(index, val)}
-                          disabled={isDisabled}
-                          required={true}
-                        />
-                      ) : (
-                        <Forms
-                          type="text"
-                          formName={header}
-                          value={formData[index]}
-                          onChange={(e) => handleInputChange(index, e.target.value)}
-                          disabled={isDisabled}
-                        />
-                      )}
-                    </div>
-                  );
-                }
-
-                if (header === "Approved By" && isNewPayroll) {
-                  return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      placeholder="Enter Approved By..."
-                      formName={header}
-                      value={formData[index]}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
-
-                if (header === "Payment Method" && isNewPayroll) {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select payment method..."
-                        options={["Credit Card", "Bank Transfer", "Cash"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={isDisabled}
-                        required={true}
-                      />
-                    </div>
-                  );
-                }
-
-                if (header === "Status") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select status..."
-                        options={["Processing", "Completed"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={isDisabled}
-                        required={true}
-                    />
-                    </div>
-                  );
-                }
-
-                return (
-                  <Forms
-                    key={index}
-                    type="text"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isDisabled}
-                  />
-                );
-              })}
+              <div className="mb-4">
+                {columnHeaders[6] && renderFormField(columnHeaders[6], 6)}
+              </div>
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer mt-5 flex justify-end space-x-3">
               <Button name="Cancel" variant="standard1" onclick={closeModal} />
-              <Button name="Submit" variant="standard2" onclick={handleFormSubmit} />
+              <Button
+                name="Submit"
+                variant="standard2"
+                onclick={handleFormSubmit}
+              />
             </div>
           </div>
         </div>

@@ -255,6 +255,8 @@ const OfficialReceipts = () => {
       if (field === "salesInvoiceId") {
         const selectedReceipt = receipts.find((r) => r.invoice_id === value);
         newForm.customerId = selectedReceipt?.customer_id || "SALES-CUST-2025";
+        newForm.totalAmount = selectedReceipt?.total_amount?.toString() || "";
+        newForm.amountDue = selectedReceipt?.amount_due?.toString() || "";
       }
       return newForm;
     });
@@ -371,7 +373,7 @@ const OfficialReceipts = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searching.toLowerCase().trim())
   );
 
   const handlePrintRow = (rowData) => {
@@ -388,76 +390,145 @@ const OfficialReceipts = () => {
             margin: 0.5in;
           }
           body {
-            font-family: Arial, sans-serif;
-            padding: 0;
-            margin: 0;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             background-color: #ffffff;
-            color: #333333;
+            color: #2c3e50;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
           }
           .container {
-            max-width: 100%;
             margin: 0 auto;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border-radius: 8px;
+            background-color: #fff;
           }
           .header {
-            border-bottom: 2px solid #0055a5;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            border-bottom: 3px solid #0055a5;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
           }
           .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0055a5;
+            width: 6rem;
+            height: auto;
           }
           .logo-subtitle {
-            font-size: 14px;
-            color: #777;
+            font-size: 15px;
+            color: #546e7a;
+            letter-spacing: 0.5px;
+            font-weight: 500;
           }
           .document-title {
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 25px 0;
             color: #0055a5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+          }
+          .document-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #0055a5;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 25px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
           }
           th, td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
             text-align: left;
           }
+          th {
+            background-color: #0055a5;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+          }
           tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
+          }
+          tr:hover {
+            background-color: #f1f7fd;
+          }
+          .receipt-number {
+            font-size: 16px;
+            color: #0055a5;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: right;
+          }
+          .summary-section {
+            margin-top: 30px;
+            background-color: #f8fbff;
+            border-left: 4px solid #0055a5;
+            padding: 15px;
+            border-radius: 4px;
+          }
+          .total-amount {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 600;
+            color: #0055a5;
+            margin: 15px 0;
           }
           .footer {
-            margin-top: 40px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
+            margin-top: 50px;
+            font-size: 13px;
             text-align: center;
-            font-size: 12px;
-            color: #777;
+            color: #607d8b;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+          }
+          .footer div {
+            margin: 5px 0;
           }
           .confidential {
             color: #cc0000;
-            font-stile: italic;
+            font-style: italic;
             margin-bottom: 10px;
+            font-weight: 500;
           }
           .watermark {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 0;
             width: 100%;
             text-align: center;
-            font-size: 100px;
-            color: rgba(0, 0, 0, 0.03);
+            font-size: 120px;
+            color: rgba(0, 85, 165, 0.03);
             transform: rotate(-45deg);
             z-index: -1;
+            font-weight: bold;
+          }
+          @media print {
+            .container {
+              box-shadow: none;
+              padding: 0;
+            }
+            body {
+              background-color: #fff;
+            }
           }
         </style>
       </head>
@@ -466,11 +537,16 @@ const OfficialReceipts = () => {
         <div class="container">
           <div class="header">
             <div>
-              <div class="logo">Kinetiq - PLM</div>
-              <div class="logo-subtitle">Medical Equipment Manufacturing Company.</div>
+              <img class="logo" src="../../public/images/kinetiq.png" alt="Kinetiq Logo" />
+              <div class="logo-subtitle">Medical Equipment Manufacturing Company</div>
+            </div>
+            <div style="text-align: right; font-size: 14px; color: #546e7a;">
+              <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})}</div>
             </div>
           </div>
-          <div class="document-title">OFFICIAL RECEIPT</div>
+          
+          <div class="document-title">Official Receipt</div>
+          
           <table>
             <tbody>
               ${columns.map((col, i) => `
@@ -481,9 +557,17 @@ const OfficialReceipts = () => {
               `).join('')}
             </tbody>
           </table>
+
           <div class="footer">
+            <div class="confidential">CONFIDENTIAL</div>
             <div>Kinetiq - PLM</div>
-            <div>Printed on ${new Date().toLocaleString()}</div>
+            <div>Generated on ${new Date().toLocaleString('en-US', {
+              month: 'long',
+              day: 'numeric', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</div>
           </div>
         </div>
         <script>
@@ -534,7 +618,7 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Create Receipt"
+              name="Update Receipt"
               variant="standard2"
               onclick={openModal}
             />

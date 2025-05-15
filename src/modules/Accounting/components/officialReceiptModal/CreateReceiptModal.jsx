@@ -11,7 +11,8 @@ const CreateReceiptModal = ({
   handleInputChange,
   handleSubmit,
   setValidation,
-  invoiceOptions, // Added prop for Sales Invoice ID dropdown
+  invoiceOptions,
+  invoices, // Added prop for invoice data
 }) => {
   const [bankAccounts, setBankAccounts] = useState([]);
   const [showBankInput, setShowBankInput] = useState(false);
@@ -110,7 +111,10 @@ const CreateReceiptModal = ({
         fetchData();
         setNewBankAccount({ accountName: "", accountCode: "" });
         setShowBankInput(false);
-        handleInputChange("bankAccount", data.account_name || newBankAccount.accountName);
+        handleInputChange(
+          "bankAccount",
+          data.account_name || newBankAccount.accountName
+        );
         setValidation({
           isOpen: true,
           type: "success",
@@ -145,74 +149,141 @@ const CreateReceiptModal = ({
             />
           </div>
           <div className="modal-body mt-4">
-            <div className="form-group">
-              <label>Created at..*</label>
-              <input
-                type="date"
-                value={reportForm.startDate}
-                onChange={(e) => handleInputChange("startDate", e.target.value)}
-              />
+            {/* Top row with date and created by */}
+            <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+              <div className="md:w-1/2">
+                <div className="form-group">
+                  <label>Created at..*</label>
+                  <input
+                    type="date"
+                    value={reportForm.startDate}
+                    onChange={(e) =>
+                      handleInputChange("startDate", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+              <div className="md:w-1/2">
+                <Forms
+                  type="text"
+                  formName="Created By*"
+                  placeholder="Created by..."
+                  value={reportForm.createdBy}
+                  disabled={true}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-y-1">
-              <Forms
-                type="text"
-                formName="Sales Invoice ID*"
-                placeholder="Enter sales invoice ID"
-                value={reportForm.salesInvoiceId}
-                onChange={(e) => handleInputChange("salesInvoiceId", e.target.value)}
-              />
-            </div>
-            <Forms
-              type="number"
-              formName="Total Amount*"
-              placeholder="Enter total amount"
-              value={reportForm.totalAmount}
-              onChange={(e) => handleInputChange("totalAmount", e.target.value)}
-            />
-            <Forms
-              type="number"
-              formName="Amount Due*"
-              placeholder="Enter amount due"
-              value={reportForm.amountDue}
-              onChange={(e) => handleInputChange("amountDue", e.target.value)}
-            />
-            <Forms
-              type="number"
-              formName="Amount Paid*"
-              placeholder="Enter Amount paid"
-              value={reportForm.amountPaid}
-              onChange={(e) => handleInputChange("amountPaid", e.target.value)}
-            />
 
-            <div className="flex flex-col md:flex-row md:space-x-5 space-y-5 md:space-y-0">
+            {/* Invoice ID section */}
+            <div className="mt-4">
               <div className="space-y-2">
                 <label className="block text-sm font-medium">
-                  Select Payment Method*
+                  Select Sales Invoice ID*
                 </label>
                 <Dropdown
                   style="selection"
-                  defaultOption="Select payment method..."
-                  options={["Cash", "Bank Transfer"]}
-                  value={reportForm.paymentMethod}
-                  onChange={(value) => {
-                    handleInputChange("paymentMethod", value);
-                    if (value !== "Bank Transfer") {
-                      handleInputChange("bankAccount", "");
-                    }
-                    if (value !== "Check") {
-                      handleInputChange("checkNumber", "");
-                    }
-                    if (value !== "Mobile Payment") {
-                      handleInputChange("transactionId", "");
-                    }
-                  }}
+                  defaultOption="Select invoice..."
+                  options={invoiceOptions}
+                  value={reportForm.salesInvoiceId}
+                  onChange={(value) => handleInputChange("salesInvoiceId", value)}
                 />
               </div>
+            </div>
 
+            {/* Amount sections in a row */}
+            <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mt-4">
+              <div className="md:w-1/3">
+                <Forms
+                  type="number"
+                  formName="Total Amount*"
+                  placeholder="Total amount"
+                  value={reportForm.totalAmount}
+                  disabled={true}
+                />
+              </div>
+              <div className="md:w-1/3">
+                <Forms
+                  type="number"
+                  formName="Amount Due*"
+                  placeholder="Amount due"
+                  value={reportForm.amountDue}
+                  disabled={true}
+                />
+              </div>
+              <div className="md:w-1/3">
+                <Forms
+                  type="number"
+                  formName="Amount Paid*"
+                  placeholder="Enter amount paid"
+                  value={reportForm.amountPaid}
+                  onChange={(e) =>
+                    handleInputChange("amountPaid", e.target.value)
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-10">
+              {/* Payment Method Section */}
+              <div className="mt-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">
+                    Select Payment Method*
+                  </label>
+                  <Dropdown
+                    style="selection"
+                    defaultOption="Select payment method..."
+                    options={["Cash", "Bank Transfer", "Check", "Mobile Payment"]}
+                    value={reportForm.paymentMethod}
+                    onChange={(value) => {
+                      handleInputChange("paymentMethod", value);
+                      if (value !== "Bank Transfer") {
+                        handleInputChange("bankAccount", "");
+                      }
+                      if (value !== "Check") {
+                        handleInputChange("checkNumber", "");
+                      }
+                      if (value !== "Mobile Payment") {
+                        handleInputChange("transactionId", "");
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Payment method specific fields */}
+              {reportForm.paymentMethod === "Check" && (
+                <div className="mt-4">
+                  <Forms
+                    type="text"
+                    formName="Check Number*"
+                    placeholder="Enter check number"
+                    value={reportForm.checkNumber}
+                    onChange={(e) =>
+                      handleInputChange("checkNumber", e.target.value)
+                    }
+                  />
+                </div>
+              )}
+
+              {reportForm.paymentMethod === "Mobile Payment" && (
+                <div className="mt-4">
+                  <Forms
+                    type="text"
+                    formName="Transaction ID*"
+                    placeholder="Enter transaction ID"
+                    value={reportForm.transactionId}
+                    onChange={(e) =>
+                      handleInputChange("transactionId", e.target.value)
+                    }
+                  />
+                </div>
+              )}
+
+              {/* Bank Transfer Section */}
               {reportForm.paymentMethod === "Bank Transfer" && (
-                <div className="md:w-2/3 border border-gray-300 rounded-lg p-4 bg-gray-100 space-y-4">
+                <div className="mt-4 border border-gray-300 rounded-lg p-4 bg-gray-100">
                   <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-x-6 text-sm">
-
                     <label className="flex items-center gap-x-2">
                       <input
                         type="radio"
@@ -232,84 +303,66 @@ const CreateReceiptModal = ({
                   </div>
 
                   {!showBankInput ? (
-                    <div>
+                    <div className="mt-3">
                       <label className="block text-sm font-medium mb-1">
                         Select Bank Account*
                       </label>
                       <Dropdown
                         style="selection"
                         defaultOption="Select bank account..."
-                        options={bankAccounts.map((account) => account.account_name)}
+                        options={bankAccounts.map(
+                          (account) => account.account_name
+                        )}
                         value={reportForm.bankAccount}
                         onChange={(value) => {
                           handleInputChange("bankAccount", value);
                         }}
-                    />
+                      />
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <Forms
-                        type="text"
-                        formName="Account Name*"
-                        placeholder="Enter account name"
-                        value={newBankAccount.accountName}
-                        onChange={(e) =>
-                          setNewBankAccount({
-                            ...newBankAccount,
-                            accountName: e.target.value,
-                          })
-                        }
-                      />
-                      <Forms
-                        type="text"
-                        formName="Account Code*"
-                        placeholder="Enter account code"
-                        value={newBankAccount.accountCode}
-                        onChange={(e) =>
-                          setNewBankAccount({
-                            ...newBankAccount,
-                            accountCode: e.target.value,
-                          })
-                        }
-                      />
-                      <Button
-                        name="Save Bank Account"
-                        variant="standard2"
-                        onclick={saveBankAccount}
-                      />
+                    <div className="mt-3">
+                      <div className="flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
+                        <div className="md:w-1/2">
+                          <Forms
+                            type="text"
+                            formName="Account Name*"
+                            placeholder="Enter account name"
+                            value={newBankAccount.accountName}
+                            onChange={(e) =>
+                              setNewBankAccount({
+                                ...newBankAccount,
+                                accountName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="md:w-1/2">
+                          <Forms
+                            type="text"
+                            formName="Account Code*"
+                            placeholder="Enter account code"
+                            value={newBankAccount.accountCode}
+                            onChange={(e) =>
+                              setNewBankAccount({
+                                ...newBankAccount,
+                                accountCode: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <Button
+                          name="Save Bank Account"
+                          variant="standard2"
+                          onclick={saveBankAccount}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
               )}
             </div>
-
-            {reportForm.paymentMethod === "Check" && (
-              <Forms
-                type="text"
-                formName="Check Number*"
-                placeholder="Enter check number"
-                value={reportForm.checkNumber}
-                onChange={(e) => handleInputChange("checkNumber", e.target.value)}
-              />
-            )}
-
-            {reportForm.paymentMethod === "Mobile Payment" && (
-              <Forms
-                type="text"
-                formName="Transaction ID*"
-                placeholder="Enter transaction ID"
-                value={reportForm.transactionId}
-                onChange={(e) => handleInputChange("transactionId", e.target.value)}
-              />
-            )}
-
-            <Forms
-              type="text"
-              formName="Created By*"
-              placeholder="Created by..."
-              value={reportForm.createdBy}
-              disabled={true}
-            />
           </div>
           <div className="modal-footer mt-5 flex justify-end space-x-3">
             <Button name="Cancel" variant="standard1" onclick={closeModal} />

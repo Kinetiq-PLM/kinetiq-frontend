@@ -9,7 +9,10 @@ const PayrollAccounting = () => {
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
   const [payrollData, setPayrollData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searching, setSearching] = useState("");
+  const [searchPayroll, setSearchPayroll] = useState("");
+  const [searchAccounting, setSearchAccounting] = useState("");
+  const [activeTab, setActiveTab] = useState("accounting"); // Default to accounting tab
+
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -74,7 +77,9 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
+        result.sort(
+          (a, b) => new Date(b.date_approved) - new Date(a.date_approved)
+        );
         const transformedData = result.map((item) => [
           item.status,
           item.payroll_accounting_id,
@@ -104,7 +109,9 @@ const PayrollAccounting = () => {
           item.reference_number,
         ]);
         setPayrollData(transformedData);
-        const hrIds = [...new Set(result.map((item) => item.payroll_hr_id).filter(Boolean))];
+        const hrIds = [
+          ...new Set(result.map((item) => item.payroll_hr_id).filter(Boolean)),
+        ];
         setPayrollHrIds(hrIds);
       } catch (error) {
         console.error("Error fetching payroll journal data:", error);
@@ -112,7 +119,8 @@ const PayrollAccounting = () => {
           isOpen: true,
           type: "error",
           title: "Error",
-          message: "Failed to fetch payroll journal data. Please try again later.",
+          message:
+            "Failed to fetch payroll journal data. Please try again later.",
         });
       } finally {
         setIsLoading(false);
@@ -126,7 +134,9 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
+        result.sort(
+          (a, b) => new Date(b.date_approved) - new Date(a.date_approved)
+        );
         const transformedData = result.map((item) => [
           item.status,
           item.payroll_accounting_id,
@@ -143,7 +153,8 @@ const PayrollAccounting = () => {
           isOpen: true,
           type: "error",
           title: "Error",
-          message: "Failed to fetch payroll accounting data. Please try again later.",
+          message:
+            "Failed to fetch payroll accounting data. Please try again later.",
         });
       } finally {
         setIsLoading(false);
@@ -208,70 +219,136 @@ const PayrollAccounting = () => {
               margin: 0.5in;
             }
             body {
-              font-family: Arial, sans-serif;
+              font-family: 'Segoe UI', Roboto, Arial, sans-serif;
               background-color: #ffffff;
-              color: #333;
+              color: #2c3e50;
+              line-height: 1.5;
+              margin: 0;
+              padding: 0;
             }
             .container {
               margin: 0 auto;
               width: 100%;
+              max-width: 1000px;
+              box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+              padding: 25px;
+              border-radius: 8px;
+              background-color: #fff;
             }
             .header {
-              border-bottom: 2px solid #0055a5;
-              padding-bottom: 15px;
-              margin-bottom: 25px;
+              border-bottom: 3px solid #0055a5;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
               display: flex;
               justify-content: space-between;
               align-items: center;
             }
             .logo {
-              font-size: 24px;
-              font-weight: bold;
-              color: #0055a5;
+              width: 6rem;
+              height: auto;
+            }
+            .logo-subtitle {
+              font-size: 15px;
+              color: #546e7a;
+              letter-spacing: 0.5px;
+              font-weight: 500;
             }
             .document-title {
               text-align: center;
-              font-size: 20px;
-              font-weight: bold;
-              margin: 20px 0;
+              font-size: 24px;
+              font-weight: 600;
+              margin: 25px 0;
               color: #0055a5;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              position: relative;
+            }
+            .document-title:after {
+              content: '';
+              position: absolute;
+              bottom: -10px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 80px;
+              height: 3px;
+              background-color: #0055a5;
             }
             table {
               width: 100%;
               border-collapse: collapse;
-              margin: 20px 0;
+              margin: 25px 0;
+              border-radius: 6px;
+              overflow: hidden;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             }
             th, td {
-              padding: 8px 12px;
-              border-bottom: 1px solid #ccc;
+              padding: 12px 15px;
+              border-bottom: 1px solid #e0e0e0;
               text-align: left;
             }
+            th {
+              background-color: #0055a5;
+              color: #ffffff;
+              font-weight: 600;
+              text-transform: uppercase;
+              font-size: 14px;
+              letter-spacing: 0.5px;
+            }
             tr:nth-child(even) {
-              background-color: #f9f9f9;
+              background-color: #f8f9fa;
+            }
+            tr:hover {
+              background-color: #f1f7fd;
             }
             .section-title {
-              font-size: 16px;
-              font-weight: bold;
-              margin-top: 30px;
-              border-bottom: 1px solid #0055a5;
+              font-size: 18px;
+              font-weight: 600;
+              margin-top: 35px;
+              margin-bottom: 15px;
+              padding-bottom: 10px;
+              border-bottom: 2px solid #0055a5;
               color: #0055a5;
             }
+            .section-title:before {
+              content: '';
+              position: absolute;
+              left: 0;
+              bottom: -2px;
+              width: 50px;
+              height: 2px;
+              background-color: #0098db;
+            }
             .footer {
-              margin-top: 40px;
-              font-size: 12px;
+              margin-top: 50px;
+              font-size: 13px;
               text-align: center;
-              color: #777;
+              color: #607d8b;
+              padding-top: 20px;
+              border-top: 1px solid #e0e0e0;
+            }
+            .footer div {
+              margin: 5px 0;
             }
             .watermark {
-              position: absolute;
+              position: fixed;
               top: 50%;
               left: 0;
               width: 100%;
               text-align: center;
-              font-size: 100px;
-              color: rgba(0, 0, 0, 0.03);
+              font-size: 120px;
+              color: rgba(0, 85, 165, 0.03);
               transform: rotate(-45deg);
               z-index: -1;
+              font-weight: bold;
+            }
+            @media print {
+              .container {
+                box-shadow: none;
+                padding: 0;
+              }
+              body {
+                background-color: #fff;
+              }
             }
           </style>
         </head>
@@ -279,26 +356,44 @@ const PayrollAccounting = () => {
           <div class="watermark">COPY</div>
           <div class="container">
             <div class="header">
-              <div class="logo">Kinetiq - PLM</div>
+              <div>
+                <img class="logo" src="../../public/images/kinetiq.png" alt="Kinetiq Logo" />
+                <div class="logo-subtitle">Medical Equipment Manufacturing Company</div>
+              </div>
+              <div style="text-align: right; font-size: 14px; color: #546e7a;">
+                <div><strong>Generated:</strong> ${new Date().toLocaleDateString(
+                  "en-US",
+                  { month: "long", day: "numeric", year: "numeric" }
+                )}</div>
+              </div>
             </div>
   
-            <div class="document-title">PAYROLL</div>
+            <div class="document-title">Payroll Report</div>
   
-            ${payrollJournalRow
-        ? `
+            ${
+              payrollJournalRow
+                ? `
                 <div class="section-title">Payroll Breakdown</div>
                 <table>
                   <tbody>
-                    ${payroll_columns.map((col, i) => renderRow(col, payrollJournalRow[i])).join("")}
+                    ${payroll_columns
+                      .map((col, i) => renderRow(col, payrollJournalRow[i]))
+                      .join("")}
                   </tbody>
                 </table>
                 `
-        : "<p><em>No payroll journal entry found for this accounting record.</em></p>"
-      }
+                : "<div style='padding: 20px; background-color: #f8f9fa; border-left: 4px solid #0055a5; border-radius: 4px;'><em>No payroll journal entry found for this accounting record.</em></div>"
+            }
   
             <div class="footer">
-              <div>Kinetiq - PLM</div>
-              <div>Printed on ${new Date().toLocaleString()}</div>
+              <div>Kinetiq - PLM - Confidential</div>
+              <div>Generated on ${new Date().toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</div>
             </div>
           </div>
   
@@ -314,8 +409,7 @@ const PayrollAccounting = () => {
     printWindow.document.close();
   };
 
-
-  const openModal = (row) => {
+  const handleOpenModal = (row) => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setModalOpen(true);
@@ -327,40 +421,24 @@ const PayrollAccounting = () => {
         status: updatedRow[0],
         payroll_accounting_id: updatedRow[1],
         payroll_hr_id: updatedRow[2],
-        employee_id: updatedRow[3],
-        pay_period_start: updatedRow[4],
-        pay_period_end: updatedRow[5],
-        employment_type: updatedRow[6],
-        base_salary: updatedRow[7],
-        overtime_hours: updatedRow[8],
-        overtime_pay: updatedRow[9],
-        holiday_pay: updatedRow[10],
-        bonus_pay: updatedRow[11],
-        thirteenth_month_pay: updatedRow[12],
-        total_bonuses: updatedRow[13],
-        gross_pay: updatedRow[14],
-        sss_contribution: updatedRow[15],
-        philhealth_contribution: updatedRow[16],
-        pagibig_contribution: updatedRow[17],
-        tax: updatedRow[18],
-        late_deduction: updatedRow[19],
-        absent_deduction: updatedRow[20],
-        undertime_deduction: updatedRow[21],
-        total_deductions: updatedRow[22],
-        net_pay: updatedRow[23],
-        date_approved: updatedRow[24],
-        reference_number: updatedRow[25],
+        date_approved: updatedRow[3],
+        approved_by: updatedRow[4],
+        payment_method: updatedRow[5],
+        reference_number: updatedRow[6],
       };
-
 
       console.log("Payload being sent to backend:", payload);
 
       const validStatuses = ["Processing", "Completed"];
       if (!validStatuses.includes(payload.status)) {
-        throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
+        throw new Error(
+          `Invalid status: ${
+            payload.status
+          }. Must be one of ${validStatuses.join(", ")}`
+        );
       }
 
-      const url = `${PAYROLL_JOURNAL_ENDPOINT}${payload.payroll_accounting_id}/`;
+      const url = `${PAYROLL_ACCOUNTING_ENDPOINT}${payload.payroll_accounting_id}/`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -373,7 +451,9 @@ const PayrollAccounting = () => {
 
       if (!response.ok) {
         console.error("Response Text:", responseText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${responseText}`
+        );
       }
 
       if (contentType && contentType.includes("application/json")) {
@@ -382,35 +462,16 @@ const PayrollAccounting = () => {
 
         setPayrollAccountingData((prevData) =>
           prevData.map((row) =>
-            row[0] === updatedRow[0]
+            row[1] === updatedRow[1] // Match on payroll_accounting_id
               ? [
-                newData.status,
-                newData.payroll_accounting_id,
-                newData.payroll_hr_id,
-                newData.employee_id,
-                newData.pay_period_start,
-                newData.pay_period_end,
-                newData.employment_type,
-                newData.base_salary,
-                newData.overtime_hours,
-                newData.overtime_pay,
-                newData.holiday_pay,
-                newData.bonus_pay,
-                newData.thirteenth_month_pay,
-                newData.total_bonuses,
-                newData.gross_pay,
-                newData.sss_contribution,
-                newData.philhealth_contribution,
-                newData.pagibig_contribution,
-                newData.tax,
-                newData.late_deduction,
-                newData.absent_deduction,
-                newData.undertime_deduction,
-                newData.total_deductions,
-                newData.net_pay,
-                newData.date_approved,
-                newData.reference_number
-              ]
+                  newData.status,
+                  newData.payroll_accounting_id,
+                  newData.payroll_hr_id,
+                  newData.date_approved,
+                  newData.approved_by,
+                  newData.payment_method,
+                  newData.reference_number,
+                ]
               : row
           )
         );
@@ -422,7 +483,9 @@ const PayrollAccounting = () => {
           message: "Payroll record updated successfully.",
         });
       } else {
-        throw new Error("Unexpected response format: Expected JSON but received HTML");
+        throw new Error(
+          "Unexpected response format: Expected JSON but received HTML"
+        );
       }
 
       setModalOpen(false);
@@ -437,12 +500,20 @@ const PayrollAccounting = () => {
     }
   };
 
-  const filteredData = payrollAccountingData.filter((row) =>
+  const filteredAccountingData = payrollAccountingData.filter((row) =>
     [row[0], row[1], row[2], row[3], row[4], row[5]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searchAccounting.toLowerCase().trim())
+  );
+
+  const filteredPayrollData = payrollData.filter((row) =>
+    [row[0], row[1], row[2], row[3], row[4], row[5]]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchPayroll.toLowerCase().trim())
   );
 
   const LoadingSpinner = () => (
@@ -456,46 +527,92 @@ const PayrollAccounting = () => {
     <div className="accountsPayable">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-          <h1 className="subModule-title">Payroll Accounting</h1>
+          <h1 className="subModule-title">Payroll Management</h1>
         </div>
 
-        <div className="parent-component-container">
-          <div className="component-container">
-            <Search
-              type="text"
-              placeholder="Search Record..."
-              value={searching}
-              onChange={(e) => setSearching(e.target.value)}
-            />
+        {/* Tab Navigation */}
+        <div className="tabs-container mb-4">
+          <div className="flex border-b w-fit">
+            <button
+              className={`py-2 px-6 mr-2 font-medium text-sm focus:outline-none cursor-pointer ${
+                activeTab === "accounting"
+                  ? "border-b-2 border-teal-500 text-teal-500"
+                  : "text-black hover:text-teal-500"
+              }`}
+              onClick={() => setActiveTab("accounting")}
+            >
+              Payroll Accounting
+            </button>
+            <button
+              className={`py-2 px-6 mr-2 font-medium text-sm focus:outline-none cursor-pointer ${
+                activeTab === "payroll"
+                  ? "border-b-2 border-teal-500 text-teal-600"
+                  : "text-black hover:text-teal-500"
+              }`}
+              onClick={() => setActiveTab("payroll")}
+            >
+              Payroll Details
+            </button>
           </div>
         </div>
 
-        <div className="title-subtitle-container">
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <Table
-              columns={payrollAccounting_columns}
-              data={filteredData}
-              handleEditRow={openModal}
-              showEditButton={true}
-            />
-          )}
-        </div>
+        {/* Accounting Tab Content */}
+        {activeTab === "accounting" && (
+          <>
+            <div className="parent-component-container">
+              <div className="component-container">
+                <Search
+                  type="text"
+                  placeholder="Search Accounting Record..."
+                  value={searchAccounting}
+                  onChange={(e) => setSearchAccounting(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="my-20"></div>
+            <div className="title-subtitle-container">
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Table
+                  columns={payrollAccounting_columns}
+                  data={filteredAccountingData}
+                  handleEditRow={handleOpenModal}
+                  showEditButton={true}
+                />
+              )}
+            </div>
+          </>
+        )}
 
-        <div className="title-subtitle-container">
-          <h1 className="subModule-title">Payroll</h1>
-        </div>
+        {/* Payroll Tab Content */}
+        {activeTab === "payroll" && (
+          <>
+            <div className="parent-component-container">
+              <div className="component-container">
+                <Search
+                  type="text"
+                  placeholder="Search Payroll Record..."
+                  value={searchPayroll}
+                  onChange={(e) => setSearchPayroll(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="title-subtitle-container">
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <Table columns={payroll_columns} data={payrollData} showPrintButton={true} handlePrintRow={handlePrintRow} />
-          )}
-        </div>
+            <div className="title-subtitle-container">
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Table
+                  columns={payroll_columns}
+                  data={filteredPayrollData}
+                  showPrintButton={true}
+                  handlePrintRow={handlePrintRow}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {modalOpen && (
@@ -506,9 +623,10 @@ const PayrollAccounting = () => {
             setModalOpen(false);
           }}
           selectedRow={selectedRow}
-          handleSubmit={(data) => handleEditSubmit(data)}
+          handleSubmit={handleEditSubmit}
           columnHeaders={payrollAccounting_columns}
           payrollHrIds={payrollHrIds}
+          isNewPayroll={true}
         />
       )}
 
