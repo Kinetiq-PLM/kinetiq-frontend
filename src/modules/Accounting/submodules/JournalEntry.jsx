@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
-import "../styles/JournalEntry.css";
-import "../styles/accounting-styling.css";
-import Button from "../components/button/Button";
-import Forms from "../components/forms/Forms";
+import AddAccountModal from "../components/journalEntryModal/AddAccountModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Dropdown from "../components/dropdown/Dropdown";
-import AddAccountModal from "../components/journalEntryModal/AddAccountModal";
+import React, { useState, useEffect } from "react";
+import Button from "../components/button/Button";
+import Forms from "../components/forms/Forms";
+import "../styles/accounting-styling.css";
+import "../styles/JournalEntry.css";
 import axios from "axios";
 
 const JournalEntry = () => {
-  const [totalDebit, setTotalDebit] = useState(0);
-  const [totalCredit, setTotalCredit] = useState(0);
-  const [journalOptions, setJournalOptions] = useState([]);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(null);
   const [isLoadingPayroll, setIsLoadingPayroll] = useState(false);
-
+  const [journalOptions, setJournalOptions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [totalCredit, setTotalCredit] = useState(0);
+  const [totalDebit, setTotalDebit] = useState(0);
   const [journalForm, setJournalForm] = useState({
     journalId: "",
     transactions: [
@@ -23,7 +22,6 @@ const JournalEntry = () => {
     ],
     description: "",
   });
-
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -31,6 +29,8 @@ const JournalEntry = () => {
     message: "",
   });
 
+
+  
   // API endpoints
   const API_URL =
     import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";

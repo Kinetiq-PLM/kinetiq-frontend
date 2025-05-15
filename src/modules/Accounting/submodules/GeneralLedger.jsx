@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import "../styles/accounting-styling.css";
-import Dropdown from "../components/dropdown/Dropdown";
-import Table from "../components/table/Table";
-import Search from "../components/search/Search";
-import NotifModal from "../components/modalNotif/NotifModal";
 import ReportModalInput from "../components/ReportModalInput";
+import NotifModal from "../components/modalNotif/NotifModal";
+import Dropdown from "../components/dropdown/Dropdown";
+import React, { useState, useEffect } from "react";
+import Search from "../components/search/Search";
+import Table from "../components/table/Table";
+import "../styles/accounting-styling.css";
 import axios from "axios";
 
 const BodyContent = () => {
-  const [activeTab, setActiveTab] = useState("General Ledger");
-  const [data, setData] = useState([]);
   const [defaultSortedData, setDefaultSortedData] = useState([]);
+  const [activeTab, setActiveTab] = useState("General Ledger");
   const [dateSortOption, setDateSortOption] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOption, setSortOption] = useState("");
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [scopedData, setScopedData] = useState(null);
+  const [data, setData] = useState([]);
   const [reportForm, setReportForm] = useState({
     startDate: "",
     endDate: "",
@@ -33,6 +33,9 @@ const BodyContent = () => {
     message: "",
   });
 
+
+
+  // Table Columns
   const columns = [
     "Entry Line ID",
     "GL Account ID",
@@ -44,17 +47,26 @@ const BodyContent = () => {
     "Description",
   ];
 
+
+
+  // API Fetching
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
 
+
+
+  // Functions: Modal open and Close
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
     setScopedData(null);
   };
 
+
+
+  // Function: Fetching Data from API
   const fetchData = async () => {
     try {
       const response = await axios.get(ENDPOINT);
@@ -86,6 +98,9 @@ const BodyContent = () => {
     }
   };
 
+
+
+  // Sorting: Fetch all data and sort it
   const fetchAllData = async () => {
     setIsLoading(true);
     const generalLedger = await fetchData();
@@ -101,6 +116,9 @@ const BodyContent = () => {
     fetchAllData();
   }, []);
 
+
+
+  // Function: Computing the net balance of the accounts after journal entry 
   const computeNetBalances = (entries) => {
     const accountSums = {};
 
@@ -121,6 +139,9 @@ const BodyContent = () => {
     }));
   };
 
+
+
+  // Function: Filtering the Accounts by account name
   const filterByActiveTab = () => {
     if (activeTab === "Accounts Payable") {
       const relevantJournalIds = new Set(
@@ -149,8 +170,14 @@ const BodyContent = () => {
     return data;
   };
 
+
+
+  // Function: Filtering the data
   const getCurrentTabData = () => scopedData || filterByActiveTab();
 
+
+
+  // Sorting: Handles sorting of debit and credit
   const handleSort = (selected) => {
     setSortOption(selected);
     const currentData = getCurrentTabData();
@@ -171,6 +198,9 @@ const BodyContent = () => {
     }
   };
 
+
+
+  // Sorting: Handles sorting for date
   const handleDateSort = (selected) => {
     setDateSortOption(selected);
     const currentData = getCurrentTabData();
@@ -184,6 +214,9 @@ const BodyContent = () => {
     setData(sorted);
   };
 
+
+
+  // Function: Searching function
   const filteredData = getCurrentTabData().filter((item) => {
     const searchContent = [
       item.entryLineId,
@@ -201,6 +234,9 @@ const BodyContent = () => {
     return searchContent.includes(searching.trim().toLowerCase());
   });
 
+
+
+  // Netbalance
   const netBalances = computeNetBalances(filteredData);
 
   const accountsPayableNet = netBalances
@@ -228,9 +264,15 @@ const BodyContent = () => {
     0
   );
 
+
+
+  // Number formatter with comma
   const formatNumber = (num) =>
     num.toLocaleString("en-US", { minimumFractionDigits: 2 });
 
+
+
+  // Loading
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -241,9 +283,14 @@ const BodyContent = () => {
   return (
     <div className="generalLedger">
       <div className="body-content-container">
+
+        {/* Title */}
         <div className="title-subtitle-container">
           <h1 className="subModule-title">{activeTab}</h1>
 
+
+
+          {/* General Ledger Tabs: Accounts payable and receivables */}
           <div className="flex border-b-2 border-gray-400 w-fit">
             {["General Ledger", "Accounts Payable", "Accounts Receivable"].map(
               (tab) => (
@@ -266,13 +313,15 @@ const BodyContent = () => {
           </div>
         </div>
 
+
+
         {/* Components: Dropdown and Search */}
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
               options={["Ascending", "Descending"]}
               style="selection"
-              defaultOption="Sort by Debit + Credit"
+              defaultOption="Sort by Debit and Credit"
               value={sortOption}
               onChange={handleSort}
             />
@@ -294,9 +343,10 @@ const BodyContent = () => {
           </div>
         </div>
 
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
+
+
+        {/* Table Component */}
+        {isLoading ? (<LoadingSpinner />) : (
           <>
             <Table
               data={filteredData.map((item) => [
@@ -312,6 +362,9 @@ const BodyContent = () => {
               columns={columns}
             />
 
+
+
+            {/* Debit and Credit: Total for each Tab */}
             <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light text-sm">
               <div className="col-span-3" />
 
@@ -364,6 +417,9 @@ const BodyContent = () => {
         handleSubmit={() => {}}
       />
 
+
+      
+      {/* User Validation Modal */}
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}
