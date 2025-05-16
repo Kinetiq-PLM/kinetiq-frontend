@@ -247,7 +247,7 @@ const Packing = () => {
       }
       
       // For other status changes, just update with what we have
-      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
+      const response = await fetch(`http://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

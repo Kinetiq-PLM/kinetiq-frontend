@@ -10,8 +10,8 @@ const DeliveryReceipt = ({ deliveryData = {} }) => {
     const fetchData = async () => {
       try {
         const [carriersResponse, employeesResponse] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/carriers/'),
-          fetch('http://127.0.0.1:8000/api/carrier-employees/')
+          fetch('http://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/'),
+          fetch('http://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carrier-employees/')
         ]);
         
         const carriersData = await carriersResponse.json();
