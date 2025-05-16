@@ -132,7 +132,7 @@ export default function StandaloneLogin() {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     localStorage.setItem("reset_code", code);
     localStorage.setItem("reset_email", email);
-    console.log("Generated code:", code);
+    //console.log("Generated code:", code);
     
     const templateStr = isConfirmCode
     ? "confirm_code_template"
