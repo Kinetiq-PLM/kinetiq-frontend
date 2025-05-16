@@ -134,6 +134,7 @@ export default function StandaloneLogin() {
     localStorage.setItem("reset_email", email);
     //console.log("Generated code:", code);
     
+    console.log(`${kinetiq_email}`)
     const templateStr = isConfirmCode
     ? "confirm_code_template"
     : "reset_code_template";
@@ -307,7 +308,7 @@ export default function StandaloneLogin() {
                         return;
                       }
                       setLoginError(""); // clear any old error
-                      generateAndSendCode(resetData.valid_email, resetData.kinetiq_email, true); // send the code to the email
+                      generateAndSendCode(resetData.valid_email, credentials.email, true); // send the code to the email
                       setView("mfaVerify");
                     
                     }}
