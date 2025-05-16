@@ -254,13 +254,36 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
-  height: 220px;
+  height: 500px;
   overflow: hidden;
 }
 
 .purch-chart-left{
     flex: 1;
-} 
+}
+
+.purch-chart-scrollable {
+  overflow-y: auto;
+  max-height: 450px;
+}
+
+.purch-chart-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.purch-chart-scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.purch-chart-scrollable::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.purch-chart-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
 
 .purch-chart-right {
     flex: 1;
@@ -332,8 +355,30 @@
   border: 1px solid #eee;
 }
 
-.purch-table {
+.purch-table-wrapper {
   margin-top: 1rem;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.purch-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.purch-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.purch-table-wrapper::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.purch-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
 
 .purch-table table {
@@ -370,18 +415,7 @@
   flex: 1;
 }
 
-.purch-leave-requests {
-  width: 99%;
-  margin-top: 2rem;
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  border: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+
 
 .purch-section-title {
   font-size: 1.2rem;
@@ -399,60 +433,9 @@
   border: 1px solid #eee;
 }
 
-.purch-leave-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  table-layout: fixed;
-}
 
-.purch-leave-table th,
-.purch-leave-table td {
-  padding: 0.75rem 1rem;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-}
 
-.purch-leave-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  text-align: center;
-}
 
-.purch-leave-table tr:last-child td {
-  border-bottom: none;
-}
-
-.purch-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.purch-badge.vacation {
-  background-color: #e0f2fe;
-  color: #0369a1;
-}
-
-.purch-badge.sick {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.purch-badge.approved {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.purch-badge.rejected {
-  background-color: #fee2e2;
-  color: #b91c1c;
-}
 
 .stats {
     display: flex;
