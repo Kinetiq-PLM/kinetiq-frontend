@@ -134,7 +134,7 @@ export default function StandaloneLogin() {
     localStorage.setItem("reset_email", email);
     //console.log("Generated code:", code);
     
-    console.log(`${kinetiq_email}`)
+    console.log(`KINETIQ EMAIL :${kinetiq_email}`)
     const templateStr = isConfirmCode
     ? "confirm_code_template"
     : "reset_code_template";
@@ -145,7 +145,7 @@ export default function StandaloneLogin() {
         email: email,
         kinetiq_email: kinetiq_email,
       });
-      console.log(`${templateStr} sent succe  ssfully! to: ${email} `);
+      console.log(`${templateStr} sent successfully! to: ${email} for ${kinetiq_email} `);
       
     } catch (err) {
       console.error("Failed to send email:", err);
