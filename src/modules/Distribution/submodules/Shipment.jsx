@@ -114,7 +114,7 @@ const Shipment = () => {
     const fetchEmployees = async () => {
       try {
         // Use the carrier-specific endpoint instead of the general employees endpoint
-        const response = await fetch('http://127.0.0.1:8000/api/carrier-employees/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carrier-employees/');
         
         if (!response.ok) {
           const errorData = await response.json();

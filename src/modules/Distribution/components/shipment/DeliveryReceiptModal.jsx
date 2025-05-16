@@ -35,14 +35,14 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
         setError(null);
         
         // Fetch employees
-        const employeesResponse = await fetch('http://127.0.0.1:8000/api/employees/');
+        const employeesResponse = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
         if (employeesResponse.ok) {
           const employeesData = await employeesResponse.json();
           setAllEmployees(employeesData);
         }
         
         // Fetch carriers
-        const carriersResponse = await fetch('http://127.0.0.1:8000/api/carriers/');
+        const carriersResponse = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/');
         if (carriersResponse.ok) {
           const carriersData = await carriersResponse.json();
           setAllCarriers(carriersData);
@@ -53,7 +53,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
         }
         
         // Fetch delivery receipt
-        const deliveryReceiptResponse = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
+        const deliveryReceiptResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
         if (!deliveryReceiptResponse.ok) {
           const errorData = await deliveryReceiptResponse.json();
           throw new Error(errorData.detail || 'Failed to fetch delivery receipt');
@@ -84,7 +84,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
   // Function to fetch customer name
   const fetchCustomerName = async (customerId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/customers/${customerId}/`);
       if (!response.ok) {
         setCustomerName(`Customer ${customerId}`);
         return;
