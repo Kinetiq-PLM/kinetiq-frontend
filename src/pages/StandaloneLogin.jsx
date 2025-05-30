@@ -98,8 +98,8 @@ export default function StandaloneLogin() {
         //console.log("Login successful:", data);
         //localStorage.setItem("user", JSON.stringify(data.data));
         setLoginError("");
-        //setView("mfa");
-        navigate("/");
+        setView("mfa");
+        //navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
