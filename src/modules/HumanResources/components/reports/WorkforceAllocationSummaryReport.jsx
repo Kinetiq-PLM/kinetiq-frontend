@@ -48,9 +48,9 @@ const WorkforceAllocationSummaryReport = ({ allocations: propsAllocations = [], 
       try {
         console.log("Fetching workforce allocation data...");
         const [allocationsRes, employeesRes, deptsRes] = await Promise.all([
-          axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/"),
-          axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
-          axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
+          axios.get("http://127.0.0.1:8001/api/workforce_allocation/workforce_allocations/"),
+          axios.get("http://127.0.0.1:8001/api/employees/"),
+          axios.get("http://127.0.0.1:8001/api/departments/department/")
         ]);
         
         setAllocations(allocationsRes.data || []);

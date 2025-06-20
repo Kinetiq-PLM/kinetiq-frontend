@@ -89,7 +89,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/"
+          "http://127.0.0.1:8001/api/calendar_dates/calendar_dates/"
         );
         setCalendarData(data);
         setError(null);
@@ -109,7 +109,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       try {
         // Fetch interviews
         const interviewsResponse = await axios.get(
-          "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/"
+          "http://127.0.0.1:8001/api/interviews/"
         );
         
         console.log("Interviews API response:", interviewsResponse.data);
@@ -135,7 +135,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         
         // Fetch leave requests
         const leavesResponse = await axios.get(
-          "https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/"
+          "http://127.0.0.1:8001/api/employee_leave_requests/leave_requests/"
         );
         setLeaves(leavesResponse.data);
         

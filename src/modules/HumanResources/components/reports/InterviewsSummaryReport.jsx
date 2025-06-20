@@ -15,7 +15,7 @@ const InterviewsSummaryReport = ({ interviews = [] }) => {
     const fetchInterviews = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/interviews/');
+        const response = await axios.get('http://127.0.0.1:8001/api/interviews/');
         console.log("Interview data fetched:", response.data);
         setInterviewData(response.data);
         setError(null);

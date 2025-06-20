@@ -74,8 +74,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
-        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/archived/"),
+        axios.get("http://127.0.0.1:8001/api/departments/department/"),
+        axios.get("http://127.0.0.1:8001/api/departments/department/archived/"),
       ]);
       setDepartments(activeRes.data);
       setArchivedDepartments(archivedRes.data);
@@ -94,8 +94,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/"),
-        axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/archived/"),
+        axios.get("http://127.0.0.1:8001/api/department_superiors/department-superiors/"),
+        axios.get("http://127.0.0.1:8001/api/department_superiors/department-superiors/archived/"),
       ]);
       setSuperiors(activeRes.data);
       setArchivedSuperiors(archivedRes.data);
@@ -113,7 +113,7 @@ const Departments = () => {
   const fetchPositions = async () => {
     try {
       // const res = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/admin/positions/position/");
-      const res = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/");
+      const res = await axios.get("http://127.0.0.1:8001/api/positions/positions/");
       setPositions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Fetch positions error:", err);
@@ -207,7 +207,7 @@ const Departments = () => {
     try {
       // If your backend auto-generates dept_id, you can just pass dept_name
       // await axios.post("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/admin/departments/department/", { dept_name: newDeptName });
-      await axios.post("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/", { dept_name: newDeptName });
+      await axios.post("http://127.0.0.1:8001/api/departments/department/", { dept_name: newDeptName });
       setShowDeptModal(false);
       showToast("Department added successfully");
       fetchDepartments();
@@ -228,7 +228,7 @@ const Departments = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${editingDept.dept_id}/`, {
+      await axios.patch(`http://127.0.0.1:8001/api/departments/department/${editingDept.dept_id}/`, {
         dept_name: editingDept.dept_name,
       });
       setShowEditModal(false);
@@ -244,7 +244,7 @@ const Departments = () => {
   const handleDeptArchive = async (id) => {
     if (!window.confirm("Archive this department?")) return;
     try {
-      await axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8001/api/departments/department/${id}/archive/`);
       showToast("Department archived successfully");
       fetchDepartments();
     } catch (err) {
@@ -259,7 +259,7 @@ const Departments = () => {
   };
   const handleDeptUnarchive = async (id) => {
     try {
-      await axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8001/api/departments/department/${id}/unarchive/`);
       setShowConfirmUnarchive(null);
       showToast("Department unarchived successfully");
       fetchDepartments();
@@ -278,7 +278,7 @@ const Departments = () => {
   const bulkUnarchive = async () => {
     try {
       await Promise.all(
-        selectedArchived.map((id) => axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/unarchive/`))
+        selectedArchived.map((id) => axios.post(`http://127.0.0.1:8001/api/departments/department/${id}/unarchive/`))
       );
       showToast("Departments unarchived successfully");
       setSelectedArchived([]);
@@ -312,7 +312,7 @@ const Departments = () => {
         is_archived: false
       };
 
-      await axios.post("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/", formData);
+      await axios.post("http://127.0.0.1:8001/api/department_superiors/department-superiors/", formData);
       
       setShowSuperiorModal(false);
       showToast("Department superior added successfully");
@@ -343,7 +343,7 @@ const Departments = () => {
       };
 
       await axios.patch(
-        `https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${editingSuperior.dept_superior_id}/`,
+        `http://127.0.0.1:8001/api/department_superiors/department-superiors/${editingSuperior.dept_superior_id}/`,
         formData
       );
       setShowEditSuperiorModal(false);
@@ -365,7 +365,7 @@ const Departments = () => {
 
     if (!window.confirm("Archive this department superior?")) return;
     try {
-      await axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8001/api/department_superiors/department-superiors/${id}/archive/`);
       showToast("Department superior archived successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
@@ -380,7 +380,7 @@ const Departments = () => {
   };
   const handleSuperiorUnarchive = async (id) => {
     try {
-      await axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8001/api/department_superiors/department-superiors/${id}/unarchive/`);
       setShowConfirmUnarchiveSuperior(null);
       showToast("Department superior unarchived successfully");
       fetchDepartmentSuperiors();
@@ -400,7 +400,7 @@ const Departments = () => {
     try {
       await Promise.all(
         selectedSuperiorArchived.map((id) =>
-          axios.post(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8001/api/department_superiors/department-superiors/${id}/unarchive/`)
         )
       );
       showToast("Department superiors unarchived successfully");

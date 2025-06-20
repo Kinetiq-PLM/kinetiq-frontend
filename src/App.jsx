@@ -1,4 +1,3 @@
-
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
@@ -20,8 +19,18 @@ function App() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMainModuleCollapsed, setIsMainModuleCollapsed] = useState(true);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Mock user with full permissions - bypassing login
+  const [user, setUser] = useState({
+    user_id: "mock_user_123",
+    employee_id: "EMP001",
+    first_name: "Demo",
+    last_name: "User",
+    role: {
+      role_name: "Administrator",
+      permissions: "All" // Full access to all modules
+    }
+  });
+  const [loading, setLoading] = useState(false); // Set to false since we're bypassing login
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [notifs, setNotifs] = useState([]);
 
@@ -35,33 +44,6 @@ function App() {
   // landing page
   const [showLanding, setShowLanding] = useState(true);
 
-  // log out at time out
-  useEffect(() => {
-    let logoutTimeout;
-
-    const resetTimeout = () => {
-      if (logoutTimeout) clearTimeout(logoutTimeout);
-      logoutTimeout = setTimeout(() => {
-        console.log("No activity detected for 10 minutes. Logging out.");
-        handleLogout();
-      }, 30 * 60 * 1000); // 30 minutes
-    };
-
-    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
-    activityEvents.forEach(event =>
-      window.addEventListener(event, resetTimeout)
-    );
-
-    resetTimeout();
-
-    return () => {
-      clearTimeout(logoutTimeout);
-      activityEvents.forEach(event =>
-        window.removeEventListener(event, resetTimeout)
-      );
-    };
-  }, []);
-
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
@@ -73,41 +55,32 @@ function App() {
 
   const navigate = useNavigate();
 
+  // Removed authentication check - bypassing login
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    // Load any stored module/submodule state
+    const storedModule = localStorage.getItem("activeModule");
+    const storedSubModule = localStorage.getItem("activeSubModule");
+    const storedShowUserProfile = localStorage.getItem("showUserProfile");
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      console.log("User data loaded from localStorage:");
-      console.log(localStorage.getItem("user"));
-
-      const storedModule = localStorage.getItem("activeModule");
-      const storedSubModule = localStorage.getItem("activeSubModule");
-      const storedShowUserProfile = localStorage.getItem("showUserProfile");
-
-      if (storedShowUserProfile === "true") {
-        setShowUserProfile(true);
-        setActiveModule(null);
-        setActiveSubModule(null);
-      } else if (storedModule) {
-        setActiveModule(storedModule);
-        if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
-      }
-    } else {
-      setUser(null);
-      navigate("/login", { replace: true }); // redirect to login if no user found
+    if (storedShowUserProfile === "true") {
+      setShowUserProfile(true);
+      setActiveModule(null);
+      setActiveSubModule(null);
+    } else if (storedModule) {
+      setActiveModule(storedModule);
+      if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
     }
-
   }, []);
 
-
+  // Simplified logout function - just clears state without redirecting
   const handleLogout = () => {
-    localStorage.removeItem("user");   // clear saved session
     localStorage.removeItem("activeModule");
     localStorage.removeItem("activeSubModule");
     localStorage.removeItem("showUserProfile");
-    setUser(null);   // clear local user state 
-    navigate("/login");  // redirect to login
+    setActiveModule(null);
+    setActiveSubModule(null);
+    setShowUserProfile(false);
+    setShowLanding(true);
   };
 
   const toggleProfileMenu = () => {
@@ -152,58 +125,33 @@ function App() {
   }, [notifOpen]);
 
 
-  //fetch notifs
+  //fetch notifs - bypassed for demo mode
   const fetchNotifs = async (user) => {
-    console.log("Fetching notifs...")
-    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
-    // const resp_text = await resp.text()
-    // console.log("resp text")
-    // console.log(resp_text)
-    const resp_data = await resp.json();
-    const notif_items = resp_data.data
-    console.log("Notifs fetched:")
-    console.log(notif_items)
-    var temp_list = []
-    //populate notifs table
-    notif_items.map((notif_item, i) => {
-      origin = notif_item.module.split(/\/(.*)/s)
-      const orig_module = origin[0]
-      const orig_submodule = origin.length == 2 ? origin[1] : null
-      const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      temp_list[i] = {
-        id: notif_item.notifications_id,
-        msg: notif_item.message,
-        orig_module: orig_module,
-        orig_submodule: orig_submodule,
-        read: notif_item.notifications_status == 'Read',
-        time: time_formatted
+    console.log("Fetching notifs... (bypassed in demo mode)")
+    // Skip actual API call in demo mode
+    // Set some mock notifications for demo purposes
+    const temp_list = [
+      {
+        id: 1,
+        msg: "Demo notification - System is running in demo mode",
+        orig_module: "Administration",
+        orig_submodule: "User",
+        read: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
-    })
-    setNotifs(temp_list)
-    console.log('Final notif list:')
-    console.log(temp_list)
-
-    //notif icon toggle (for loop so we can break out)
-    for (var i = 0; i < temp_list.length; ++i) {
-      if (temp_list[i].read == false) {
-        console.log('found notif')
-        setHasNotification(true)
-        break
-      }
-    }
+    ];
+    
+    setNotifs(temp_list);
+    console.log('Demo notif list:', temp_list);
+    
+    // Set notification indicator for demo
+    setHasNotification(true);
   }
 
-  //func for marking notifs as read
+  //func for marking notifs as read - bypassed for demo mode
   const readNotif = async (notif_id) => {
-    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        notifications_id: notif_id
-      })
-    })
+    console.log(`Marking notification ${notif_id} as read (bypassed in demo mode)`);
+    // Skip actual API call in demo mode
   }
 
   //get notifs
@@ -245,51 +193,6 @@ function App() {
       iconsRef.current.scrollTop = descsRef.current.scrollTop;
     }
   };
-
-  // const loadMainModule = (moduleId) => {
-  //   if (moduleFileNames[moduleId] && !activeSubModule) {
-  //     const LazyComponent = lazy(() =>
-  //       import(
-  //         /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-  //       )
-  //     );
-
-  //     const WrappedComponent = () => (
-  //       <LazyComponent
-  //         loadSubModule={loadSubModule}
-  //         setActiveSubModule={setActiveSubModule}
-  //         user_id={user?.user_id}
-  //         employee_id={user?.employee_id}
-  //       />
-  //     );
-
-  //     setModuleComponent(() => WrappedComponent);
-  //     setShowUserProfile(false);
-  //   }
-  // };
-
-  // const loadSubModule = (submoduleId, mainModule = activeModule) => {
-  //   if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
-  //     const LazyComponent = lazy(() =>
-  //       import(
-  //         /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
-  //       )
-  //     );
-
-  //     const WrappedComponent = () => (
-  //       <LazyComponent
-  //         loadSubModule={loadSubModule}
-  //         setActiveSubModule={setActiveSubModule}
-  //         user_id={user?.user_id}
-  //         employee_id={user?.employee_id}
-  //       />
-  //     );
-  //     setModuleComponent(() => WrappedComponent);
-
-  //     setShowUserProfile(false);
-  //   }
-  // };
-
 
   const mainModules = import.meta.glob('./modules/*/*.jsx');
   const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
@@ -489,34 +392,17 @@ function App() {
 
 
 
-  const rawPermissions = user?.role?.permissions || "";
-  const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  // Bypass permissions - allow access to all modules
+  const rawPermissions = user?.role?.permissions || "All";
   console.log('raw permissions...')
   console.log(rawPermissions)
-  console.log("allowed modules...")
-  console.log(allowedModules)
+  
+  // Grant access to all modules and submodules
+  const filteredModuleFileNames = rawPermissions === "All" ? 
+    moduleSubmoduleFileNames : 
+    moduleSubmoduleFileNames; // Always use all modules
 
-  const filteredModuleFileNames = {};
-
-  allowedModules.forEach((permission) => {
-    const [main, sub] = permission.split(/\/(.*)/s)
-    console.log('perms main: ' + main)
-    console.log('params sub: ' + sub)
-    if (!filteredModuleFileNames[main]) {
-      filteredModuleFileNames[main] = {};
-    }
-
-    if (!sub) {
-      console.log('including all submodules of ' + main)
-      filteredModuleFileNames[main] = {
-        ...moduleSubmoduleFileNames[main]
-      }
-    } else {
-      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
-    }
-  });
-
-  console.log('filtered modules...')
+  console.log('filtered modules (all accessible)...')
   console.log(filteredModuleFileNames)
   /*
     const filteredModuleFileNames = allowedModules.includes("All")

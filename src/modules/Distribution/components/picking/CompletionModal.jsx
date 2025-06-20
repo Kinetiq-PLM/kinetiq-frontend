@@ -30,7 +30,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
     if (!orderID) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-notes/order/${orderID}/`);
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-notes/order/${orderID}/`);
       
       if (response.ok) {
         const data = await response.json();

@@ -23,7 +23,7 @@ useEffect(() => {
 
     // Otherwise fetch from API
     try {
-      const response = await axios.get("https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_salary/employee_salary/");
+      const response = await axios.get("http://127.0.0.1:8001/api/employee_salary/employee_salary/");
       console.log("Salary API response:", response.data);
       
       // Make sure we're properly handling the API response format
@@ -39,7 +39,7 @@ useEffect(() => {
       
       for (const employeeId of employeeIds) {
         try {
-          const empRes = await axios.get(`https://1wj5891jxg.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employeeId}/`);
+          const empRes = await axios.get(`http://127.0.0.1:8001/api/employees/${employeeId}/`);
           typesObj[employeeId] = empRes.data.employment_type;
         } catch (err) {
           console.error(`Failed to fetch employment type for ${employeeId}:`, err);

@@ -57,7 +57,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     if (!orderID) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-notes/order/${orderID}/`);
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-notes/order/${orderID}/`);
       
       if (response.ok) {
         const data = await response.json();
@@ -433,12 +433,12 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
       setLoading(true);
       
       // First try to get existing items
-      let response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/items/`);
+      let response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
       let data = await response.json();
       
       // If no items exist yet, create them
       if (!response.ok || data.length === 0) {
-        const createResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
+        const createResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
           method: 'POST'
         });
         
@@ -451,7 +451,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         await new Promise(resolve => setTimeout(resolve, 300));
         
         // Fetch again after creating
-        response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/items/`);
+        response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
         
         // Check if we received items with names
         data = await response.json();
@@ -459,7 +459,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         // If we still have missing data, fetch one more time after a delay
         if (data.length > 0 && data.some(item => !item.item_name || !item.warehouse_name)) {
           await new Promise(resolve => setTimeout(resolve, 700));
-          response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/items/`);
+          response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
           data = await response.json();
         }
       }
@@ -493,7 +493,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
       // Check if employee has changed but hasn't been saved
       if (selectedEmployee !== pickingList.picked_by) {
         // First save the employee change
-        const saveResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/update/`, {
+        const saveResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/update/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -515,7 +515,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
       // Check if the picking list is still in "Not Started" status
       // If so, automatically update to "In Progress" first
       if (pickingList.picked_status === 'Not Started') {
-        const statusUpdateResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/update/`, {
+        const statusUpdateResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/update/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -541,7 +541,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
       }
       
       // Now update the item status - THIS IS THE MAIN FIX - METHOD NEEDS TO BE PUT
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-items/${item.picking_item_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-items/${item.picking_item_id}/update/`, {
         method: 'PUT', // CHANGED: Added method: 'PUT' here - this was missing!
         headers: {
           'Content-Type': 'application/json',
